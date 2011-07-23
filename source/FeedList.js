@@ -8,7 +8,7 @@ enyo.kind({
     {kind: enyo.Header, style: "min-height: 60px;", name: "feedListHeader", content: "Discover"},
     {kind: enyo.Scroller, flex: 1, components: [
       {kind: enyo.VirtualRepeater, name: "feedList", onSetupRow: "getFeed", components: [
-        {kind: enyo.SwipeableItem, onConfirm: "deleteFeed", layoutKind: enyo.HFlexLayout, tapHighlight: true, onclick: "highlight", components: [
+        {kind: enyo.SwipeableItem, onConfirm: "deleteFeed", layoutKind: enyo.HFlexLayout, tapHighlight: true, components: [
           {name: "listItemTitle", content: ""}
         ]}
       ]}
@@ -28,6 +28,10 @@ enyo.kind({
              title: "Linux Outlaws",
              url: "???"
          });
+      this.feedList.push({
+             title: "TLTS",
+             url: "???"
+         });
     } else {
       this.feedList = JSON.parse(this.feedList);
       this.$.feedList.render();
@@ -44,7 +48,13 @@ enyo.kind({
   },
   
   highlight: function(inSender, inEvent) {
-    // TODO How to highlight an item?
+    if (this.formerHighlight != undefined) {
+      this.formerHighlight.parent.setStyle("color: black; background: green; font-weight: normal;");
+    }
+    
+    //this.$.listItemTitle.parent.setStyle("color: red; background: blue; font-weight: bold;");
+    this.$.listItemTitle.parent.setClassName("selected");
+    this.formerHighlight = this.$.listItemTitle;
   },
   
   addFeed: function() {

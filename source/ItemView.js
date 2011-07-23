@@ -8,9 +8,28 @@ enyo.kind({
          {kind: enyo.Spinner, name: "feedWebViewSpinner", align: "right"}
       ]}
     ]},
-    {kind: enyo.Scroller, flex: 1, components: []},
+    {kind: "Sound", src: "http://traffic.libsyn.com/linuxoutlaws/linuxoutlaws219.mp3"},
+    {kind: "Button", content: "Play", flex: 1, onclick: "play", name: "playButton"},
     {kind: enyo.Toolbar, pack: "justify", components: [
       {kind: enyo.GrabButton}
     ]}
-  ]
-}); 
+  ],
+  
+  ready: function() {
+    this.plays = false;
+    this.$.sound.audio.controls = true;
+  },
+  
+  play: function() {
+    if (!this.plays) {
+      this.$.sound.play();
+      this.plays = true;
+      this.$.playButton.setContent("Pause");
+    } else {
+      this.$.sound.audio.pause();
+      this.plays = false;
+      this.$.playButton.setContent("Play");
+    }
+  }
+});
+
