@@ -22,11 +22,13 @@ enyo.kind({
 		]}
 	],
 
-	ready: function() {
+	create: function() {
+		this.inherited(arguments);
+		
 		this.feedList = [];
 		this.feedList.push({
 			title: "Linux Outlaws",
-			url: "???"
+			url: "http://feeds.feedburner.com/linuxoutlaws"
 		});
 		this.feedList.push({
 			title: "TLTS",

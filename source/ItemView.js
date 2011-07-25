@@ -6,16 +6,23 @@ enyo.kind({
 			{content: "Listen", name: "selectedItemName", style: "text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", flex: 1},
 			{kind: enyo.Spinner, name: "feedWebViewSpinner", align: "right"}
 		]},
-		{kind: "Sound", src: "http://traffic.libsyn.com/linuxoutlaws/linuxoutlaws219.mp3"},
+		{kind: "Sound"},
 		{kind: "Button", content: "Play", flex: 1, onclick: "play", name: "playButton"},
 		{kind: enyo.Toolbar, pack: "justify", components: [
 			{kind: enyo.GrabButton}
 		]}
 	],
 
-	ready: function() {
+	create: function() {
+		this.inherited(arguments);
+		
 		this.plays = false;
-		this.$.sound.audio.controls = true;
+		//this.$.sound.audio.controls = true;
+	},
+	
+	setItem: function(feedItem) {
+		this.$.playButton.setContent("Play " + feedItem.title + "(" + feedItem.url + ")");
+		this.$.sound.src = feedItem.url;
 	},
 
 	play: function() {
