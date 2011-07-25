@@ -1,3 +1,3 @@
 enyo.depends(
-  "PadCatcher.css"
+  "PodCatcher.css"
 );
