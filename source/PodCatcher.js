@@ -1,19 +1,18 @@
-// Main podcatcher kind, manages control flow 
+// Main podcatcher kind
+// Establishes components and manages some control flow
 enyo.kind({
-  name: "Net.Alliknow.PodCatcher",
-  kind: enyo.VFlexBox,
-  components: [
-    {kind: "PageHeader", components: [
-      {kind: enyo.VFlexBox, content: "Yet Another Simple Pod Catcher", flex: 1}
-    ]},
-    {kind: "SlidingPane", flex: 1, multiViewMinWidth: 480, onSelect: "paneSelected", name: "feedSlidingPane",
-      components: [
-        {kind: "Net.Alliknow.PodCatcher.FeedList", name: "feedListPane", width: "320px", 
-          onListTap: "showFeed", onNewFeedTap: "showAddNewFeedPopup"},
-        {kind: "Net.Alliknow.PodCatcher.FeedItemList", name: "feedItemListPane", width: "320px", peekWidth: 50,
-          onListTap: "openFeedItem", onRefreshTap: "refreshFeedItemsList"},
-        {kind: "Net.Alliknow.PodCatcher.ItemView", name: "feedItemViewPane", flex: 1, peekWidth: 100,
-          onResize: "resizeWebView"}
-     ]}
-  ]   
+	name: "Net.Alliknow.PodCatcher",
+	kind: "VFlexBox",
+	components: [
+		{kind: "SlidingPane", name: "feedSlidingPane", flex: 1, multiViewMinWidth: 480, components: [
+			{kind: "Net.Alliknow.PodCatcher.FeedList", name: "feedListPane", width: "300px", onSelectFeed: "feedSelected"},
+			{kind: "Net.Alliknow.PodCatcher.FeedItemList", name: "feedItemListPane", width: "300px", peekWidth: 100},
+			{kind: "Net.Alliknow.PodCatcher.ItemView", name: "feedItemViewPane", flex: 1, peekWidth: 250}
+		]}
+	],
+	
+	feedSelected: function(inSender, feed) {
+		enyo.log(feed);
+		this.$.feedItemListPane.setHeaderTitle("Select from \"" + feed.title + "\"");
+	}
 });

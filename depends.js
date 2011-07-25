@@ -1,4 +1,4 @@
 enyo.depends(
-  "source/",
-  "css/"
+	"source/",
+	"css/"
 );
