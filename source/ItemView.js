@@ -1,3 +1,4 @@
+// Show a single feed item (podcast) and allow playing
 enyo.kind({
 	name: "Net.Alliknow.PodCatcher.ItemView",
 	kind: "SlidingView",
@@ -22,12 +23,10 @@ enyo.kind({
 	},
 	
 	setItem: function(feedItem) {
-		if (this.plays) {
-			this.togglePlay();
-		}
-		
+		if (this.plays) this.togglePlay();
+				
 		this.$.playButton.setDisabled(false);
-		this.$.selectedItemName.setContent("Listen to \"" + feedItem.title + "\" (" + feedItem.url + ")");
+		this.$.selectedItemName.setContent("Listen to \"" + feedItem.title + "\"");
 		this.$.descriptionLabel.setContent(feedItem.description);
 		this.$.itemScroller.scrollTo(0, 0);
 		this.$.sound.setSrc(feedItem.url);

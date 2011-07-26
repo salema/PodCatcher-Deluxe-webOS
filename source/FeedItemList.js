@@ -1,3 +1,4 @@
+// Show list of all feed items (podcasts) as a sliding pane
 enyo.kind({
 	name: "Net.Alliknow.PodCatcher.FeedItemList",
 	kind: "SlidingView",
