@@ -5,6 +5,6 @@
 	"type": "web",
 	"main": "index.html",
 	"title": "Yet Another Simple Pod Catcher",
-	"icon": "icon.png",
+	"icon": "icons/speaker48.png",
 	"uiRevision": "2"
 }
