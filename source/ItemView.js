@@ -2,14 +2,16 @@ enyo.kind({
 	name: "Net.Alliknow.PodCatcher.ItemView",
 	kind: "SlidingView",
 	components: [
-		{kind: "Header", layoutKind: "HFlexLayout", components: [
-			{content: "Listen", name: "selectedItemName", style: "text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", flex: 1},
-			{kind: enyo.Spinner, name: "feedWebViewSpinner", align: "right"}
+		{kind: "Header", layoutKind: "HFlexLayout", style: "min-height: 60px;", components: [
+			{content: "Listen", name: "selectedItemName", style: "text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", flex: 1}
 		]},
 		{kind: "Sound"},
-		{kind: "Button", content: "Play", flex: 1, onclick: "play", name: "playButton"},
-		{kind: enyo.Toolbar, pack: "justify", components: [
-			{kind: enyo.GrabButton}
+		{kind: "Scroller", name: "itemScroller", flex: 1, style: "margin: 5px 12px", components: [
+			{kind: "HtmlContent", content: "", name: "descriptionLabel", flex: 1}
+		]},
+		{kind: "Toolbar", pack: "right", components: [
+			{kind: "GrabButton"},
+			{kind: "ToolButton", name: "playButton", style: "margin-left: 40px", caption: "Play", onclick: "togglePlay", disabled: true, flex: 1}
 		]}
 	],
 
@@ -17,23 +19,36 @@ enyo.kind({
 		this.inherited(arguments);
 		
 		this.plays = false;
-		//this.$.sound.audio.controls = true;
 	},
 	
 	setItem: function(feedItem) {
-		this.$.playButton.setContent("Play " + feedItem.title + "(" + feedItem.url + ")");
-		this.$.sound.src = feedItem.url;
+		if (this.plays) {
+			this.togglePlay();
+		}
+		
+		this.$.playButton.setDisabled(false);
+		this.$.selectedItemName.setContent("Listen to \"" + feedItem.title + "\" (" + feedItem.url + ")");
+		this.$.descriptionLabel.setContent(feedItem.description);
+		this.$.itemScroller.scrollTo(0, 0);
+		this.$.sound.setSrc(feedItem.url);
 	},
 
-	play: function() {
+	togglePlay: function() {
 		if (!this.plays) {
 			this.$.sound.play();
+			this.$.playButton.setCaption("Pause");
+			this.$.sound.audio.ownerLink = this;
+			this.$.sound.audio.addEventListener('ended', function(){ 
+					this.ownerLink.togglePlay();
+				}, false);
+			
 			this.plays = true;
-			this.$.playButton.setContent("Pause");
 		} else {
 			this.$.sound.audio.pause();
+			this.$.playButton.setCaption("Play");
+			this.$.sound.audio.removeEventListener('ended');
+			
 			this.plays = false;
-			this.$.playButton.setContent("Play");
 		}
 	}
 });

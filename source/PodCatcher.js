@@ -5,8 +5,8 @@ enyo.kind({
 	kind: "VFlexBox",
 	components: [
 		{kind: "SlidingPane", name: "feedSlidingPane", flex: 1, multiViewMinWidth: 480, components: [
-			{kind: "Net.Alliknow.PodCatcher.FeedList", name: "feedListPane", width: "300px", onSelectFeed: "feedSelected"},
-			{kind: "Net.Alliknow.PodCatcher.FeedItemList", name: "feedItemListPane", width: "300px", peekWidth: 100, onSelectItem: "itemSelected"},
+			{kind: "Net.Alliknow.PodCatcher.FeedList", name: "feedListPane", width: "230px", onSelectFeed: "feedSelected"},
+			{kind: "Net.Alliknow.PodCatcher.FeedItemList", name: "feedItemListPane", width: "350px", peekWidth: 100, onSelectItem: "itemSelected"},
 			{kind: "Net.Alliknow.PodCatcher.ItemView", name: "feedItemViewPane", flex: 1, peekWidth: 250}
 		]}
 	],
