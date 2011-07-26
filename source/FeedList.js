@@ -15,7 +15,7 @@ enyo.kind({
 		{kind: "Scroller", flex: 1, components: [
 			{kind: "VirtualRepeater", name: "feedListVR", onSetupRow: "getFeed", onclick: "selectFeed", components: [
 				{kind: "SwipeableItem", layoutKind: "HFlexLayout", tapHighlight: true, onConfirm: "deleteFeed", components: [
-					{name: "listItemTitle", content: ""}
+					{name: "listItemTitle", style: "text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", content: ""}
 				]}
 			]}
 		]},
