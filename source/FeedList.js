@@ -9,7 +9,7 @@
 //
 // Yet Another Simple Pod Catcher is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-// or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+// or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
 // along with Yet Another Simple Pod Catcher. If not, see <http://www.gnu.org/licenses/>.
@@ -26,8 +26,9 @@ enyo.kind({
 	components: [
 		{kind: "ApplicationEvents", onLoad: "startup"},
 		{kind: "ApplicationEvents", onUnload: "shutdown"},
-		{kind: "Header", content: "Discover Podcasts",  style: "min-height: 60px;"},
+		{kind: "SystemService", name: "preferencesService"},
 		{kind: "Net.Alliknow.PodCatcher.AddFeedPopup", name: "addFeedPopup", onAddFeed: "addFeed"},
+		{kind: "Header", content: "Discover Podcasts",  style: "min-height: 60px;"},
 		{kind: "Scroller", flex: 1, components: [
 			{kind: "VirtualRepeater", name: "feedListVR", onSetupRow: "getFeed", onclick: "selectFeed", components: [
 				{kind: "SwipeableItem", layoutKind: "HFlexLayout", tapHighlight: true, onConfirm: "deleteFeed", components: [
@@ -44,14 +45,26 @@ enyo.kind({
 	create: function() {
 		this.inherited(arguments);
 		
-		this.feedList = [];
-		this.addTestFeeds();
+		this.$.preferencesService.call(
+		{
+			keys: ["storedFeedList"]
+		},
+		{
+			method: "getPreferences",
+			onSuccess: "gotPreferences",
+			onFailure: "gotPreferencesFailure"
+		});
 		
-		var storedFeedList = localStorage.getItem("storedFeedList");
-		//enyo.log(storedFeedList);
-		if (storedFeedList != undefined && storedFeedList.length != 0) {
-			this.feedList = JSON.parse(storedFeedList);
-		}
+		this.feedList = [];
+	},
+	
+	gotPreferences: function(inSender, inResponse) {
+		this.feedList = inResponse.storedFeedList;
+		this.$.feedListVR.render();
+	},
+	
+	gotPreferencesFailure: function(inSender, inResponse) {
+		enyo.log("got failure from preferencesService");
 	},
 	
 	startup: function() {
@@ -62,8 +75,16 @@ enyo.kind({
 	},
 	
 	shutdown: function() {
-		localStorage.setItem("feedList", JSON.stringify(this.feedList));
-		//enyo.log("shutdown called");
+		enyo.log("shutdown called");
+		this.$.preferencesService.call(
+		{
+			keys: {
+				"storedFeedList": this.feedList
+			}
+		},
+		{
+			method: "setPreferences"
+		});
 	},
 	
 	getFeed: function(inSender, inIndex) {
@@ -110,16 +131,20 @@ enyo.kind({
 	
 	addTestFeeds: function() {
 		this.feedList.push({
-			title: "Linux Outlaws",
-			url: "http://feeds.feedburner.com/linuxoutlaws"
+			title: "Letter for Gaelic Learners",
+			url: "http://downloads.bbc.co.uk/podcasts/scotland/litirbheag/rss.xml"
 		});
 		this.feedList.push({
-			title: "Eine Stunde Zeit",
-			url: "http://www.radioeins.de/archiv/podcast/eine_stunde_zeit.feed.podcast.xml"
+			title: "BBC World Update: Daily Commute",
+			url: "http://downloads.bbc.co.uk/podcasts/worldservice/worldupmc/rss.xml"
 		});
 		this.feedList.push({
-			title: "Greenpeace Podcast",
-			url: "http://www.greenpeace-berlin.de/fileadmin/podcast/greencast.xml"
+			title: "Burmese Morning Broadcast",
+			url: "http://downloads.bbc.co.uk/podcasts/worldservice/burmorning/rss.xml"
+		});
+		this.feedList.push({
+			title: "Newshour",
+			url: "http://downloads.bbc.co.uk/podcasts/worldservice/newshour/rss.xml"
 		});
 	}
 }); 

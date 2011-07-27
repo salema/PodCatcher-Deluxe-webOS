@@ -1,0 +1,39 @@
+{
+	"storedFeedList": [{
+		"title": "Linux Outlaws",
+		"url": "http://feeds.feedburner.com/linuxoutlaws"
+	},
+	{
+		"title": "Eine Stunde Zeit",
+		"url": "http://www.radioeins.de/archiv/podcast/eine_stunde_zeit.feed.podcast.xml"
+	},
+	{
+		"title": "Greenpeace Podcast",
+		"url": "http://www.greenpeace-berlin.de/fileadmin/podcast/greencast.xml"
+	},
+	{
+		"title": "Linux Action Show - MP3",
+		"url": "http://feeds.feedburner.com/TheLinuxActionShow"
+	},
+	{
+		"title": "Linux Action Show - OGG",
+		"url": "http://feeds.feedburner.com/TheLinuxActionShowOGG"
+	},
+	{
+		"title": "Letter for Gaelic Learners",
+		"url": "http://downloads.bbc.co.uk/podcasts/scotland/litirbheag/rss.xml"
+	},
+	{
+		"title": "BBC World Update: Daily Commute",
+		"url": "http://downloads.bbc.co.uk/podcasts/worldservice/worldupmc/rss.xml"
+	},
+	{
+		"title": "Burmese Morning Broadcast",
+		"url": "http://downloads.bbc.co.uk/podcasts/worldservice/burmorning/rss.xml"
+	},
+	{
+		"title": "Newshour",
+		"url": "http://downloads.bbc.co.uk/podcasts/worldservice/newshour/rss.xml"
+	}],
+	"returnValue": true
+}
