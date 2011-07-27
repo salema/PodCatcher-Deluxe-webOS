@@ -1,1 +1,13 @@
-I am trying to get into webOS hacking, don't take this serious...
+===============================================================
+A simple pod catcher written for webOS using the enyo framework
+===============================================================
+
+This software is a simple pod catcher trageted for devices
+running HP's webOS. It features a intuitive three column layout
+and basic Playback functionality. Multiple feeds are supported.
+Feeds can be searched while playing. Podcast description is
+displayed, supporting also HTML content.
+
+===============================================================
+Copyright 2011 Kevin Hausmann
+This software is licensed under the GPL. See COPYING for details.
