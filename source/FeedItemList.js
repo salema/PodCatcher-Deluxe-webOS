@@ -87,5 +87,6 @@ enyo.kind({
 	
 	grabFeedFailed: function() {
 		enyo.log("Failed to load feed");
+		this.$.feedItemsSpinner.hide();
 	}
 }); 
