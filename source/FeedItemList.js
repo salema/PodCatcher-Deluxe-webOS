@@ -68,6 +68,8 @@ enyo.kind({
 		var items = source.getElementsByTagName("item");
 		
 		for (var index = 0; index < items.length; index++) {
+			if (! this.isValidFeedItem(items[index])) continue;
+			
 			var title = items[index].getElementsByTagName("title")[0].firstChild.data;
 			var link = items[index].getElementsByTagName("enclosure")[0].getAttribute("url");
 			var pubDate = items[index].getElementsByTagName("pubDate")[0].firstChild.data;
@@ -88,5 +90,12 @@ enyo.kind({
 	grabFeedFailed: function() {
 		enyo.log("Failed to load feed");
 		this.$.feedItemsSpinner.hide();
+	},
+	
+	isValidFeedItem: function(item) {
+		return item.getElementsByTagName("title").length == 1 &&
+			item.getElementsByTagName("enclosure").length == 1 &&
+			item.getElementsByTagName("pubDate").length == 1 &&
+			item.getElementsByTagName("description").length == 1;
 	}
 }); 

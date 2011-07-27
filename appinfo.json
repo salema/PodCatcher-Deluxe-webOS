@@ -1,10 +1,10 @@
 {
 	"id": "net.alliknow.yaspc",
-	"version": "0.1",
+	"version": "0.1.0",
 	"vendor": "Kevin Hausmann",
 	"type": "web",
 	"main": "index.html",
-	"title": "Yet Another Simple Pod Catcher",
-	"icon": "icons/speaker48.png",
+	"title": "Simple PodCatcher",
+	"icon": "icons/icon48.png",
 	"uiRevision": "2"
 }
