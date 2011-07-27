@@ -1,5 +1,9 @@
 {
 	"storedFeedList": [{
+		"title": "Palm Developer Podcast",
+		"url": "http://feeds.feedburner.com/PalmDeveloperCenterPodcasts"
+	},
+	{
 		"title": "Linux Outlaws",
 		"url": "http://feeds.feedburner.com/linuxoutlaws"
 	},
