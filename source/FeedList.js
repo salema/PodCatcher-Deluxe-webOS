@@ -146,5 +146,9 @@ enyo.kind({
 			title: "Newshour",
 			url: "http://downloads.bbc.co.uk/podcasts/worldservice/newshour/rss.xml"
 		});
+		this.feedList.push({
+			title: "Anderson Cooper 360°",
+			url: "http://rss.cnn.com/services/podcasting/ac360/rss"
+		});
 	}
 }); 

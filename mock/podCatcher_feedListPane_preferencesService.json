@@ -4,19 +4,7 @@
 		"url": "http://feeds.feedburner.com/linuxoutlaws"
 	},
 	{
-		"title": "Eine Stunde Zeit",
-		"url": "http://www.radioeins.de/archiv/podcast/eine_stunde_zeit.feed.podcast.xml"
-	},
-	{
-		"title": "Greenpeace Podcast",
-		"url": "http://www.greenpeace-berlin.de/fileadmin/podcast/greencast.xml"
-	},
-	{
-		"title": "Linux Action Show - MP3",
-		"url": "http://feeds.feedburner.com/TheLinuxActionShow"
-	},
-	{
-		"title": "Linux Action Show - OGG",
+		"title": "Linux Action Show",
 		"url": "http://feeds.feedburner.com/TheLinuxActionShowOGG"
 	},
 	{
@@ -34,6 +22,18 @@
 	{
 		"title": "Newshour",
 		"url": "http://downloads.bbc.co.uk/podcasts/worldservice/newshour/rss.xml"
+	},
+	{
+		"title": "Anderson Cooper 360°",
+		"url": "http://rss.cnn.com/services/podcasting/ac360/rss"
+	},
+	{
+		"title": "Eine Stunde Zeit",
+		"url": "http://www.radioeins.de/archiv/podcast/eine_stunde_zeit.feed.podcast.xml"
+	},
+	{
+		"title": "Greenpeace Podcast",
+		"url": "http://www.greenpeace-berlin.de/fileadmin/podcast/greencast.xml"
 	}],
 	"returnValue": true
 }
