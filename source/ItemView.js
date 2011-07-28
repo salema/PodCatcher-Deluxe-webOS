@@ -26,7 +26,7 @@ enyo.kind({
 		{kind: "Scroller", name: "itemScroller", flex: 1, style: "margin: 5px 12px", components: [
 			{kind: "HtmlContent", content: "", name: "descriptionLabel", flex: 1}
 		]},
-		{kind: "Toolbar", pack: "right", components: [
+		{kind: "Toolbar", components: [
 		   	{kind: "GrabButton", style: "position: static"},
 			{kind: "ToolButton", name: "playButton", caption: "Play", onclick: "togglePlay", disabled: true, flex: 1}
 		]}
