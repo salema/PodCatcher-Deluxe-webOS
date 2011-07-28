@@ -59,7 +59,12 @@ enyo.kind({
 	},
 	
 	gotPreferences: function(inSender, inResponse) {
-		this.feedList = inResponse.storedFeedList;
+		if (inResponse.storedFeedList == undefined) return;
+		
+		for (var index = 0; index < inResponse.storedFeedList.length; index++) {
+			this.feedList.push(inResponse.storedFeedList[index]);
+		}
+				
 		this.$.feedListVR.render();
 	},
 	
