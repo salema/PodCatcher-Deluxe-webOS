@@ -56,6 +56,7 @@ enyo.kind({
 			onFailure: "gotPreferencesFailure"
 		});
 		
+		this.selectedIndex = -1;
 		this.feedList = [];
 	},
 	
@@ -98,18 +99,21 @@ enyo.kind({
 		
 		if (feed) {
 			this.$.listItemTitle.setContent(feed.title);
+			if (this.selectedIndex == inIndex) this.$.listItemTitle.addClass("highlight");
 			return true;
 		}
 	},
 	
 	selectFeed: function(inSender, inIndex) {
-		var index = this.$.feedListVR.fetchRowIndex();
-		var feed = this.feedList[index];
+		this.selectedIndex = this.$.feedListVR.fetchRowIndex();
+		var feed = this.feedList[this.selectedIndex];
 		
 		if (feed) {
 			this.$.deleteButton.setDisabled(false);
 			this.doSelectFeed(feed);
 		}
+		
+		this.$.feedListVR.render();
 	},
 
 	showAddFeedPopup: function(inSender, inIndex) {
@@ -126,13 +130,17 @@ enyo.kind({
 
 	deleteFeed: function(inSender, inIndex) {
 		// Make this work for the button as well
-		if (inIndex instanceof MouseEvent) inIndex = this.$.feedListVR.fetchRowIndex();
+		if (inIndex instanceof MouseEvent) {
+			if (this.selectedIndex < 0) return;
+			inIndex = this.selectedIndex;
+		}
 		
 		this.feedList.splice(inIndex, 1);
-		this.$.feedListVR.render();
 		
-		if (this.feedList.length == 0 ||
-				this.$.feedListVR.fetchRowIndex() >= this.feedList.length) this.$.deleteButton.setDisabled(true);
+		if (inIndex == this.selectedIndex) this.selectedIndex = -1;
+		if (this.feedList.length == 0 || this.selectedIndex < 0) this.$.deleteButton.setDisabled(true);
+		
+		this.$.feedListVR.render();	
 	},
 	
 	addTestFeeds: function() {

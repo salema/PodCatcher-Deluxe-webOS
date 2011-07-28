@@ -45,6 +45,7 @@ enyo.kind({
 		this.inherited(arguments);
 		
 		this.feedItemList = [];
+		this.selectedIndex = -1;
 	},
 	
 	getFeedItems: function(inSender, inIndex) {
@@ -52,6 +53,7 @@ enyo.kind({
 
 		if (feedItem) {
 			this.$.feedItemTitle.setContent(feedItem.title);
+			if (this.selectedIndex == inIndex) this.$.feedItemTitle.addClass("highlight");
 			//var pubDate = new Date(feedItem.pubDate);
 			//var formatter = new enyo.g11n.DateFmt();
 			//var string = formatter.format(pubDate);
@@ -61,16 +63,19 @@ enyo.kind({
 	},
 	
 	selectFeedItem: function(inSender, inIndex) {
-		var index = this.$.feedListItemsVR.fetchRowIndex();
-		var feedItem = this.feedItemList[index];
+		this.selectedIndex = this.$.feedListItemsVR.fetchRowIndex();
+		var feedItem = this.feedItemList[this.selectedIndex];
 		
 		if (feedItem) this.doSelectItem(feedItem);
+		
+		this.$.feedListItemsVR.render();
 	},
 	
 	setFeed: function(feed) {
 		this.$.selectedFeedName.setContent("Select from \"" + feed.title + "\"");
 		this.$.feedItemsSpinner.show();
 		
+		this.selectedIndex = -1;
 		this.feedItemList = [];
 		this.$.feedListItemsVR.render();
 		
