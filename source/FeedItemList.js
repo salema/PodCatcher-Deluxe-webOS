@@ -46,6 +46,7 @@ enyo.kind({
 		
 		this.feedItemList = [];
 		this.selectedIndex = -1;
+		this.formatter = new enyo.g11n.DateFmt({date: "long",	time: "medium"});
 	},
 	
 	getFeedItems: function(inSender, inIndex) {
@@ -54,10 +55,9 @@ enyo.kind({
 		if (feedItem) {
 			this.$.feedItemTitle.setContent(feedItem.title);
 			if (this.selectedIndex == inIndex) this.$.feedItemTitle.addClass("highlight");
-			//var pubDate = new Date(feedItem.pubDate);
-			//var formatter = new enyo.g11n.DateFmt();
-			//var string = formatter.format(pubDate);
-			this.$.feedItemPublished.setContent(feedItem.pubDate);
+			
+			var pubDate = new Date(feedItem.pubDate);
+			this.$.feedItemPublished.setContent(this.formatter.format(pubDate));
 			return true;
 		}
 	},

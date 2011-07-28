@@ -14,7 +14,8 @@
 	},
 	{
 		"title": "Letter for Gaelic Learners",
-		"url": "http://downloads.bbc.co.uk/podcasts/scotland/litirbheag/rss.xml"
+		"url": "http://downloads.bbc.co.uk/podcasts/scotland/litirbheag/rss.xml",
+		"image": "http://www.bbc.co.uk/podcasts/assets/artwork/266/litirbheag.jpg"
 	},
 	{
 		"title": "BBC World Update: Daily Commute",
@@ -34,7 +35,8 @@
 	},
 	{
 		"title": "Eine Stunde Zeit",
-		"url": "http://www.radioeins.de/archiv/podcast/eine_stunde_zeit.feed.podcast.xml"
+		"url": "http://www.radioeins.de/archiv/podcast/eine_stunde_zeit.feed.podcast.xml",
+		"image": "http://www.radioeins.de/etc/medialib/rbb/rad/image_bilder/podcast/podcast___eine_stunde.file.jpg"
 	},
 	{
 		"title": "Greenpeace Podcast",

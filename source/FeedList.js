@@ -29,7 +29,7 @@ enyo.kind({
 		{kind: "SystemService", name: "preferencesService"},
 		{kind: "Net.Alliknow.PodCatcher.AddFeedPopup", name: "addFeedPopup", onAddFeed: "addFeed"},
 		{kind: "Header", content: "Discover Podcasts",  style: "min-height: 60px;"},
-		{kind: "Scroller", flex: 1, components: [
+		{kind: "Scroller", name: "feedListScroller", flex: 1, components: [
 			{kind: "VirtualRepeater", name: "feedListVR", onSetupRow: "getFeed", onclick: "selectFeed", components: [
 				{kind: "SwipeableItem", layoutKind: "HFlexLayout", tapHighlight: true, onConfirm: "deleteFeed", components: [
 					{name: "listItemTitle", style: "text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", content: ""}
@@ -124,10 +124,11 @@ enyo.kind({
 	},
 	
 	addFeed: function(inSender, feed) {
+		// TODO Is already in list?
 		this.feedList.push(feed);
 		this.$.feedListVR.render();
 		
-		this.$.deleteButton.setDisabled(false);
+		this.$.feedListScroller.scrollToBottom();
 	},
 
 	deleteFeed: function(inSender, inIndex) {
