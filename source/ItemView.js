@@ -27,8 +27,8 @@ enyo.kind({
 			{kind: "HtmlContent", content: "", name: "descriptionLabel", flex: 1}
 		]},
 		{kind: "Toolbar", pack: "right", components: [
-			{kind: "GrabButton"},
-			{kind: "ToolButton", name: "playButton", style: "margin-left: 40px", caption: "Play", onclick: "togglePlay", disabled: true, flex: 1}
+		   	{kind: "GrabButton", style: "position: static"},
+			{kind: "ToolButton", name: "playButton", caption: "Play", onclick: "togglePlay", disabled: true, flex: 1}
 		]}
 	],
 
