@@ -36,7 +36,7 @@ enyo.kind({
 				]}
 			]}
 		]},
-		{kind: "Image", name: "feedImage", style: "width: 80%; margin: 10px;", src: "icons/icon128.png"},
+		{kind: "Image", name: "feedImage", style: "width: 80%; margin: 10px 20px;", src: "icons/icon128.png"},
 		{kind: "Toolbar", pack: "justify", components: [
 			{kind: "ToolButton", caption: "Add", onclick: "showAddFeedPopup", flex: 1},
 			{kind: "ToolButton", name: "deleteButton", caption: "Delete", onclick: "deleteFeed"}
@@ -109,6 +109,8 @@ enyo.kind({
 		var feed = this.feedList[this.selectedIndex];
 		
 		if (feed) {
+			if (feed.image != undefined) this.$.feedImage.setSrc(feed.image);
+			else this.$.feedImage.setSrc("icons/icon128.png");
 			this.$.deleteButton.setDisabled(false);
 			this.doSelectFeed(feed);
 		}
@@ -137,7 +139,10 @@ enyo.kind({
 		
 		this.feedList.splice(inIndex, 1);
 		
-		if (inIndex == this.selectedIndex) this.selectedIndex = -1;
+		if (inIndex == this.selectedIndex) {
+			this.selectedIndex = -1;
+			this.$.feedImage.setSrc("icons/icon128.png");
+		}
 		if (this.feedList.length == 0 || this.selectedIndex < 0) this.$.deleteButton.setDisabled(true);
 		
 		this.$.feedListVR.render();	

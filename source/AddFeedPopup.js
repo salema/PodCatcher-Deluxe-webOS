@@ -48,14 +48,18 @@ enyo.kind({
 		var parser = new DOMParser;
 		var source = parser.parseFromString(inResponse, "text/xml");
 		
-		// Get title from feed
+		// Get infos from feed
 		var title = source.getElementsByTagName("title");
+		var description = source.getElementsByTagName("description");
+		var image = this.findFeedImage(source);
 		
 		// Only add feed if title is present (and feed is valid)
-		if (title.length > 0) {
+		if (title.length > 0 && description.length > 0) {
 			this.doAddFeed({
 				title: title[0].firstChild.data,
-				url: this.$.newFeedURL.getValue()
+				url: this.$.newFeedURL.getValue(),
+				description: description[0].firstChild.data,
+				image: image
 			})
 			this.close();
 		// Grab feed failed	
@@ -64,5 +68,14 @@ enyo.kind({
 	
 	grabFeedFailed: function() {
 		this.$.newFeedURL.setValue("Failed to load feed");
+	},
+	
+	findFeedImage: function(feed) {
+		//if (feed.getElementsByTagName("image").length > 0)
+		//	return feed.getElementsByTagName("image")[0].getAttribute("url");
+		if (feed.getElementsByTagName("thumbnail").length > 0)
+			return feed.getElementsByTagName("thumbnail")[0].getAttribute("url");
+		if (feed.getElementsByTagName("image").length > 0)
+			return feed.getElementsByTagName("image")[0].getAttribute("href");
 	}
 });
