@@ -24,7 +24,7 @@ enyo.kind({
 	},
 	components: [
 		{kind: "WebService", name: "grabFeed", onSuccess: "grabFeedSuccess", onFailure: "grabFeedFailed"},
-		{kind: "Header", layoutKind: "HFlexLayout", style: "min-height: 60px;", components: [
+		{kind: "Header", layoutKind: "HFlexLayout", style: "min-height: 60px", components: [
 			{content: "Select", name: "selectedFeedName", style: "text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", flex: 1},
 			{kind: "Spinner", name: "feedItemsSpinner", align: "right"}
 		]},
@@ -54,7 +54,7 @@ enyo.kind({
 			this.$.feedItemTitle.setContent(feedItem.title);
 			//var pubDate = new Date(feedItem.pubDate);
 			//var formatter = new enyo.g11n.DateFmt();
-			//var string = formatter.prototype.format(pubDate);
+			//var string = formatter.format(pubDate);
 			this.$.feedItemPublished.setContent(feedItem.pubDate);
 			return true;
 		}

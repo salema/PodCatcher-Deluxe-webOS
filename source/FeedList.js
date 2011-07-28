@@ -36,8 +36,9 @@ enyo.kind({
 				]}
 			]}
 		]},
+		{kind: "Image", name: "feedImage", style: "width: 80%; margin: 10px;", src: "icons/icon128.png"},
 		{kind: "Toolbar", pack: "justify", components: [
-			{kind: "ToolButton", caption: "Add", onclick: "showAddFeedPopup"},
+			{kind: "ToolButton", caption: "Add", onclick: "showAddFeedPopup", flex: 1},
 			{kind: "ToolButton", name: "deleteButton", caption: "Delete", onclick: "deleteFeed"}
 		]}
 	],

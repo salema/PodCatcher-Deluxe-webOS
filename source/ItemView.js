@@ -19,12 +19,13 @@ enyo.kind({
 	name: "Net.Alliknow.PodCatcher.ItemView",
 	kind: "SlidingView",
 	components: [
-		{kind: "Header", layoutKind: "HFlexLayout", style: "min-height: 60px;", components: [
+		{kind: "PalmService", name: "launchBrowserCall", service: "palm://com.palm.applicationManager/", method: "launch"},
+   		{kind: "Header", layoutKind: "HFlexLayout", style: "min-height: 60px;", components: [
 			{content: "Listen", name: "selectedItemName", style: "text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", flex: 1}
 		]},
 		{kind: "Sound"},
 		{kind: "Scroller", name: "itemScroller", flex: 1, style: "margin: 5px 12px", components: [
-			{kind: "HtmlContent", content: "", name: "descriptionLabel", flex: 1}
+			{kind: "HtmlContent", name: "descriptionLabel", onLinkClick: "openBrowser", flex: 1}
 		]},
 		{kind: "Toolbar", components: [
 		   	{kind: "GrabButton", style: "position: static"},
@@ -65,5 +66,9 @@ enyo.kind({
 			
 			this.plays = false;
 		}
+	},
+	
+	openBrowser: function(inSender, inUrl) {
+		this.$.launchBrowserCall.call({"id": "com.palm.app.browser", "params":{"target": inUrl}});
 	}
 });
