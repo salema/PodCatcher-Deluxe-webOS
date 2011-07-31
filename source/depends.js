@@ -1,7 +1,8 @@
 enyo.depends(
+	"types/",
 	"PodCatcher.js",
-	"FeedList.js",
-	"FeedItemList.js",
-	"ItemView.js",
-	"AddFeedPopup.js"
+	"PodcastList.js",
+	"EpisodeList.js",
+	"EpisodeView.js",
+	"AddPodcastPopup.js"
 );

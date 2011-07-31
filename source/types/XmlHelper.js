@@ -16,25 +16,33 @@
  */
 
 /**
- * Main podcatcher kind
- * Establishes components and manages some control flow
+ * Some helper functions
  */
-enyo.kind({
-	name: "Net.Alliknow.PodCatcher",
-	kind: "VFlexBox",
-	components: [
-		{kind: "SlidingPane", flex: 1, components: [
-			{kind: "Net.Alliknow.PodCatcher.PodcastList", name: "podcastListPane", width: "230px", onSelectPodcast: "podcastSelected"},
-			{kind: "Net.Alliknow.PodCatcher.EpisodeList", name: "episodeListPane", width: "350px", peekWidth: 100, onSelectEpisode: "episodeSelected"},
-			{kind: "Net.Alliknow.PodCatcher.EpisodeView", name: "episodeViewPane", flex: 1, peekWidth: 250}
-		]}
-	],
-	
-	podcastSelected: function(inSender, podcast) {
-		this.$.episodeListPane.setPodcast(podcast);
-	},
-	
-	episodeSelected: function(inSender, episode) {
-		this.$.episodeViewPane.setEpisode(episode);
-	}
-});
+function XmlHelper() {
+}
+
+XmlHelper.prototype.get = function(xml, tag) {
+	return xml.getElementsByTagName(tag);
+}
+
+XmlHelper.prototype.getFirst = function(xml, tag) {
+	return this.get(xml, tag)[0];
+}
+
+XmlHelper.prototype.getFirstValue = function(xml, tag) {
+	return this.getFirst(xml, tag).firstChild.data;
+}
+
+XmlHelper.prototype.createXmlParser = function(xml) {
+  var parser = new DOMParser();
+	return parser.parseFromString(xml, "text/xml");
+}
+
+XmlHelper.TITLE = "title";
+XmlHelper.ENCLOSURE = "enclosure";
+XmlHelper.PUBDATE = "pubDate";
+XmlHelper.DESCRIPTION = "description";
+XmlHelper.IMAGE = "image";
+XmlHelper.THUMBNAIL = "thumbnail";
+XmlHelper.URL = "url";
+XmlHelper.HREF = "href";

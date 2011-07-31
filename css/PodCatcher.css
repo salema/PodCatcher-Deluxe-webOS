@@ -1,2 +1,2 @@
-/* TODO: put your application-specific CSS here */
 .highlight { font-weight: bold }
+.error {color: red; font-size: smaller; padding: 10px;}

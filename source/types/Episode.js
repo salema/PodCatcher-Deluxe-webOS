@@ -16,25 +16,22 @@
  */
 
 /**
- * Main podcatcher kind
- * Establishes components and manages some control flow
+ * Represent a podcast episode
  */
-enyo.kind({
-	name: "Net.Alliknow.PodCatcher",
-	kind: "VFlexBox",
-	components: [
-		{kind: "SlidingPane", flex: 1, components: [
-			{kind: "Net.Alliknow.PodCatcher.PodcastList", name: "podcastListPane", width: "230px", onSelectPodcast: "podcastSelected"},
-			{kind: "Net.Alliknow.PodCatcher.EpisodeList", name: "episodeListPane", width: "350px", peekWidth: 100, onSelectEpisode: "episodeSelected"},
-			{kind: "Net.Alliknow.PodCatcher.EpisodeView", name: "episodeViewPane", flex: 1, peekWidth: 250}
-		]}
-	],
-	
-	podcastSelected: function(inSender, podcast) {
-		this.$.episodeListPane.setPodcast(podcast);
-	},
-	
-	episodeSelected: function(inSender, episode) {
-		this.$.episodeViewPane.setEpisode(episode);
-	}
-});
+function Episode() {
+	this.helper = new XmlHelper();
+}
+
+Episode.prototype.read = function(xml) {
+	this.title = this.helper.getFirstValue(xml, XmlHelper.TITLE);
+	this.url = this.helper.getFirst(xml, XmlHelper.ENCLOSURE).getAttribute(Episode.URL);
+	this.pubDate = this.helper.getFirstValue(xml, XmlHelper.PUBDATE);
+	this.description = this.helper.getFirstValue(xml, XmlHelper.DESCRIPTION);
+}
+
+Episode.prototype.isValid = function(xml) {
+	return this.helper.get(xml, XmlHelper.TITLE).length > 0 &&
+		this.helper.get(xml, XmlHelper.ENCLOSURE).length > 0 &&
+		this.helper.get(xml, XmlHelper.PUBDATE).length > 0 &&
+		this.helper.get(xml, XmlHelper.DESCRIPTION).length > 0;
+}
