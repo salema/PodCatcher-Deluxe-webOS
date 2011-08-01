@@ -24,8 +24,7 @@ enyo.kind({
 	components: [
 		{kind: "PalmService", name: "launchBrowserCall", service: "palm://com.palm.applicationManager/", method: "launch"},
    		{kind: "Header", layoutKind: "HFlexLayout", style: "min-height: 60px;", components: [
-			{content: "Listen", name: "episodeName", style: "text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", flex: 1},
-			{name: "time"}
+			{content: "Listen", name: "episodeName", style: "text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", flex: 1}
 		]},
 		{kind: "Sound"},
 		{kind: "Scroller", name: "episodeScroller", flex: 1, style: "margin: 5px 12px", components: [
@@ -47,9 +46,9 @@ enyo.kind({
 		if (this.plays) this.togglePlay();
 		
 		this.$.sound.audio.ownerLink = this;
-		this.$.sound.audio.addEventListener("playing", function(inEvent) { 
-			this.ownerLink.log(inEvent);
-		}, true);
+//		this.$.sound.audio.addEventListener("playing", function(inEvent) { 
+//			this.ownerLink.log(inEvent);
+//		}, true);
 		
 		this.$.playButton.setCaption("Play");
 		this.$.playButton.setDisabled(false);
