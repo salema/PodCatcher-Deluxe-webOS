@@ -45,7 +45,7 @@ enyo.kind({
 	setEpisode: function(episode) {
 		if (this.plays) this.togglePlay();
 		
-		this.$.sound.audio.ownerLink = this;
+//		this.$.sound.audio.ownerLink = this;
 //		this.$.sound.audio.addEventListener("playing", function(inEvent) { 
 //			this.ownerLink.log(inEvent);
 //		}, true);
@@ -62,15 +62,11 @@ enyo.kind({
 		if (!this.plays) {
 			this.$.sound.play();
 			this.$.playButton.setCaption("Pause");
-			this.$.sound.audio.addEventListener('ended', function(){ 
-					this.ownerLink.togglePlay();
-				}, false);
 			
 			this.plays = true;
 		} else {
 			this.$.sound.audio.pause();
 			this.$.playButton.setCaption("Resume");
-			this.$.sound.audio.removeEventListener('ended');
 			
 			this.plays = false;
 		}

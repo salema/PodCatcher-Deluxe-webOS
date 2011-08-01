@@ -27,7 +27,6 @@ enyo.kind({
 		onSelectPodcast: ""
 	},
 	components: [
-		{kind: "ApplicationEvents", onLoad: "startup"},
 		{kind: "SystemService", name: "preferencesService"},
 		{kind: "Net.Alliknow.PodCatcher.AddPodcastPopup", name: "addPodcastPopup", onAddPodcast: "addPodcast"},
 		{kind: "Header", content: "Discover Podcasts",  style: "min-height: 60px;"},
@@ -63,18 +62,18 @@ enyo.kind({
 		this.podcastList = [];
 	},
 	
-	startup: function() {
-		if (this.podcastList.length == 0) this.showAddPodcastPopup();
-	},
-	
 	restorePodcastList: function(inSender, inResponse) {
-		if (inResponse.storedPodcastList == undefined) return;
+		var list = inResponse.storedPodcastList;
 		
-		for (var index = 0; index < inResponse.storedPodcastList.length; index++) {
-			this.podcastList.push(inResponse.storedPodcastList[index]);
+		if (list == undefined || list.length == 0) {
+			 this.showAddPodcastPopup();
 		}
-				
-		this.$.podcastListVR.render();
+		else {
+			for (var index = 0; index < inResponse.storedPodcastList.length; index++) {
+				this.podcastList.push(inResponse.storedPodcastList[index]);
+			}
+			this.$.podcastListVR.render();
+		}
 	},
 	
 	
@@ -101,7 +100,9 @@ enyo.kind({
 	},
 	
 	selectPodcast: function(inSender, inIndex) {
-		this.selectedIndex = this.$.podcastListVR.fetchRowIndex();
+		if (this.$.podcastListVR.fetchRowIndex() == this.selectedIndex) return;
+		else this.selectedIndex = this.$.podcastListVR.fetchRowIndex();
+		
 		var podcast = this.podcastList[this.selectedIndex];
 		
 		if (podcast) {

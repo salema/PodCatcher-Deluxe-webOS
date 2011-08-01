@@ -9,6 +9,11 @@
 		"image": "http://sixgun.org/files/linuxoutlaws.jpg"
 	},
 	{
+		"title": "Escape - Der Experte",
+		"url": "http://www.radioeins.de/archiv/podcast/escape_der_experte.feed.podcast.xml",
+		"image": "http://www.radioeins.de/etc/medialib/rbb/rad/image_bilder/podcast/podcast___der_experte.file.jpg"
+	},
+	{
 		"title": "Linux Action Show",
 		"url": "http://feeds.feedburner.com/TheLinuxActionShowOGG"
 	},

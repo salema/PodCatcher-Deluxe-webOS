@@ -26,7 +26,9 @@ Episode.prototype.read = function(xml) {
 	this.title = this.helper.getFirstValue(xml, XmlHelper.TITLE);
 	this.url = this.helper.getFirst(xml, XmlHelper.ENCLOSURE).getAttribute(XmlHelper.URL);
 	this.pubDate = this.helper.getFirstValue(xml, XmlHelper.PUBDATE);
-	this.description = this.helper.getFirstValue(xml, XmlHelper.DESCRIPTION);
+	if (this.helper.getFirst(xml, XmlHelper.DESCRIPTION).firstChild != undefined)
+		this.description = this.helper.getFirstValue(xml, XmlHelper.DESCRIPTION);
+	else this.description = "<i>No description.</i>";
 }
 
 Episode.prototype.isValid = function(xml) {

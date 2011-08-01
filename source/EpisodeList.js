@@ -49,7 +49,7 @@ enyo.kind({
 		
 		this.episodeList = [];
 		this.selectedIndex = -1;
-		//this.formatter = new enyo.g11n.DateFmt({date: "long",	time: "medium"});
+		this.formatter = new enyo.g11n.DateFmt({date: "long",	time: "medium"});
 	},
 	
 	getEpisode: function(inSender, inIndex) {
@@ -68,7 +68,9 @@ enyo.kind({
 	},
 	
 	selectEpisode: function(inSender, inIndex) {
-		this.selectedIndex = this.$.episodeListVR.fetchRowIndex();
+		if (this.$.episodeListVR.fetchRowIndex() == this.selectedIndex) return; 
+		else this.selectedIndex = this.$.episodeListVR.fetchRowIndex();
+		
 		var episode = this.episodeList[this.selectedIndex];
 		
 		if (episode) this.doSelectEpisode(episode);
