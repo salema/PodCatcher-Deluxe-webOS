@@ -26,44 +26,46 @@ enyo.kind({
 	},
 	width: "70%",
 	components: [
-		{kind: "WebService", name: "grabPodcast", onSuccess: "grabPodcastSuccess", onFailure: "grabPodcastFailed"},
+		{kind: "WebService", name: "grabPodcastService", onSuccess: "grabPodcastSuccess", onFailure: "grabPodcastFailed"},
 		{kind: "VFlexBox", components: [
 			{kind: "HFlexBox", align: "center", components: [
-				{kind: "Input", name: "newPodcastURL", hint: "Insert Podcast URL here", onchange: "addPodcast", flex: 1, alwaysLooksFocused: true, selectAllOnFocus: true, autoCapitalize: "lowercase"},
+				{kind: "Input", name: "urlInput", hint: "Insert Podcast URL here", onchange: "addPodcast", flex: 1, alwaysLooksFocused: true, selectAllOnFocus: true, autoCapitalize: "lowercase"},
 				{kind: "Spinner", name: "loadSpinner"},
-				{kind: "Button", content: "Add Podcast", onclick: "addPodcast"}
+				{kind: "Button", name: "addButton", content: "Add Podcast", onclick: "addPodcast"}
 			]},
 			{name: "error", content: "test", style: "display: none", className: "error"}
 		]},
 	],
 	
 	reset: function() {
-		this.$.newPodcastURL.setValue("");
+		this.$.urlInput.setValue("");
 		this.$.error.setStyle("display: none");
 		this.$.loadSpinner.hide();
-		this.$.newPodcastURL.setDisabled(false);
+		this.$.urlInput.setDisabled(false);
+		this.$.addButton.setDisabled(false);
 	},
 
 	addPodcast: function() {
-		this.$.loadSpinner.show();
 		this.$.error.setStyle("display: none");
-		this.$.newPodcastURL.setDisabled(true);
+		
+		this.$.loadSpinner.show();
+		this.$.urlInput.setDisabled(true);
+		this.$.addButton.setDisabled(true);
 
-		var url = this.$.newPodcastURL.getValue();
-		// Check for protocol
+		var url = this.$.urlInput.getValue();
+		// Check for protocol and add http if none is given
 		if (!(url.substring(0, 7) === "http://")) url = "http://" + url;
 		
 		// Try to grab podcast
-		this.$.grabPodcast.setUrl(encodeURI(url));
-		this.$.grabPodcast.call();
+		this.$.grabPodcastService.setUrl(encodeURI(url));
+		this.$.grabPodcastService.call();
 	},
 	
 	grabPodcastSuccess: function(inSender, inResponse, inRequest) {
-		var podcast = new Podcast();
+		var podcast = new Podcast(this.$.urlInput.getValue());
 		
 		if (podcast.isValid(inResponse)) {
 			podcast.read(inResponse);
-			podcast.setUrl(this.$.newPodcastURL.getValue());
 			
 			this.doAddPodcast(podcast);
 			this.close();	
@@ -73,7 +75,9 @@ enyo.kind({
 	grabPodcastFailed: function() {
 		this.$.error.setContent("Your podcast failed to load. Please check the URL and make sure you are online. Tap anywhere outside this window to cancel.");
 		this.$.error.setStyle("display: block");
-		this.$.newPodcastURL.setDisabled(false);
+		
+		this.$.urlInput.setDisabled(false);
+		this.$.addButton.setDisabled(false);
 		this.$.loadSpinner.hide();
 	},
 });

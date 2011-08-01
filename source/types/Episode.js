@@ -24,14 +24,14 @@ function Episode() {
 
 Episode.prototype.read = function(xml) {
 	this.title = this.helper.getFirstValue(xml, XmlHelper.TITLE);
-	this.url = this.helper.getFirst(xml, XmlHelper.ENCLOSURE).getAttribute(Episode.URL);
+	this.url = this.helper.getFirst(xml, XmlHelper.ENCLOSURE).getAttribute(XmlHelper.URL);
 	this.pubDate = this.helper.getFirstValue(xml, XmlHelper.PUBDATE);
 	this.description = this.helper.getFirstValue(xml, XmlHelper.DESCRIPTION);
 }
 
 Episode.prototype.isValid = function(xml) {
-	return this.helper.get(xml, XmlHelper.TITLE).length > 0 &&
-		this.helper.get(xml, XmlHelper.ENCLOSURE).length > 0 &&
-		this.helper.get(xml, XmlHelper.PUBDATE).length > 0 &&
-		this.helper.get(xml, XmlHelper.DESCRIPTION).length > 0;
+	return this.helper.has(xml, XmlHelper.TITLE) &&
+		this.helper.has(xml, XmlHelper.ENCLOSURE) &&
+		this.helper.has(xml, XmlHelper.PUBDATE) &&
+		this.helper.has(xml, XmlHelper.DESCRIPTION);
 }

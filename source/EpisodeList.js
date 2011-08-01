@@ -49,7 +49,7 @@ enyo.kind({
 		
 		this.episodeList = [];
 		this.selectedIndex = -1;
-		this.formatter = new enyo.g11n.DateFmt({date: "long",	time: "medium"});
+		//this.formatter = new enyo.g11n.DateFmt({date: "long",	time: "medium"});
 	},
 	
 	getEpisode: function(inSender, inIndex) {
@@ -60,7 +60,9 @@ enyo.kind({
 			if (this.selectedIndex == inIndex) this.$.episodeTitle.addClass("highlight");
 			
 			var pubDate = new Date(episode.pubDate);
-			this.$.episodePublished.setContent(this.formatter.format(pubDate));
+			if (this.formatter != undefined) this.$.episodePublished.setContent(this.formatter.format(pubDate));
+			else this.$.episodePublished.setContent(episode.pubDate);
+			
 			return true;
 		}
 	},

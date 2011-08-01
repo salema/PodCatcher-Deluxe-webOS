@@ -24,7 +24,8 @@ enyo.kind({
 	components: [
 		{kind: "PalmService", name: "launchBrowserCall", service: "palm://com.palm.applicationManager/", method: "launch"},
    		{kind: "Header", layoutKind: "HFlexLayout", style: "min-height: 60px;", components: [
-			{content: "Listen", name: "episodeName", style: "text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", flex: 1}
+			{content: "Listen", name: "episodeName", style: "text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", flex: 1},
+			{name: "time"}
 		]},
 		{kind: "Sound"},
 		{kind: "Scroller", name: "episodeScroller", flex: 1, style: "margin: 5px 12px", components: [
@@ -44,7 +45,13 @@ enyo.kind({
 	
 	setEpisode: function(episode) {
 		if (this.plays) this.togglePlay();
-				
+		
+		this.$.sound.audio.ownerLink = this;
+		this.$.sound.audio.addEventListener("playing", function(inEvent) { 
+			this.ownerLink.log(inEvent);
+		}, true);
+		
+		this.$.playButton.setCaption("Play");
 		this.$.playButton.setDisabled(false);
 		this.$.episodeName.setContent("Listen to \"" + episode.title + "\"");
 		this.$.episodeDescription.setContent(episode.description);
@@ -56,7 +63,6 @@ enyo.kind({
 		if (!this.plays) {
 			this.$.sound.play();
 			this.$.playButton.setCaption("Pause");
-			this.$.sound.audio.ownerLink = this;
 			this.$.sound.audio.addEventListener('ended', function(){ 
 					this.ownerLink.togglePlay();
 				}, false);
@@ -64,11 +70,18 @@ enyo.kind({
 			this.plays = true;
 		} else {
 			this.$.sound.audio.pause();
-			this.$.playButton.setCaption("Play");
+			this.$.playButton.setCaption("Resume");
 			this.$.sound.audio.removeEventListener('ended');
 			
 			this.plays = false;
 		}
+	},
+	
+	log: function(text) {
+		//enyo.log(this.$.sound.audio.duration);
+		//enyo.log(this.$.sound.audio.currentTime);
+		var time = this.$.sound.audio.currentTime / 60 + ":" + this.$.sound.audio.duration / 60;
+		this.$.time.setContent(time);
 	},
 	
 	openBrowser: function(inSender, inUrl) {

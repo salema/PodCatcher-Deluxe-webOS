@@ -19,6 +19,7 @@
  * Represent a podcast
  */
 function Podcast(url) {
+	this.url = url;
 	this.helper = new XmlHelper();
 }
 
@@ -37,18 +38,21 @@ Podcast.prototype.read = function(xml) {
 Podcast.prototype.isValid = function(xml) {
 	var source = this.helper.createXmlParser(xml);
 		
-	var title = this.helper.get(source, XmlHelper.TITLE);
-	var description = this.helper.get(source, XmlHelper.DESCRIPTION);
-	
-	return title.length > 0 && description.length > 0;
+	return this.helper.has(source, XmlHelper.TITLE) && this.helper.has(source, XmlHelper.DESCRIPTION)
 }
 
 Podcast.prototype.findImage = function(source) {
-	// TODO make this work all the time...
-	//if (this.helper.get(source, XmlHelper.IMAGE).length > 0)
-	//	return this.helper.getFirst(source, XmlHelper.IMAGE).getAttribute("url");
-	if (this.helper.get(source, XmlHelper.THUMBNAIL).length > 0)
+	// Image is in image tag
+	if (this.helper.has(source, XmlHelper.IMAGE)) {
+		var imageXml = this.helper.getFirst(source, XmlHelper.IMAGE);
+		
+		// Image has seperate url tag
+		if (this.helper.has(imageXml, XmlHelper.URL))
+			return this.helper.getFirstValue(imageXml, XmlHelper.URL);
+		// This is the <itunes:image href="xyz"> case
+		else return imageXml.getAttribute(XmlHelper.HREF);
+	}	
+	// Image is in thumbnail tag
+	else if (this.helper.get(source, XmlHelper.THUMBNAIL).length > 0)
 		return this.helper.getFirst(source, XmlHelper.THUMBNAIL).getAttribute(XmlHelper.URL);
-	if (this.helper.get(source, XmlHelper.IMAGE).length > 0)
-		return this.helper.getFirst(source, XmlHelper.IMAGE).getAttribute(XmlHelper.HREF);
 }

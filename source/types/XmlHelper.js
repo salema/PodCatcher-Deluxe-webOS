@@ -21,6 +21,10 @@
 function XmlHelper() {
 }
 
+XmlHelper.prototype.has = function(xml, tag) {
+	return this.get(xml, tag).length > 0;
+}
+
 XmlHelper.prototype.get = function(xml, tag) {
 	return xml.getElementsByTagName(tag);
 }

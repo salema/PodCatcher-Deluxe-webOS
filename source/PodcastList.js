@@ -42,7 +42,7 @@ enyo.kind({
 		{kind: "Image", name: "podcastImage", style: "width: 82%; padding: 10px 20px; border-top: 2px solid gray", src: "icons/icon128.png"},
 		{kind: "Toolbar", pack: "justify", components: [
 			{kind: "ToolButton", caption: "Add", onclick: "showAddPodcastPopup", flex: 1},
-			{kind: "ToolButton", name: "deleteButton", caption: "Delete", onclick: "deletePodcast"}
+			{kind: "ToolButton", name: "deleteButton", caption: "Delete", onclick: "deletePodcast", disabled: true}
 		]}
 	],
 
@@ -78,10 +78,7 @@ enyo.kind({
 	},
 	
 	startup: function() {
-		if (this.podcastList.length == 0) {
-			this.$.deleteButton.setDisabled(true);
-			this.showAddPodcastPopup();
-		}
+		if (this.podcastList.length == 0) this.showAddPodcastPopup();
 	},
 	
 	shutdown: function() {
@@ -143,11 +140,14 @@ enyo.kind({
 		
 		this.podcastList.splice(inIndex, 1);
 		
+		// Via button only
 		if (inIndex == this.selectedIndex) {
 			this.selectedIndex = -1;
 			this.$.podcastImage.setSrc("icons/icon128.png");
+			this.$.deleteButton.setDisabled(true);
 		}
-		if (this.podcastList.length == 0 || this.selectedIndex < 0) this.$.deleteButton.setDisabled(true);
+		// Via swipe and above in list
+		else if (inIndex < this.selectedIndex) this.selectedIndex--;
 		
 		this.$.podcastListVR.render();	
 	},
