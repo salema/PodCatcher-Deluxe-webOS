@@ -52,12 +52,12 @@ enyo.kind({
 		this.$.urlInput.setDisabled(true);
 		this.$.addButton.setDisabled(true);
 
-		var url = this.$.urlInput.getValue();
 		// Check for protocol and add http if none is given
-		if (!(url.substring(0, 7) === "http://")) url = "http://" + url;
+		if (!(this.$.urlInput.getValue().substring(0, 7) === "http://")) 
+			this.$.urlInput.setValue("http://" + this.$.urlInput.getValue());
 		
 		// Try to grab podcast
-		this.$.grabPodcastService.setUrl(encodeURI(url));
+		this.$.grabPodcastService.setUrl(encodeURI(this.$.urlInput.getValue()));
 		this.$.grabPodcastService.call();
 	},
 	

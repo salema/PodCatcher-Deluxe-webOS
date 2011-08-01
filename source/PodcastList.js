@@ -28,7 +28,6 @@ enyo.kind({
 	},
 	components: [
 		{kind: "ApplicationEvents", onLoad: "startup"},
-		{kind: "ApplicationEvents", onUnload: "shutdown"},
 		{kind: "SystemService", name: "preferencesService"},
 		{kind: "Net.Alliknow.PodCatcher.AddPodcastPopup", name: "addPodcastPopup", onAddPodcast: "addPodcast"},
 		{kind: "Header", content: "Discover Podcasts",  style: "min-height: 60px;"},
@@ -55,15 +54,20 @@ enyo.kind({
 		},
 		{
 			method: "getPreferences",
-			onSuccess: "gotPreferences",
-			onFailure: "gotPreferencesFailure"
+			onSuccess: "restorePodcastList",
+			onFailure: "preferencesFailure",
+			subscribe : false
 		});
 		
 		this.selectedIndex = -1;
 		this.podcastList = [];
 	},
 	
-	gotPreferences: function(inSender, inResponse) {
+	startup: function() {
+		if (this.podcastList.length == 0) this.showAddPodcastPopup();
+	},
+	
+	restorePodcastList: function(inSender, inResponse) {
 		if (inResponse.storedPodcastList == undefined) return;
 		
 		for (var index = 0; index < inResponse.storedPodcastList.length; index++) {
@@ -73,24 +77,16 @@ enyo.kind({
 		this.$.podcastListVR.render();
 	},
 	
-	gotPreferencesFailure: function(inSender, inResponse) {
-		enyo.log("got failure from preferencesService");
-	},
 	
-	startup: function() {
-		if (this.podcastList.length == 0) this.showAddPodcastPopup();
-	},
-	
-	shutdown: function() {
-		enyo.log("shutdown called");
+	storePodcastList: function() {
 		this.$.preferencesService.call(
 		{
-			keys: {
-				"storedPodcastList": this.podcastList
-			}
+			"storedPodcastList": this.podcastList
 		},
 		{
-			method: "setPreferences"
+			method: "setPreferences",
+			onFailure : "preferencesFailure",
+  		subscribe : false
 		});
 	},
 	
@@ -126,8 +122,9 @@ enyo.kind({
 	addPodcast: function(inSender, podcast) {
 		// TODO Is already in list?
 		this.podcastList.push(podcast);
+		this.storePodcastList();
+				
 		this.$.podcastListVR.render();
-		
 		this.$.podcastListScroller.scrollToBottom();
 	},
 
@@ -149,29 +146,11 @@ enyo.kind({
 		// Via swipe and above in list
 		else if (inIndex < this.selectedIndex) this.selectedIndex--;
 		
+		this.storePodcastList();
 		this.$.podcastListVR.render();	
 	},
 	
-	addTestPodcasts: function() {
-		this.podcastList.push({
-			title: "Letter for Gaelic Learners",
-			url: "http://downloads.bbc.co.uk/podcasts/scotland/litirbheag/rss.xml"
-		});
-		this.podcastList.push({
-			title: "BBC World Update: Daily Commute",
-			url: "http://downloads.bbc.co.uk/podcasts/worldservice/worldupmc/rss.xml"
-		});
-		this.podcastList.push({
-			title: "Burmese Morning Broadcast",
-			url: "http://downloads.bbc.co.uk/podcasts/worldservice/burmorning/rss.xml"
-		});
-		this.podcastList.push({
-			title: "Newshour",
-			url: "http://downloads.bbc.co.uk/podcasts/worldservice/newshour/rss.xml"
-		});
-		this.podcastList.push({
-			title: "Anderson Cooper 360°",
-			url: "http://rss.cnn.com/services/podcasting/ac360/rss"
-		});
+	preferencesFailure: function(inSender, inResponse) {
+		enyo.log("got failure from preferencesService");
 	}
 }); 
