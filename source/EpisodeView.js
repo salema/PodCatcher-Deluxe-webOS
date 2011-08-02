@@ -23,7 +23,7 @@ enyo.kind({
 	kind: "SlidingView",
 	components: [
 		{kind: "PalmService", name: "launchBrowserCall", service: "palm://com.palm.applicationManager/", method: "launch"},
-   		{kind: "Header", layoutKind: "HFlexLayout", style: "min-height: 60px;", components: [
+   	{kind: "Header", layoutKind: "HFlexLayout", style: "min-height: 60px;", components: [
 			{name: "episodeName", content: $L("Listen"), style: "text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", flex: 1}
 		]},
 		{kind: "Sound"},

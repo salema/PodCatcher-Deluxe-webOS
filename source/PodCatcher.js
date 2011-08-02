@@ -23,9 +23,10 @@ enyo.kind({
 	name: "Net.Alliknow.PodCatcher",
 	kind: "VFlexBox",
 	components: [
+		{kind: "PalmService", name: "launchBrowserCall", service: "palm://com.palm.applicationManager/", method: "launch"},
 		{kind: "AppMenu", components: [
-        	{kind: "HelpMenu", target: "http://salema.github.com/Yet-Another-Simple-Pod-Catcher"}
-        ]},
+  		{kind: "MenuItem", caption: $L("Help"), onclick: "openHelp"}
+    ]},
 		{kind: "SlidingPane", flex: 1, components: [
 			{kind: "Net.Alliknow.PodCatcher.PodcastList", name: "podcastListPane", width: "230px", onSelectPodcast: "podcastSelected"},
 			{kind: "Net.Alliknow.PodCatcher.EpisodeList", name: "episodeListPane", width: "350px", peekWidth: 100, onSelectEpisode: "episodeSelected"},
@@ -39,6 +40,10 @@ enyo.kind({
 	
 	closeAppMenuHandler: function() {
 	    this.$.appMenu.close();
+	},
+	
+	openHelp: function(inSender) {
+		this.$.launchBrowserCall.call({"id": "com.palm.app.browser", "params":{"target": "http://salema.github.com/Yet-Another-Simple-Pod-Catcher"}});
 	},
 	
 	podcastSelected: function(inSender, podcast) {
