@@ -32,7 +32,7 @@ enyo.kind({
 		]},
 		{kind: "Toolbar", components: [
 		   	{kind: "GrabButton", style: "position: static"},
-			{kind: "ToolButton", name: "playButton", caption: "Play", onclick: "togglePlay", disabled: true, flex: 1}
+			{kind: "ToolButton", name: "playButton", caption: $L"Play", onclick: "togglePlay", disabled: true, flex: 1}
 		]}
 	],
 
@@ -40,9 +40,9 @@ enyo.kind({
 		this.inherited(arguments);
 		
 		//this.resources = new enyo.g11n.Resources({"root": "file:///C:/Users/hausmann/Yet-Another-Simple-Pod-Catcher"});
-		this.resources = new enyo.g11n.Resources({"locale": "de_de"});
+		//this.resources = new enyo.g11n.Resources({"locale": "de_de"});
 		//this.resources = new enyo.g11n.Resources();
-		enyo.log(this.resources);
+		//enyo.log(this.resources);
 		this.plays = false;
 	},
 	
@@ -54,7 +54,7 @@ enyo.kind({
 //			this.ownerLink.log(inEvent);
 //		}, true);
 		
-		this.$.playButton.setCaption(this.resources.$L("Play"));
+		this.$.playButton.setCaption($L("Play"));
 		this.$.playButton.setDisabled(false);
 		this.$.episodeName.setContent("Listen to \"" + episode.title + "\"");
 		this.$.episodeDescription.setContent(episode.description);
