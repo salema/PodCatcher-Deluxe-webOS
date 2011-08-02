@@ -128,6 +128,7 @@ enyo.kind({
 	},
 
 	deletePodcast: function(inSender, inIndex) {
+		// TODO Ask for confirmation when coming from button
 		// Make this work for the button as well
 		if (inIndex instanceof MouseEvent) {
 			if (this.selectedIndex < 0) return;

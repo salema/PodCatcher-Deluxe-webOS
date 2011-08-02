@@ -24,7 +24,7 @@ enyo.kind({
 	components: [
 		{kind: "PalmService", name: "launchBrowserCall", service: "palm://com.palm.applicationManager/", method: "launch"},
    		{kind: "Header", layoutKind: "HFlexLayout", style: "min-height: 60px;", components: [
-			{content: "Listen", name: "episodeName", style: "text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", flex: 1}
+			{name: "episodeName", content: $L("Listen"), style: "text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", flex: 1}
 		]},
 		{kind: "Sound"},
 		{kind: "Scroller", name: "episodeScroller", flex: 1, style: "margin: 5px 12px", components: [
@@ -32,17 +32,13 @@ enyo.kind({
 		]},
 		{kind: "Toolbar", components: [
 		   	{kind: "GrabButton", style: "position: static"},
-			{kind: "ToolButton", name: "playButton", caption: $L"Play", onclick: "togglePlay", disabled: true, flex: 1}
+			{kind: "ToolButton", name: "playButton", caption: $L("Play"), onclick: "togglePlay", disabled: true, flex: 1}
 		]}
 	],
 
 	create: function() {
 		this.inherited(arguments);
 		
-		//this.resources = new enyo.g11n.Resources({"root": "file:///C:/Users/hausmann/Yet-Another-Simple-Pod-Catcher"});
-		//this.resources = new enyo.g11n.Resources({"locale": "de_de"});
-		//this.resources = new enyo.g11n.Resources();
-		//enyo.log(this.resources);
 		this.plays = false;
 	},
 	
@@ -56,7 +52,7 @@ enyo.kind({
 		
 		this.$.playButton.setCaption($L("Play"));
 		this.$.playButton.setDisabled(false);
-		this.$.episodeName.setContent("Listen to \"" + episode.title + "\"");
+		this.$.episodeName.setContent($L("Listen to") + " \"" + episode.title + "\"");
 		this.$.episodeDescription.setContent(episode.description);
 		this.$.episodeScroller.scrollTo(0, 0);
 		this.$.sound.setSrc(episode.url);
@@ -65,7 +61,7 @@ enyo.kind({
 	togglePlay: function() {
 		if (!this.plays) {
 			this.$.sound.play();
-			this.$.playButton.setCaption($L("Pause"));
+			this.$.playButton.setCaption(this.resources.$L("Pause"));
 			
 			this.plays = true;
 		} else {
