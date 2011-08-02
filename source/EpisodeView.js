@@ -61,7 +61,7 @@ enyo.kind({
 	togglePlay: function() {
 		if (!this.plays) {
 			this.$.sound.play();
-			this.$.playButton.setCaption(this.resources.$L("Pause"));
+			this.$.playButton.setCaption($L("Pause"));
 			
 			this.plays = true;
 		} else {
