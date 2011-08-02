@@ -27,7 +27,7 @@ enyo.kind({
 		onSelectPodcast: ""
 	},
 	components: [
-		{kind: "SystemService", name: "preferencesService"},
+		{kind: "SystemService", name: "preferencesService", onFailure: "preferencesFailure", subscribe : false},
 		{kind: "Net.Alliknow.PodCatcher.AddPodcastPopup", name: "addPodcastPopup", onAddPodcast: "addPodcast"},
 		{kind: "Header", content: "Discover Podcasts",  style: "min-height: 60px;"},
 		{kind: "Scroller", name: "podcastListScroller", flex: 1, components: [
@@ -47,6 +47,9 @@ enyo.kind({
 	create: function() {
 		this.inherited(arguments);
 		
+		this.selectedIndex = -1;
+		this.podcastList = [];
+		
 		this.$.preferencesService.call(
 		{
 			keys: ["storedPodcastList"]
@@ -54,20 +57,17 @@ enyo.kind({
 		{
 			method: "getPreferences",
 			onSuccess: "restorePodcastList",
-			onFailure: "preferencesFailure",
-			subscribe : false
-		});
-		
-		this.selectedIndex = -1;
-		this.podcastList = [];
+		});		
 	},
 	
 	restorePodcastList: function(inSender, inResponse) {
 		var list = inResponse.storedPodcastList;
 		
+		// first start of app (or empty podcast list)
 		if (list == undefined || list.length == 0) {
 			 this.showAddPodcastPopup();
 		}
+		// podcast list restored
 		else {
 			for (var index = 0; index < inResponse.storedPodcastList.length; index++) {
 				this.podcastList.push(inResponse.storedPodcastList[index]);
@@ -76,16 +76,13 @@ enyo.kind({
 		}
 	},
 	
-	
 	storePodcastList: function() {
 		this.$.preferencesService.call(
 		{
 			"storedPodcastList": this.podcastList
 		},
 		{
-			method: "setPreferences",
-			onFailure : "preferencesFailure",
-  		subscribe : false
+			method: "setPreferences"
 		});
 	},
 	
@@ -99,13 +96,14 @@ enyo.kind({
 		}
 	},
 	
-	selectPodcast: function(inSender, inIndex) {
+	selectPodcast: function(inSender, inEvent) {
 		if (this.$.podcastListVR.fetchRowIndex() == this.selectedIndex) return;
 		else this.selectedIndex = this.$.podcastListVR.fetchRowIndex();
 		
 		var podcast = this.podcastList[this.selectedIndex];
 		
 		if (podcast) {
+			// TODO Replace with web service loading the image
 			if (podcast.image != undefined) this.$.podcastImage.setSrc(podcast.image);
 			else this.$.podcastImage.setSrc("icons/icon128.png");
 			this.$.deleteButton.setDisabled(false);
