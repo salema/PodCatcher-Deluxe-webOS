@@ -24,7 +24,7 @@ enyo.kind({
 	kind: "VFlexBox",
 	components: [
 		{kind: "AppMenu", components: [
-        	{kind: "HelpMenu", target: "http://salema.github.com/Yet-Another-Simple-Pod-Catcher/help.html"}
+        	{kind: "HelpMenu", target: "http://salema.github.com/Yet-Another-Simple-Pod-Catcher"}
         ]},
 		{kind: "SlidingPane", flex: 1, components: [
 			{kind: "Net.Alliknow.PodCatcher.PodcastList", name: "podcastListPane", width: "230px", onSelectPodcast: "podcastSelected"},
