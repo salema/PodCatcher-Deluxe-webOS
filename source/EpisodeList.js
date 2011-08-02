@@ -28,14 +28,14 @@ enyo.kind({
 	components: [
 		{kind: "WebService", name: "grabPodcast", onSuccess: "grabPodcastSuccess", onFailure: "grabPodcastFailed"},
 		{kind: "Header", layoutKind: "HFlexLayout", style: "min-height: 60px", components: [
-			{content: "Select", name: "selectedPodcastName", style: "text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", flex: 1},
+			{content: $L("Select"), name: "selectedPodcastName", style: "text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", flex: 1},
 			{kind: "Spinner", name: "episodeSpinner", align: "right"}
 		]},
 		{kind: "Scroller", flex: 1, components: [
 			{kind: "VirtualRepeater", name: "episodeListVR", onSetupRow: "getEpisode", onclick: "selectEpisode", components: [
 				{kind: "Item", layout: "HFlexBox", components: [
-					{name: "episodeTitle", style: "text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", content: ""},
-					{name: "episodePublished", style: "font-size: 0.75em", content: ""}
+					{name: "episodeTitle", style: "text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"},
+					{name: "episodePublished", style: "font-size: 0.75em"}
 				]}
 			]}
 		]},
@@ -49,7 +49,7 @@ enyo.kind({
 		
 		this.episodeList = [];
 		this.selectedIndex = -1;
-		this.formatter = new enyo.g11n.DateFmt({date: "long",	time: "medium"});
+		this.formatter = new enyo.g11n.DateFmt({date: "long", time: "medium"});
 	},
 	
 	getEpisode: function(inSender, inIndex) {
@@ -79,7 +79,7 @@ enyo.kind({
 	},
 	
 	setPodcast: function(podcast) {
-		this.$.selectedPodcastName.setContent("Select from \"" + podcast.title + "\"");
+		this.$.selectedPodcastName.setContent($L("Select from") + " \"" + podcast.title + "\"");
 		this.$.episodeSpinner.show();
 		
 		this.selectedIndex = -1;

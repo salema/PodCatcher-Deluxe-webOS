@@ -29,11 +29,11 @@ enyo.kind({
 		{kind: "WebService", name: "grabPodcastService", onSuccess: "grabPodcastSuccess", onFailure: "grabPodcastFailed"},
 		{kind: "VFlexBox", components: [
 			{kind: "HFlexBox", align: "center", components: [
-				{kind: "Input", name: "urlInput", hint: "Insert Podcast URL here", onchange: "addPodcast", flex: 1, alwaysLooksFocused: true, selectAllOnFocus: true, autoCapitalize: "lowercase"},
+				{kind: "Input", name: "urlInput", hint: $L("Insert Podcast URL here"), onchange: "addPodcast", flex: 1, alwaysLooksFocused: true, selectAllOnFocus: true, autoCapitalize: "lowercase"},
 				{kind: "Spinner", name: "loadSpinner"},
-				{kind: "Button", name: "addButton", content: "Add Podcast", onclick: "addPodcast"}
+				{kind: "Button", name: "addButton", content: $L("Add Podcast"), onclick: "addPodcast"}
 			]},
-			{name: "error", content: "test", style: "display: none", className: "error"}
+			{name: "error", style: "display: none", className: "error"}
 		]},
 	],
 	
@@ -73,7 +73,7 @@ enyo.kind({
 	},
 	
 	grabPodcastFailed: function() {
-		this.$.error.setContent("Your podcast failed to load. Please check the URL and make sure you are online. Tap anywhere outside this window to cancel.");
+		this.$.error.setContent($L("Your podcast failed to load. Please check the URL and make sure you are online. Tap anywhere outside this window to cancel."));
 		this.$.error.setStyle("display: block");
 		
 		this.$.urlInput.setDisabled(false);

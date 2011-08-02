@@ -29,7 +29,7 @@ enyo.kind({
 	components: [
 		{kind: "SystemService", name: "preferencesService", onFailure: "preferencesFailure", subscribe : false},
 		{kind: "Net.Alliknow.PodCatcher.AddPodcastPopup", name: "addPodcastPopup", onAddPodcast: "addPodcast"},
-		{kind: "Header", content: "Discover Podcasts",  style: "min-height: 60px;"},
+		{kind: "Header", content: $L("Discover Podcasts"),  style: "min-height: 60px;"},
 		{kind: "Scroller", name: "podcastListScroller", flex: 1, components: [
 			{kind: "VirtualRepeater", name: "podcastListVR", onSetupRow: "getPodcast", onclick: "selectPodcast", components: [
 				{kind: "SwipeableItem", layoutKind: "HFlexLayout", onConfirm: "deletePodcast", components: [
@@ -39,8 +39,8 @@ enyo.kind({
 		]},
 		{kind: "Image", name: "podcastImage", style: "width: 82%; padding: 10px 20px; border-top: 2px solid gray", src: "icons/icon128.png"},
 		{kind: "Toolbar", pack: "justify", components: [
-			{kind: "ToolButton", caption: "Add", onclick: "showAddPodcastPopup", flex: 1},
-			{kind: "ToolButton", name: "deleteButton", caption: "Delete", onclick: "deletePodcast", disabled: true}
+			{kind: "ToolButton", caption: $L("Add"), onclick: "showAddPodcastPopup", flex: 1},
+			{kind: "ToolButton", name: "deleteButton", caption: $L("Delete"), onclick: "deletePodcast", disabled: true}
 		]}
 	],
 
