@@ -39,6 +39,10 @@ enyo.kind({
 	create: function() {
 		this.inherited(arguments);
 		
+		//this.resources = new enyo.g11n.Resources({"root": "file:///C:/Users/hausmann/Yet-Another-Simple-Pod-Catcher"});
+		this.resources = new enyo.g11n.Resources({"locale": "de_de"});
+		//this.resources = new enyo.g11n.Resources();
+		enyo.log(this.resources);
 		this.plays = false;
 	},
 	
@@ -50,7 +54,7 @@ enyo.kind({
 //			this.ownerLink.log(inEvent);
 //		}, true);
 		
-		this.$.playButton.setCaption("Play");
+		this.$.playButton.setCaption(this.resources.$L("Play"));
 		this.$.playButton.setDisabled(false);
 		this.$.episodeName.setContent("Listen to \"" + episode.title + "\"");
 		this.$.episodeDescription.setContent(episode.description);
@@ -61,12 +65,12 @@ enyo.kind({
 	togglePlay: function() {
 		if (!this.plays) {
 			this.$.sound.play();
-			this.$.playButton.setCaption("Pause");
+			this.$.playButton.setCaption($L("Pause"));
 			
 			this.plays = true;
 		} else {
 			this.$.sound.audio.pause();
-			this.$.playButton.setCaption("Resume");
+			this.$.playButton.setCaption($L("Resume"));
 			
 			this.plays = false;
 		}
