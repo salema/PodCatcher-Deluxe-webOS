@@ -49,7 +49,7 @@ enyo.kind({
 		
 		this.episodeList = [];
 		this.selectedIndex = -1;
-		//this.formatter = new enyo.g11n.DateFmt({date: "long", time: "medium"});
+		this.formatter = new enyo.g11n.DateFmt({date: "long", time: "medium"});
 	},
 	
 	getEpisode: function(inSender, inIndex) {
