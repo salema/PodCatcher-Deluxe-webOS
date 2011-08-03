@@ -24,7 +24,8 @@ enyo.kind({
 	components: [
 		{kind: "PalmService", name: "launchBrowserCall", service: "palm://com.palm.applicationManager/", method: "launch"},
    	{kind: "Header", layoutKind: "HFlexLayout", style: "min-height: 60px;", components: [
-			{name: "episodeName", content: $L("Listen"), style: "text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", flex: 1}
+			{name: "episodeName", content: $L("Listen"), style: "text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", flex: 1},
+			{kind: "Spinner", name: "stalledSpinner", align: "right"}
 		]},
 		{kind: "Sound"},
 		{kind: "Scroller", name: "episodeScroller", flex: 1, style: "margin: 5px 12px", components: [
@@ -39,8 +40,6 @@ enyo.kind({
 	create: function() {
 		this.inherited(arguments);
 		
-		// for some strange reason this does not work
-		//this.$.sound.audio.addEventListener('ended', enyo.bind(this, this.playbackEnded), false); 
 		this.plays = false;
 	},
 	
@@ -83,6 +82,11 @@ enyo.kind({
 	},
 	
 	updatePlaytime: function() {
+		// Update stalled spinner
+		if (this.$.sound.audio.readyState != 4) this.$.stalledSpinner.show();
+		else this.$.stalledSpinner.hide();
+		
+		// Update play button
 		if (this.$.sound.audio.currentTime == this.$.sound.audio.duration) this.playbackEnded();
 		else this.$.playButton.setCaption($L("Pause at") + " " + this.createTimeString());
 	},
