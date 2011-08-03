@@ -39,16 +39,14 @@ enyo.kind({
 	create: function() {
 		this.inherited(arguments);
 		
+		// for some strange reason this does not work
+		//this.$.sound.audio.addEventListener('ended', enyo.bind(this, this.playbackEnded), false); 
 		this.plays = false;
 	},
 	
 	setEpisode: function(episode) {
+		if (episode.url == this.$.sound.getSrc()) return;
 		if (this.plays) this.togglePlay();
-		
-//		this.$.sound.audio.ownerLink = this;
-//		this.$.sound.audio.addEventListener("playing", function(inEvent) { 
-//			this.ownerLink.log(inEvent);
-//		}, true);
 		
 		this.$.playButton.setCaption($L("Play"));
 		this.$.playButton.setDisabled(false);
@@ -76,8 +74,17 @@ enyo.kind({
 		}
 	},
 	
+	playbackEnded: function() {
+		this.$.playButton.setCaption($L("Playback complete"));
+		this.$.playButton.setDisabled(true);
+		
+		clearInterval(this.interval);
+		this.plays = false;
+	},
+	
 	updatePlaytime: function() {
-		this.$.playButton.setCaption($L("Pause at") + " " + this.createTimeString());
+		if (this.$.sound.audio.currentTime == this.$.sound.audio.duration) this.playbackEnded();
+		else this.$.playButton.setCaption($L("Pause at") + " " + this.createTimeString());
 	},
 	
 	createTimeString: function() {

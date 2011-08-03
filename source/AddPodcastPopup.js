@@ -43,6 +43,15 @@ enyo.kind({
 		this.$.loadSpinner.hide();
 		this.$.urlInput.setDisabled(false);
 		this.$.addButton.setDisabled(false);
+		
+		// TODO make insert clipboard work
+		enyo.dom.getClipboard(enyo.bind(this, this.gotClipboard));
+	},
+	
+	gotClipboard: function(inTest, inTest2) {
+		enyo.log(inTest);
+		// if (clipboard.length > 0 && clipboard.startsWith("http"))
+		//	this.$.urlInput.setValue(clipboard);
 	},
 
 	addPodcast: function() {
