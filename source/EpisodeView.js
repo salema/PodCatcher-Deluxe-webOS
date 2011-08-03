@@ -89,8 +89,8 @@ enyo.kind({
 		var minutes = Math.floor(Math.floor(time) / 60);
 		var seconds = Math.floor(time) % 60;
 		
-		if (minutes == Number.NaN) minutes = "--";
-		if (seconds == Number.NaN) seconds = "--"; 
+		if (isNaN(minutes) || !isFinite(minutes)) minutes = "--";
+		if (isNaN(seconds) || !isFinite(seconds)) seconds = "--"; 
 		else if (seconds < 10) seconds = "0" + seconds;
 		
 		return  minutes + ":" + seconds; 
