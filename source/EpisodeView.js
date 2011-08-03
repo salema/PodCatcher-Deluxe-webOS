@@ -61,22 +61,39 @@ enyo.kind({
 	togglePlay: function() {
 		if (!this.plays) {
 			this.$.sound.play();
-			this.$.playButton.setCaption($L("Pause"));
+			if (this.$.sound.audio.currentTime == 0) this.$.playButton.setCaption($L("Pause"));
+			else this.$.playButton.setCaption($L("Pause at") + " " + this.createTimeString());
 			
+			this.interval = setInterval(enyo.bind(this, this.updatePlaytime), 1000);
 			this.plays = true;
 		} else {
 			this.$.sound.audio.pause();
-			this.$.playButton.setCaption($L("Resume"));
+			clearInterval(this.interval);
 			
+			this.$.playButton.setCaption($L("Resume at") + " " + this.createTimeString());
+						
 			this.plays = false;
 		}
 	},
 	
-	log: function(text) {
-		//enyo.log(this.$.sound.audio.duration);
-		//enyo.log(this.$.sound.audio.currentTime);
-		var time = this.$.sound.audio.currentTime / 60 + ":" + this.$.sound.audio.duration / 60;
-		this.$.time.setContent(time);
+	updatePlaytime: function() {
+		this.$.playButton.setCaption($L("Pause at") + " " + this.createTimeString());
+	},
+	
+	createTimeString: function() {
+		return this.formatTime(this.$.sound.audio.currentTime) + " " +  $L("of") + " " +
+			this.formatTime(this.$.sound.audio.duration);
+	},
+	
+	formatTime: function(time) {
+		var minutes = Math.floor(Math.floor(time) / 60);
+		var seconds = Math.floor(time) % 60;
+		
+		if (minutes == Number.NaN) minutes = "--";
+		if (seconds == Number.NaN) seconds = "--"; 
+		else if (seconds < 10) seconds = "0" + seconds;
+		
+		return  minutes + ":" + seconds; 
 	},
 	
 	openBrowser: function(inSender, inUrl) {
