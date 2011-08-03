@@ -49,6 +49,7 @@ enyo.kind({
 		
 		this.$.playButton.setCaption($L("Play"));
 		this.$.playButton.setDisabled(false);
+		this.$.stalledSpinner.hide();
 		this.$.episodeName.setContent($L("Listen to") + " \"" + episode.title + "\"");
 		this.$.episodeDescription.setContent(episode.description);
 		this.$.episodeScroller.scrollTo(0, 0);
@@ -58,17 +59,13 @@ enyo.kind({
 	togglePlay: function() {
 		if (!this.plays) {
 			this.$.sound.play();
-			if (this.$.sound.audio.currentTime == 0) this.$.playButton.setCaption($L("Pause"));
-			else this.$.playButton.setCaption($L("Pause at") + " " + this.createTimeString());
-			
+			this.updatePlaytime();
 			this.interval = setInterval(enyo.bind(this, this.updatePlaytime), 1000);
 			this.plays = true;
 		} else {
 			this.$.sound.audio.pause();
-			clearInterval(this.interval);
-			
 			this.$.playButton.setCaption($L("Resume at") + " " + this.createTimeString());
-						
+			clearInterval(this.interval);
 			this.plays = false;
 		}
 	},
@@ -76,6 +73,7 @@ enyo.kind({
 	playbackEnded: function() {
 		this.$.playButton.setCaption($L("Playback complete"));
 		this.$.playButton.setDisabled(true);
+		this.$.stalledSpinner.hide();
 		
 		clearInterval(this.interval);
 		this.plays = false;
@@ -87,7 +85,8 @@ enyo.kind({
 		else this.$.stalledSpinner.hide();
 		
 		// Update play button
-		if (this.$.sound.audio.currentTime == this.$.sound.audio.duration) this.playbackEnded();
+		if (this.$.sound.audio.currentTime == 0) this.$.playButton.setCaption($L("Pause"));
+		else if (this.$.sound.audio.currentTime == this.$.sound.audio.duration) this.playbackEnded();
 		else this.$.playButton.setCaption($L("Pause at") + " " + this.createTimeString());
 	},
 	

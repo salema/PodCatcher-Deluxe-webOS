@@ -115,7 +115,6 @@ enyo.kind({
 
 	showAddPodcastPopup: function(inSender, inIndex) {
 		this.$.addPodcastPopup.openAtCenter();
-		this.$.addPodcastPopup.reset();
 	},
 	
 	addPodcast: function(inSender, podcast) {

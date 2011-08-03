@@ -37,7 +37,9 @@ enyo.kind({
 		]},
 	],
 	
-	reset: function() {
+	open: function() {
+		this.inherited(arguments);
+		
 		this.$.urlInput.setValue("");
 		this.$.error.setStyle("display: none");
 		this.$.loadSpinner.hide();
