@@ -57,4 +57,4 @@ Podcast.prototype.findImage = function(source) {
 		return this.helper.getFirst(source, XmlHelper.THUMBNAIL).getAttribute(XmlHelper.URL);
 }
 
-Podcast.DEFAULT_IMAGE = "icons/default.png";
+Podcast.DEFAULT_IMAGE = "icons/icon128.png";
