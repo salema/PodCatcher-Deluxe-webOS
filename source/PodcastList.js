@@ -33,11 +33,11 @@ enyo.kind({
 		{kind: "Scroller", name: "podcastListScroller", flex: 1, components: [
 			{kind: "VirtualRepeater", name: "podcastListVR", onSetupRow: "getPodcast", onclick: "selectPodcast", components: [
 				{kind: "SwipeableItem", layoutKind: "HFlexLayout", onConfirm: "deletePodcast", components: [
-					{name: "podcastTitle", style: "text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", content: ""}
+					{name: "podcastTitle", style: "text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"}
 				]}
 			]}
 		]},
-		{kind: "Image", name: "podcastImage", style: "width: 82%; padding: 10px 20px; border-top: 2px solid gray", src: "icons/icon128.png"},
+		{kind: "Image", name: "podcastImage", style: "width: 82%; padding: 10px 20px; border-top: 2px solid gray", src: Podcast.DEFAULT_IMAGE},
 		{kind: "Toolbar", pack: "justify", components: [
 			{kind: "ToolButton", caption: $L("Add"), onclick: "showAddPodcastPopup", flex: 1},
 			{kind: "ToolButton", name: "deleteButton", caption: $L("Delete"), onclick: "deletePodcast", disabled: true}
@@ -72,6 +72,7 @@ enyo.kind({
 			for (var index = 0; index < inResponse.storedPodcastList.length; index++) {
 				this.podcastList.push(inResponse.storedPodcastList[index]);
 			}
+			
 			this.$.podcastListVR.render();
 		}
 	},
@@ -86,6 +87,7 @@ enyo.kind({
 		});
 	},
 	
+	// Method called for item creation from virtual repeater
 	getPodcast: function(inSender, inIndex) {
 		var podcast = this.podcastList[inIndex];
 		
@@ -97,16 +99,17 @@ enyo.kind({
 	},
 	
 	selectPodcast: function(inSender, inEvent) {
+		// No action if current podcast is tapped on again
 		if (this.$.podcastListVR.fetchRowIndex() == this.selectedIndex) return;
 		else this.selectedIndex = this.$.podcastListVR.fetchRowIndex();
 		
 		var podcast = this.podcastList[this.selectedIndex];
 		
 		if (podcast) {
-			// TODO Replace with web service loading the image
 			if (podcast.image != undefined) this.$.podcastImage.setSrc(podcast.image);
-			else this.$.podcastImage.setSrc("icons/icon128.png");
+			else this.$.podcastImage.setSrc(Podcast.DEFAULT_IMAGE);
 			this.$.deleteButton.setDisabled(false);
+			
 			this.doSelectPodcast(podcast);
 		}
 		
@@ -136,10 +139,10 @@ enyo.kind({
 		
 		this.podcastList.splice(inIndex, 1);
 		
-		// Via button only
+		// Via button or swipe on selected
 		if (inIndex == this.selectedIndex) {
 			this.selectedIndex = -1;
-			this.$.podcastImage.setSrc("icons/icon128.png");
+			this.$.podcastImage.setSrc(Podcast.DEFAULT_IMAGE);
 			this.$.deleteButton.setDisabled(true);
 		}
 		// Via swipe and above in list
@@ -150,6 +153,8 @@ enyo.kind({
 	},
 	
 	preferencesFailure: function(inSender, inResponse) {
-		enyo.log("got failure from preferencesService");
+		this.warn("got failure from preferencesService");
+		this.warn(JSON.stringify(inSender));
+		this.warn(JSON.stringify(inResponse));
 	}
 }); 

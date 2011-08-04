@@ -110,7 +110,7 @@ enyo.kind({
 	},
 	
 	grabPodcastFailed: function() {
-		enyo.log("Failed to load podcast feed");
+		this.warn("Failed to load podcast feed");
 		this.$.episodeSpinner.hide();
 	},
 }); 
