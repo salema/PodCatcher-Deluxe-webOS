@@ -23,7 +23,7 @@ enyo.kind({
 	kind: "SlidingView",
 	components: [
 		{kind: "PalmService", name: "launchBrowserCall", service: "palm://com.palm.applicationManager/", method: "launch"},
-   	{kind: "Header", layoutKind: "HFlexLayout", style: "min-height: 60px;", components: [
+   		{kind: "Header", layoutKind: "HFlexLayout", style: "min-height: 60px;", components: [
 			{name: "episodeName", content: $L("Listen"), style: "text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", flex: 1},
 			{kind: "Spinner", name: "stalledSpinner", align: "right"}
 		]},
@@ -44,15 +44,18 @@ enyo.kind({
 	},
 	
 	setEpisode: function(episode) {
+		// Don't do anything if same episode is set again
 		if (episode.url == this.$.sound.getSrc()) return;
 		if (this.plays) this.togglePlay();
 		
+		// Update UI
 		this.$.playButton.setCaption($L("Play"));
 		this.$.playButton.setDisabled(false);
 		this.$.stalledSpinner.hide();
 		this.$.episodeName.setContent($L("Listen to") + " \"" + episode.title + "\"");
 		this.$.episodeDescription.setContent(episode.description);
 		this.$.episodeScroller.scrollTo(0, 0);
+		// Set sound source
 		this.$.sound.setSrc(episode.url);
 	},
 
@@ -61,23 +64,14 @@ enyo.kind({
 			this.$.sound.play();
 			this.updatePlaytime();
 			this.interval = setInterval(enyo.bind(this, this.updatePlaytime), 1000);
-			this.plays = true;
 		} else {
 			this.$.sound.audio.pause();
 			if (this.$.sound.audio.currentTime == 0) this.$.playButton.setCaption($L("Resume"));
 			else this.$.playButton.setCaption($L("Resume at") + " " + this.createTimeString());
 			clearInterval(this.interval);
-			this.plays = false;
 		}
-	},
-	
-	playbackEnded: function() {
-		this.$.playButton.setCaption($L("Playback complete"));
-		this.$.playButton.setDisabled(true);
-		this.$.stalledSpinner.hide();
 		
-		clearInterval(this.interval);
-		this.plays = false;
+		this.plays = !this.plays;
 	},
 	
 	updatePlaytime: function() {
@@ -91,11 +85,21 @@ enyo.kind({
 		else this.$.playButton.setCaption($L("Pause at") + " " + this.createTimeString());
 	},
 	
+	playbackEnded: function() {
+		this.$.playButton.setCaption($L("Playback complete"));
+		this.$.playButton.setDisabled(true);
+		this.$.stalledSpinner.hide();
+		
+		clearInterval(this.interval);
+		this.plays = false;
+	},
+	
 	createTimeString: function() {
 		return this.formatTime(this.$.sound.audio.currentTime) + " " +  $L("of") + " " +
 			this.formatTime(this.$.sound.audio.duration);
 	},
 	
+	// Convert a time given in seconds with many digits to MM:SS
 	formatTime: function(time) {
 		var minutes = Math.floor(Math.floor(time) / 60);
 		var seconds = Math.floor(time) % 60;
@@ -108,6 +112,6 @@ enyo.kind({
 	},
 	
 	openBrowser: function(inSender, inUrl) {
-		this.$.launchBrowserCall.call({"id": "com.palm.app.browser", "params":{"target": inUrl}});
+		this.$.launchBrowserCall.call({"id": "com.palm.app.browser", "params": {"target": inUrl}});
 	}
 });
