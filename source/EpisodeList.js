@@ -49,7 +49,9 @@ enyo.kind({
 		
 		this.episodeList = [];
 		this.selectedIndex = -1;
-		this.formatter = new enyo.g11n.DateFmt({date: "long", time: "medium"});
+		// add weekday makes this crash
+		//this.formatter = new enyo.g11n.DateFmt({date: "long", time: "short", weekday: true});
+		this.formatter = new enyo.g11n.DateFmt({date: "long", time: "short"});
 	},
 	
 	getEpisode: function(inSender, inIndex) {

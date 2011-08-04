@@ -64,7 +64,8 @@ enyo.kind({
 			this.plays = true;
 		} else {
 			this.$.sound.audio.pause();
-			this.$.playButton.setCaption($L("Resume at") + " " + this.createTimeString());
+			if (this.$.sound.audio.currentTime == 0) this.$.playButton.setCaption($L("Resume"));
+			else this.$.playButton.setCaption($L("Resume at") + " " + this.createTimeString());
 			clearInterval(this.interval);
 			this.plays = false;
 		}
