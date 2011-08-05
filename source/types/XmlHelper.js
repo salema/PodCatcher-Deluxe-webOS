@@ -43,6 +43,7 @@ XmlHelper.prototype.parse = function(xmlDocument) {
 	return parser.parseFromString(xmlDocument, "text/xml");
 }
 
+XmlHelper.ITEM = "item";
 XmlHelper.TITLE = "title";
 XmlHelper.ENCLOSURE = "enclosure";
 XmlHelper.PUBDATE = "pubDate";
