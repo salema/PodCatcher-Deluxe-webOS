@@ -33,7 +33,7 @@ enyo.kind({
 				{kind: "Spinner", name: "loadSpinner"},
 				{kind: "Button", name: "addButton", content: $L("Add Podcast"), onclick: "addPodcast"}
 			]},
-			{name: "error", style: "display: none", className: "error"}
+			{name: "error", style: "display: none;", className: "error"}
 		]},
 	],
 	
@@ -47,18 +47,18 @@ enyo.kind({
 		this.$.addButton.setDisabled(false);
 		
 		// TODO make insert clipboard work
-		enyo.dom.getClipboard(enyo.bind(this, this.gotClipboard));
+		// enyo.dom.getClipboard(enyo.bind(this, this.gotClipboard));
 	},
 	
 	gotClipboard: function(inTest, inTest2) {
-		enyo.log(inTest);
+		// enyo.log(inTest);
 		// if (clipboard.length > 0 && clipboard.startsWith("http"))
 		//	this.$.urlInput.setValue(clipboard);
 	},
 
 	addPodcast: function() {
+		// update UI
 		this.$.error.setStyle("display: none");
-		
 		this.$.loadSpinner.show();
 		this.$.urlInput.setDisabled(true);
 		this.$.addButton.setDisabled(true);
