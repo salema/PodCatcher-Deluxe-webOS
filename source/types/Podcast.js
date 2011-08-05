@@ -27,34 +27,36 @@ Podcast.prototype.setUrl = function(url) {
 	this.url = url;
 }
 
-Podcast.prototype.read = function(xml) {
-	var source = this.helper.createXmlParser(xml);
+// Read podcast information from feed
+// Make sure to call isValid() before reading
+Podcast.prototype.read = function(xmlDocument) {
+	var xmlTree = this.helper.parse(xmlDocument);
 		
-	this.title = this.helper.getFirstValue(source, XmlHelper.TITLE);
-	this.description = this.helper.getFirstValue(source, XmlHelper.DESCRIPTION);
-	this.image = this.findImage(source);
+	this.title = this.helper.getFirstValue(xmlTree, XmlHelper.TITLE);
+	this.description = this.helper.getFirstValue(xmlTree, XmlHelper.DESCRIPTION);
+	this.image = this.findImage(xmlTree);
 }
 
-Podcast.prototype.isValid = function(xml) {
-	var source = this.helper.createXmlParser(xml);
+Podcast.prototype.isValid = function(xmlDocument) {
+	var xmlTree = this.helper.parse(xmlDocument);
 		
-	return this.helper.has(source, XmlHelper.TITLE) && this.helper.has(source, XmlHelper.DESCRIPTION)
+	return this.helper.has(xmlTree, XmlHelper.TITLE) && this.helper.has(xmlTree, XmlHelper.DESCRIPTION)
 }
 
-Podcast.prototype.findImage = function(source) {
+Podcast.prototype.findImage = function(xmlTree) {
 	// Image is in image tag
-	if (this.helper.has(source, XmlHelper.IMAGE)) {
-		var imageXml = this.helper.getFirst(source, XmlHelper.IMAGE);
+	if (this.helper.has(xmlTree, XmlHelper.IMAGE)) {
+		var imageXmlTree = this.helper.getFirst(xmlTree, XmlHelper.IMAGE);
 		
 		// Image has seperate url tag
-		if (this.helper.has(imageXml, XmlHelper.URL))
-			return this.helper.getFirstValue(imageXml, XmlHelper.URL);
+		if (this.helper.has(imageXmlTree, XmlHelper.URL))
+			return this.helper.getFirstValue(imageXmlTree, XmlHelper.URL);
 		// This is the <itunes:image href="xyz"> case
-		else return imageXml.getAttribute(XmlHelper.HREF);
+		else return imageXmlTree.getAttribute(XmlHelper.HREF);
 	}	
 	// Image is in thumbnail tag
-	else if (this.helper.get(source, XmlHelper.THUMBNAIL).length > 0)
-		return this.helper.getFirst(source, XmlHelper.THUMBNAIL).getAttribute(XmlHelper.URL);
+	else if (this.helper.get(xmlTree, XmlHelper.THUMBNAIL).length > 0)
+		return this.helper.getFirst(xmlTree, XmlHelper.THUMBNAIL).getAttribute(XmlHelper.URL);
 }
 
 Podcast.DEFAULT_IMAGE = "icons/icon128.png";

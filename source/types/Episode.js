@@ -22,18 +22,21 @@ function Episode() {
 	this.helper = new XmlHelper();
 }
 
-Episode.prototype.read = function(xml) {
-	this.title = this.helper.getFirstValue(xml, XmlHelper.TITLE);
-	this.url = this.helper.getFirst(xml, XmlHelper.ENCLOSURE).getAttribute(XmlHelper.URL);
-	this.pubDate = this.helper.getFirstValue(xml, XmlHelper.PUBDATE);
-	if (this.helper.getFirst(xml, XmlHelper.DESCRIPTION).firstChild != undefined)
-		this.description = this.helper.getFirstValue(xml, XmlHelper.DESCRIPTION);
-	else this.description = "<i>No description.</i>";
+// Read episode information from feed
+// Make sure to call isValid() before reading
+Episode.prototype.read = function(xmlTree) {
+	this.title = this.helper.getFirstValue(xmlTree, XmlHelper.TITLE);
+	this.url = this.helper.getFirst(xmlTree, XmlHelper.ENCLOSURE).getAttribute(XmlHelper.URL);
+	this.pubDate = this.helper.getFirstValue(xmlTree, XmlHelper.PUBDATE);
+	
+	if (this.helper.getFirst(xmlTree, XmlHelper.DESCRIPTION).firstChild != undefined)
+		this.description = this.helper.getFirstValue(xmlTree, XmlHelper.DESCRIPTION);
+	else this.description = "<i>" + $L("No description available.") + "</i>";
 }
 
-Episode.prototype.isValid = function(xml) {
-	return this.helper.has(xml, XmlHelper.TITLE) &&
-		this.helper.has(xml, XmlHelper.ENCLOSURE) &&
-		this.helper.has(xml, XmlHelper.PUBDATE) &&
-		this.helper.has(xml, XmlHelper.DESCRIPTION);
+Episode.prototype.isValid = function(xmlTree) {
+	return this.helper.has(xmlTree, XmlHelper.TITLE) &&
+		this.helper.has(xmlTree, XmlHelper.ENCLOSURE) &&
+		this.helper.has(xmlTree, XmlHelper.PUBDATE) &&
+		this.helper.has(xmlTree, XmlHelper.DESCRIPTION);
 }

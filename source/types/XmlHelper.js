@@ -16,30 +16,31 @@
  */
 
 /**
- * Some helper functions
+ * Some helper functions to work on XML documents (like podcast feeds)
  */
 function XmlHelper() {
 }
 
-XmlHelper.prototype.has = function(xml, tag) {
-	return this.get(xml, tag).length > 0;
+XmlHelper.prototype.get = function(xmlTree, tagName) {
+	return xmlTree.getElementsByTagName(tagName);
 }
 
-XmlHelper.prototype.get = function(xml, tag) {
-	return xml.getElementsByTagName(tag);
+XmlHelper.prototype.has = function(xmlTree, tagName) {
+	return this.get(xmlTree, tagName).length > 0;
 }
 
-XmlHelper.prototype.getFirst = function(xml, tag) {
-	return this.get(xml, tag)[0];
+XmlHelper.prototype.getFirst = function(xmlTree, tagName) {
+	return this.get(xmlTree, tagName)[0];
 }
 
-XmlHelper.prototype.getFirstValue = function(xml, tag) {
-	return this.getFirst(xml, tag).firstChild.data;
+XmlHelper.prototype.getFirstValue = function(xmlTree, tagName) {
+	return this.getFirst(xmlTree, tagName).firstChild.data;
 }
 
-XmlHelper.prototype.createXmlParser = function(xml) {
+XmlHelper.prototype.parse = function(xmlDocument) {
   var parser = new DOMParser();
-	return parser.parseFromString(xml, "text/xml");
+	
+	return parser.parseFromString(xmlDocument, "text/xml");
 }
 
 XmlHelper.TITLE = "title";
