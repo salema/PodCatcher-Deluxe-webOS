@@ -37,7 +37,7 @@ enyo.kind({
 				]}
 			]}
 		]},
-		{kind: "Image", name: "podcastImage", style: "width: 82%; padding: 10px 20px; border-top: 2px solid gray", src: Podcast.DEFAULT_IMAGE},
+		{kind: "Image", name: "podcastImage", className: "podcastImage", src: Podcast.DEFAULT_IMAGE},
 		{kind: "Toolbar", pack: "justify", className: "toolbar", components: [
 			{kind: "ToolButton", caption: $L("Add"), onclick: "showAddPodcastPopup", flex: 1},
 			{kind: "ToolButton", name: "deleteButton", caption: $L("Delete"), onclick: "deletePodcast", disabled: true}
