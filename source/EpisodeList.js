@@ -27,19 +27,19 @@ enyo.kind({
 	},
 	components: [
 		{kind: "WebService", name: "grabPodcast", onSuccess: "grabPodcastSuccess", onFailure: "grabPodcastFailed"},
-		{kind: "Header", layoutKind: "HFlexLayout", style: "min-height: 60px", components: [
-			{content: $L("Select"), name: "selectedPodcastName", style: "text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", flex: 1},
+		{kind: "Header", layoutKind: "HFlexLayout", className: "header", components: [
+			{content: $L("Select"), name: "selectedPodcastName", className: "nowrap", flex: 1},
 			{kind: "Spinner", name: "episodeSpinner", align: "right"}
 		]},
 		{kind: "Scroller", flex: 1, components: [
 			{kind: "VirtualRepeater", name: "episodeListVR", onSetupRow: "getEpisode", onclick: "selectEpisode", components: [
 				{kind: "Item", layout: "HFlexBox", components: [
-					{name: "episodeTitle", style: "text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"},
-					{name: "episodePublished", style: "font-size: 0.75em"}
+					{name: "episodeTitle", className: "nowrap"},
+					{name: "episodePublished", className: "nowrap", style: "font-size: smaller"}
 				]}
 			]}
 		]},
-		{kind: "Toolbar", components: [
+		{kind: "Toolbar", className: "toolbar", components: [
 			{kind: "GrabButton"}
 		]}
 	],
