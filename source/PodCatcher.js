@@ -25,6 +25,7 @@ enyo.kind({
 	components: [
 		{kind: "PalmService", name: "launchBrowserCall", service: "palm://com.palm.applicationManager/", method: "launch"},
 		{kind: "AppMenu", components: [
+			{kind: "AppMenuItem", caption: $L("About"), onclick: "openAbout"},
 			{kind: "AppMenuItem", caption: $L("Help"), onclick: "openHelp"}
 		]},
 		{kind: "SlidingPane", flex: 1, components: [
@@ -34,12 +35,8 @@ enyo.kind({
 		]}
 	],
 	
-	openAppMenuHandler: function() {
-	    this.$.appMenu.open();
-	},
-	
-	closeAppMenuHandler: function() {
-	    this.$.appMenu.close();
+	openAbout: function(inSender) {
+		this.$.launchBrowserCall.call({"id": "com.palm.app.browser", "params":{"target": "http://salema.github.com/Yet-Another-Simple-Pod-Catcher"}});
 	},
 	
 	openHelp: function(inSender) {
@@ -52,5 +49,13 @@ enyo.kind({
 	
 	episodeSelected: function(inSender, episode) {
 		this.$.episodeViewPane.setEpisode(episode);
+	},
+	
+	openAppMenuHandler: function() {
+		this.$.appMenu.open();
+	},
+	
+	closeAppMenuHandler: function() {
+		this.$.appMenu.close();
 	}
 });
