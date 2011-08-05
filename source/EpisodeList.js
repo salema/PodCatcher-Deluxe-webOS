@@ -31,6 +31,7 @@ enyo.kind({
 			{content: $L("Select"), name: "selectedPodcastName", className: "nowrap", flex: 1},
 			{kind: "Spinner", name: "episodeSpinner", align: "right"}
 		]},
+		{name: "error", style: "display: none", className: "error"},
 		{kind: "Scroller", flex: 1, components: [
 			{kind: "VirtualRepeater", name: "episodeListVR", onSetupRow: "getEpisode", onclick: "selectEpisode", components: [
 				{kind: "Item", layout: "HFlexBox", components: [
@@ -47,6 +48,7 @@ enyo.kind({
 	create: function() {
 		this.inherited(arguments);
 		
+		this.helper = new XmlHelper();
 		this.episodeList = [];
 		this.selectedIndex = -1;
 		// add weekday makes this crash
@@ -54,6 +56,19 @@ enyo.kind({
 		this.formatter = new enyo.g11n.DateFmt({date: "long", time: "short"});
 	},
 	
+	setPodcast: function(podcast) {
+		this.$.selectedPodcastName.setContent($L("Select from") + " \"" + podcast.title + "\"");
+		this.$.episodeSpinner.show();
+		this.$.error.setStyle("display: none;");
+		
+		this.selectedIndex = -1;
+		this.episodeList = [];
+		this.$.episodeListVR.render();
+		
+		this.$.grabPodcast.setUrl(encodeURI(podcast.url));
+		this.$.grabPodcast.call();
+	},
+		
 	getEpisode: function(inSender, inIndex) {
 		var episode = this.episodeList[inIndex];
 
@@ -74,28 +89,15 @@ enyo.kind({
 		else this.selectedIndex = this.$.episodeListVR.fetchRowIndex();
 		
 		var episode = this.episodeList[this.selectedIndex];
-		
 		if (episode) this.doSelectEpisode(episode);
 		
 		this.$.episodeListVR.render();
 	},
 	
-	setPodcast: function(podcast) {
-		this.$.selectedPodcastName.setContent($L("Select from") + " \"" + podcast.title + "\"");
-		this.$.episodeSpinner.show();
-		
-		this.selectedIndex = -1;
-		this.episodeList = [];
-		this.$.episodeListVR.render();
-		
-		this.$.grabPodcast.setUrl(encodeURI(podcast.url));
-		this.$.grabPodcast.call();
-	},
-	
 	grabPodcastSuccess: function(inSender, inResponse, inRequest) {
-		var parser = new DOMParser;
-		var source = parser.parseFromString(inResponse, "text/xml");
-		var items = source.getElementsByTagName("item");
+		this.log(inResponse);
+		var xmlTree = this.helper.parse(inResponse);
+		var items = this.helper.get(xmlTree, XmlHelper.ITEM);
 		
 		for (var index = 0; index < items.length; index++) {
 			var episode = new Episode();
@@ -105,12 +107,16 @@ enyo.kind({
 			this.episodeList.push(episode);
 		}
 		
+		if (this.episodeList.length == 0) this.grabPodcastFailed();
+		
 		this.$.episodeListVR.render();
 		this.$.episodeSpinner.hide();
 	},
 	
 	grabPodcastFailed: function() {
 		this.warn("Failed to load podcast feed");
+		this.$.error.setContent($L("The podcast feed failed to load. Please make sure you are online."));
+		this.$.error.setStyle("display: block;");
 		this.$.episodeSpinner.hide();
-	},
+	}
 }); 
