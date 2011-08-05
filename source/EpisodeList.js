@@ -95,7 +95,6 @@ enyo.kind({
 	},
 	
 	grabPodcastSuccess: function(inSender, inResponse, inRequest) {
-		this.log(inResponse);
 		var xmlTree = this.helper.parse(inResponse);
 		var items = this.helper.get(xmlTree, XmlHelper.ITEM);
 		
