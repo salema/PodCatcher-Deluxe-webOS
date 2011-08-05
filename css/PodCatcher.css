@@ -2,8 +2,8 @@
  *
  * This file is part of Yet Another Simple Pod Catcher.
  *
- * Yet Another Simple Pod Catcher is free software: you can redistribute it 
- * and/or modify it under the terms of the GNU General Public License as 
+ * Yet Another Simple Pod Catcher is free software: you can redistribute it
+ * and/or modify it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the License,
  * or (at your option) any later version.
  *
@@ -22,8 +22,8 @@
 	min-height: 60px;
 }
 .nowrap {
-	text-overflow: ellipsis; 
-	overflow: hidden; 
+	text-overflow: ellipsis;
+	overflow: hidden;
 	white-space: nowrap;
 }
 .highlight {
@@ -32,6 +32,10 @@
 .error {
 	color: red;
 	font-size: smaller;
-	padding-top: 10px;
-	padding-left: 10px;
+	padding: 10px 10px 0px 10px;
+}
+.podcastImage {
+	width: 82%;
+	padding: 10px 20px;
+	border-top: 2px solid gray
 }
