@@ -20,7 +20,10 @@
  */
 enyo.kind({
 	name: "Net.Alliknow.PodCatcher.AddPodcastPopup",
-	kind: "Popup",
+	kind: "ModalDialog",
+	caption: $L("Add a new Podcast"),
+	scrim: false,
+	dismissWithClick: true,
 	events: {
 		onAddPodcast: ""
 	},
