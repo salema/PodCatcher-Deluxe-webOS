@@ -28,6 +28,7 @@ enyo.kind({
 	},
 	components: [
 		{kind: "SystemService", name: "preferencesService", onFailure: "preferencesFailure", subscribe : false},
+		{kind: "WebService", name: "grabPodcastImage", onSuccess: "grabPodcastImageSuccess", onFailure: "grabPodcastImageFailed"},
 		{kind: "Net.Alliknow.PodCatcher.AddPodcastPopup", name: "addPodcastPopup", onAddPodcast: "addPodcast"},
 		{kind: "Header", content: $L("Discover Podcasts"), className: "header"},
 		{kind: "Scroller", name: "podcastListScroller", flex: 1, components: [
@@ -40,7 +41,7 @@ enyo.kind({
 		{kind: "Image", name: "podcastImage", className: "podcastImage", src: Podcast.DEFAULT_IMAGE},
 		{kind: "Toolbar", pack: "justify", className: "toolbar", components: [
 			{kind: "ToolButton", caption: $L("Add"), onclick: "showAddPodcastPopup", flex: 1},
-			{kind: "ToolButton", name: "deleteButton", caption: $L("Delete"), onclick: "deletePodcast", disabled: true}
+			//{kind: "ToolButton", name: "deleteButton", caption: $L("Delete"), onclick: "deletePodcast", disabled: true}
 		]}
 	],
 
@@ -106,9 +107,9 @@ enyo.kind({
 		var podcast = this.podcastList[this.selectedIndex];
 		
 		if (podcast) {
-			if (podcast.image != undefined) this.$.podcastImage.setSrc(podcast.image);
-			else this.$.podcastImage.setSrc(Podcast.DEFAULT_IMAGE);
 			this.$.deleteButton.setDisabled(false);
+			this.$.grabPodcastImage.setUrl(encodeURI(podcast.image));
+			this.$.grabPodcastImage.call();
 			
 			this.doSelectPodcast(podcast);
 		}
@@ -135,6 +136,7 @@ enyo.kind({
 		if (inIndex instanceof MouseEvent) {
 			if (this.selectedIndex < 0) return;
 			inIndex = this.selectedIndex;
+			alert("test");
 		}
 		
 		this.podcastList.splice(inIndex, 1);
@@ -151,6 +153,17 @@ enyo.kind({
 		this.storePodcastList();
 		this.$.podcastListVR.render();	
 	},
+	
+	grabPodcastImageSuccess: function(inSender, inResponse, inRequest) {
+		var podcast = this.podcastList[this.selectedIndex];
+		
+		if (podcast.image == undefined || inResponse.length == 0) this.grabPodcastImageFailure();
+		else this.$.podcastImage.setSrc(podcast.image);
+	},
+	
+	grabPodcastImageFailure: function(inSender, inResponse, inRequest) {
+		this.$.podcastImage.setSrc(Podcast.DEFAULT_IMAGE);
+	}, 
 	
 	preferencesFailure: function(inSender, inResponse) {
 		this.warn("got failure from preferencesService");
