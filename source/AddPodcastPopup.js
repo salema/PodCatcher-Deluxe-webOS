@@ -50,14 +50,13 @@ enyo.kind({
 		this.$.urlInput.setDisabled(false);
 		this.$.addButton.setDisabled(false);
 		
-		// TODO make insert clipboard work
-		//enyo.dom.getClipboard(enyo.bind(this, this.gotClipboard));
+		// TODO Does this actually work???
+		enyo.dom.getClipboard(enyo.bind(this, this.gotClipboard));
 	},
 	
 	gotClipboard: function(inText) {
-		//this.log(inText);
-		// if (inText.length > 0 && inText.startsWith("http"))
-		//	this.$.urlInput.setValue(inText);
+		if (inText && inText.length > 7 && inText.substring(0, 7) === "http://")
+			this.$.urlInput.setValue(inText);
 	},
 
 	addPodcast: function() {
