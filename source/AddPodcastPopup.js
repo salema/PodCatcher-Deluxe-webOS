@@ -32,7 +32,7 @@ enyo.kind({
 		{kind: "WebService", name: "grabPodcastService", onSuccess: "grabPodcastSuccess", onFailure: "grabPodcastFailed"},
 		{kind: "VFlexBox", components: [
 			{kind: "HFlexBox", align: "center", components: [
-				{kind: "Input", name: "urlInput", hint: $L("Insert Podcast URL here"), onchange: "addPodcast", inputType: "url", flex: 1, 
+				{kind: "Input", name: "urlInput", hint: $L("Insert Podcast URL here"), inputType: "url", flex: 1, 
 						alwaysLooksFocused: true, selectAllOnFocus: true, spellcheck: false, autoCapitalize: "lowercase"},
 				{kind: "Spinner", name: "loadSpinner"},
 				{kind: "Button", name: "addButton", content: $L("Add Podcast"), onclick: "addPodcast"}
@@ -51,13 +51,13 @@ enyo.kind({
 		this.$.addButton.setDisabled(false);
 		
 		// TODO make insert clipboard work
-		// enyo.dom.getClipboard(enyo.bind(this, this.gotClipboard));
+		//enyo.dom.getClipboard(enyo.bind(this, this.gotClipboard));
 	},
 	
-	gotClipboard: function(inTest, inTest2) {
-		// enyo.log(inTest);
-		// if (clipboard.length > 0 && clipboard.startsWith("http"))
-		//	this.$.urlInput.setValue(clipboard);
+	gotClipboard: function(inText) {
+		//this.log(inText);
+		// if (inText.length > 0 && inText.startsWith("http"))
+		//	this.$.urlInput.setValue(inText);
 	},
 
 	addPodcast: function() {
