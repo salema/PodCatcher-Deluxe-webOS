@@ -120,7 +120,8 @@ enyo.kind({
 	},
 	
 	addPodcast: function(inSender, podcast) {
-		// TODO Is already in list?
+		if (isPodcastInList(podcast)) return;
+		
 		this.podcastList.push(podcast);
 		this.storePodcastList();
 				
@@ -143,6 +144,13 @@ enyo.kind({
 		this.$.podcastListVR.render();	
 	},
 	
+	isPodcastInList: function(podcast) {
+		for (var index = 0; index < this.podcastList.length; index++)
+			if (this.podcastList[index].url == podcast.url) return true;
+			
+		return false;	
+	},
+	
 	grabPodcastImageSuccess: function(inSender, inResponse, inRequest) {
 		var podcast = this.podcastList[this.selectedIndex];
 		
@@ -152,7 +160,7 @@ enyo.kind({
 	
 	grabPodcastImageFailure: function(inSender, inResponse, inRequest) {
 		this.$.podcastImage.setSrc(Podcast.DEFAULT_IMAGE);
-	}, 
+	},
 	
 	preferencesFailure: function(inSender, inResponse) {
 		this.warn("got failure from preferencesService");
