@@ -32,7 +32,8 @@ enyo.kind({
 		{kind: "WebService", name: "grabPodcastService", onSuccess: "grabPodcastSuccess", onFailure: "grabPodcastFailed"},
 		{kind: "VFlexBox", components: [
 			{kind: "HFlexBox", align: "center", components: [
-				{kind: "Input", name: "urlInput", hint: $L("Insert Podcast URL here"), onchange: "addPodcast", flex: 1, alwaysLooksFocused: true, selectAllOnFocus: true, autoCapitalize: "lowercase"},
+				{kind: "Input", name: "urlInput", hint: $L("Insert Podcast URL here"), onchange: "addPodcast", inputType: "url", flex: 1, 
+						alwaysLooksFocused: true, selectAllOnFocus: true, spellcheck: false, autoCapitalize: "lowercase"},
 				{kind: "Spinner", name: "loadSpinner"},
 				{kind: "Button", name: "addButton", content: $L("Add Podcast"), onclick: "addPodcast"}
 			]},
