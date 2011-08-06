@@ -40,8 +40,7 @@ enyo.kind({
 		]},
 		{kind: "Image", name: "podcastImage", className: "podcastImage", src: Podcast.DEFAULT_IMAGE},
 		{kind: "Toolbar", pack: "justify", className: "toolbar", components: [
-			{kind: "ToolButton", caption: $L("Add"), onclick: "showAddPodcastPopup", flex: 1},
-			//{kind: "ToolButton", name: "deleteButton", caption: $L("Delete"), onclick: "deletePodcast", disabled: true}
+			{kind: "ToolButton", caption: $L("Add"), onclick: "showAddPodcastPopup", flex: 1}
 		]}
 	],
 
@@ -107,7 +106,6 @@ enyo.kind({
 		var podcast = this.podcastList[this.selectedIndex];
 		
 		if (podcast) {
-			this.$.deleteButton.setDisabled(false);
 			this.$.grabPodcastImage.setUrl(encodeURI(podcast.image));
 			this.$.grabPodcastImage.call();
 			
@@ -131,21 +129,12 @@ enyo.kind({
 	},
 
 	deletePodcast: function(inSender, inIndex) {
-		// TODO Ask for confirmation when coming from button
-		// Make this work for the button as well
-		if (inIndex instanceof MouseEvent) {
-			if (this.selectedIndex < 0) return;
-			inIndex = this.selectedIndex;
-			alert("test");
-		}
-		
 		this.podcastList.splice(inIndex, 1);
 		
-		// Via button or swipe on selected
+		// Swipe on selected
 		if (inIndex == this.selectedIndex) {
 			this.selectedIndex = -1;
 			this.$.podcastImage.setSrc(Podcast.DEFAULT_IMAGE);
-			this.$.deleteButton.setDisabled(true);
 		}
 		// Via swipe and above in list
 		else if (inIndex < this.selectedIndex) this.selectedIndex--;
