@@ -120,7 +120,7 @@ enyo.kind({
 	},
 	
 	addPodcast: function(inSender, podcast) {
-		if (isPodcastInList(podcast)) return;
+		if (this.isPodcastInList(podcast)) return;
 		
 		this.podcastList.push(podcast);
 		this.storePodcastList();
