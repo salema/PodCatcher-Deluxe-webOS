@@ -28,7 +28,7 @@ enyo.kind({
 	},
 	components: [
 		{kind: "SystemService", name: "preferencesService", onFailure: "preferencesFailure", subscribe : false},
-		{kind: "WebService", name: "grabPodcastImage", onSuccess: "grabPodcastImageSuccess", onFailure: "grabPodcastImageFailed"},
+		{kind: "WebService", name: "grabPodcastImage", onSuccess: "grabPodcastImageSuccess"},
 		{kind: "Net.Alliknow.PodCatcher.AddPodcastPopup", name: "addPodcastPopup", onAddPodcast: "addPodcast"},
 		{kind: "Header", content: $L("Discover Podcasts"), className: "header"},
 		{kind: "Scroller", name: "podcastListScroller", flex: 1, components: [
@@ -106,6 +106,7 @@ enyo.kind({
 		var podcast = this.podcastList[this.selectedIndex];
 		
 		if (podcast) {
+			this.$.podcastImage.setSrc(Podcast.DEFAULT_IMAGE);
 			this.$.grabPodcastImage.setUrl(encodeURI(podcast.image));
 			this.$.grabPodcastImage.call();
 			
@@ -154,12 +155,7 @@ enyo.kind({
 	grabPodcastImageSuccess: function(inSender, inResponse, inRequest) {
 		var podcast = this.podcastList[this.selectedIndex];
 		
-		if (podcast.image == undefined || inResponse.length == 0) this.grabPodcastImageFailure();
-		else this.$.podcastImage.setSrc(podcast.image);
-	},
-	
-	grabPodcastImageFailure: function(inSender, inResponse, inRequest) {
-		this.$.podcastImage.setSrc(Podcast.DEFAULT_IMAGE);
+		if (podcast.image != undefined && inResponse.length != 0) this.$.podcastImage.setSrc(podcast.image);
 	},
 	
 	preferencesFailure: function(inSender, inResponse) {
