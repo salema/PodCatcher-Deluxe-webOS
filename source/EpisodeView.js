@@ -22,6 +22,8 @@ enyo.kind({
 	name: "Net.Alliknow.PodCatcher.EpisodeView",
 	kind: "SlidingView",
 	components: [
+		{kind: "SystemService", name: "preferencesService", subscribe : false},
+		{kind: "ApplicationEvents", onUnload: "storeResumeInformation"},
 		{kind: "PalmService", name: "launchBrowserCall", service: "palm://com.palm.applicationManager/", method: "launch"},
 		{kind: "Header", layoutKind: "HFlexLayout", className: "header", components: [
 			{name: "episodeName", content: $L("Listen"), className: "nowrap", flex: 1},
@@ -42,12 +44,48 @@ enyo.kind({
 		this.inherited(arguments);
 		
 		this.plays = false;
+		
+		this.$.preferencesService.call(
+		{
+			keys: ["resumeEpisode", "resumeTime"]
+		},
+		{
+			method: "getPreferences",
+			onSuccess: "resume",
+		});
+	},
+	
+	resume: function(inSender, inResponse) {
+		if (inResponse.resumeEpisode == undefined) return;
+		else {
+			this.setEpisode(inResponse.resumeEpisode);
+			
+			if (inResponse.resumeTime > 0) {
+				this.resumeOnce = inResponse.resumeTime;
+				this.$.playButton.setCaption($L("Resume at") + " " + this.formatTime(inResponse.resumeTime));
+			}
+		}
+	},
+	
+	storeResumeInformation: function() {
+		if (this.episode == undefined) return;
+		
+		this.$.preferencesService.call(
+		{
+			"resumeEpisode": this.episode,
+			"resumeTime": this.$.sound.audio.currentTime
+		},
+		{
+			method: "setPreferences"
+		});
 	},
 	
 	setEpisode: function(episode) {
 		// Don't do anything if same episode is set again
 		if (episode.url == this.$.sound.getSrc()) return;
 		if (this.plays) this.togglePlay();
+		
+		this.episode = episode;
 		
 		// Update UI
 		this.$.playButton.setCaption($L("Play"));
@@ -64,6 +102,10 @@ enyo.kind({
 
 	togglePlay: function() {
 		if (!this.plays) {
+			if (this.resumeOnce > 0) {
+				this.$.sound.audio.currentTime = this.resumeOnce;
+				this.resumeOnce = -1;
+			}
 			this.$.sound.play();
 			this.updatePlaytime();
 			this.interval = setInterval(enyo.bind(this, this.updatePlaytime), 1000);

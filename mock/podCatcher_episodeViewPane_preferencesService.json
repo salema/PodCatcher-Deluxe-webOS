@@ -1,0 +1,9 @@
+{
+	"resumeEpisode": {
+		"title": "Testtitel",
+		"url": "http://traffic.libsyn.com/linuxoutlaws/linuxoutlaws221.mp3",
+		"description": "Testbeschreibung"
+	},
+	"resumeTime": 1234,
+	"returnValue": true
+}
