@@ -56,6 +56,8 @@ enyo.kind({
 		this.$.episodeName.setContent($L("Listen to") + " \"" + episode.title + "\"");
 		this.$.episodeDescription.setContent(episode.description);
 		this.$.episodeScroller.scrollTo(0, 0);
+		this.$.playSlider.setPosition(0);
+		this.$.playSlider.setBarPosition(0);
 		// Set sound source
 		this.$.sound.setSrc(episode.url);
 	},
