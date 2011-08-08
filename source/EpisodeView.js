@@ -128,7 +128,8 @@ enyo.kind({
 	
 	updatePlaytime: function() {
 		// Update stalled spinner
-		if (this.$.sound.audio.readyState != 4) this.$.stalledSpinner.show();
+		if (this.$.sound.audio.readyState != 4 || this.$.sound.audio.seeking)
+			this.$.stalledSpinner.show();
 		else this.$.stalledSpinner.hide();
 		
 		// Update play button
