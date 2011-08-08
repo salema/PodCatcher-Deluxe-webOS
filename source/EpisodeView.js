@@ -31,6 +31,7 @@ enyo.kind({
 		{kind: "Scroller", name: "episodeScroller", flex: 1, style: "margin: 5px 12px", components: [
 			{kind: "HtmlContent", name: "episodeDescription", onLinkClick: "openBrowser", flex: 1}
 		]},
+		{kind: "ProgressSlider", name: "playSlider", style: "margin: 10px;", onChange: "seek"},
 		{kind: "Toolbar", className: "toolbar", components: [
 			{kind: "GrabButton", style: "position: static"},
 			{kind: "ToolButton", name: "playButton", caption: $L("Play"), onclick: "togglePlay", disabled: true, flex: 1}
@@ -75,6 +76,11 @@ enyo.kind({
 		this.plays = !this.plays;
 	},
 	
+	seek: function(inSender, inEvent) {
+		this.$.sound.audio.currentTime = inEvent;
+		this.updatePlaytime();
+	},
+	
 	updatePlaytime: function() {
 		// Update stalled spinner
 		if (this.$.sound.audio.readyState != 4) this.$.stalledSpinner.show();
@@ -84,6 +90,12 @@ enyo.kind({
 		if (this.$.sound.audio.currentTime == 0) this.$.playButton.setCaption($L("Pause"));
 		else if (this.$.sound.audio.currentTime == this.$.sound.audio.duration) this.playbackEnded();
 		else this.$.playButton.setCaption($L("Pause at") + " " + this.createTimeString());
+		
+		// Update play slider
+		this.$.playSlider.setMaximum(this.$.sound.audio.duration);
+		this.$.playSlider.setBarMaximum(this.$.sound.audio.duration);
+		this.$.playSlider.setPosition(this.$.sound.audio.currentTime);
+		this.$.playSlider.setBarPosition(this.$.sound.audio.currentTime);
 	},
 	
 	playbackEnded: function() {
