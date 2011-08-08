@@ -86,6 +86,7 @@ enyo.kind({
 		if (this.plays) this.togglePlay();
 		
 		this.episode = episode;
+		this.resumeOnce = -1;
 		
 		// Update UI
 		this.$.playButton.setCaption($L("Play"));
