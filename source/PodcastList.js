@@ -69,8 +69,8 @@ enyo.kind({
 		}
 		// podcast list restored
 		else {
-			for (var index = 0; index < inResponse.storedPodcastList.length; index++) {
-				this.podcastList.push(inResponse.storedPodcastList[index]);
+			for (var index = 0; index < list.length; index++) {
+				this.podcastList.push(list[index]);
 			}
 			
 			this.$.podcastListVR.render();

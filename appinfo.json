@@ -1,6 +1,6 @@
 {
 	"id": "net.alliknow.yaspc",
-	"version": "2.1.5",
+	"version": "2.2.1",
 	"vendor": "Kevin Hausmann",
 	"type": "web",
 	"main": "index.html",
