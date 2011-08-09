@@ -57,7 +57,7 @@ enyo.kind({
 		{
 			method: "getPreferences",
 			onSuccess: "restorePodcastList",
-		});		
+		});
 	},
 	
 	restorePodcastList: function(inSender, inResponse) {
