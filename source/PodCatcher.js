@@ -37,15 +37,15 @@ enyo.kind({
 	],
 	
 	openDeluxe: function(inSender) {
-		this.$.launchBrowserCall.call({"id": "com.palm.app.browser", "params":{"target": "http://developer.palm.com/appredirect/?packageid=net.alliknow.podcatcher"}});
+		this.$.launchBrowserCall.call({"id": "com.palm.app.browser", "params": {"target": "http://developer.palm.com/appredirect/?packageid=net.alliknow.podcatcher"}});
 	},
 	
 	openAbout: function(inSender) {
-		this.$.launchBrowserCall.call({"id": "com.palm.app.browser", "params":{"target": "http://salema.github.com/Yet-Another-Simple-Pod-Catcher"}});
+		this.$.launchBrowserCall.call({"id": "com.palm.app.browser", "params": {"target": "http://salema.github.com/Yet-Another-Simple-Pod-Catcher"}});
 	},
 	
 	openHelp: function(inSender) {
-		this.$.launchBrowserCall.call({"id": "com.palm.app.browser", "params":{"target": "http://salema.github.com/Yet-Another-Simple-Pod-Catcher/help.html"}});
+		this.$.launchBrowserCall.call({"id": "com.palm.app.browser", "params": {"target": "http://salema.github.com/Yet-Another-Simple-Pod-Catcher/help.html"}});
 	},
 	
 	podcastSelected: function(inSender, podcast) {
