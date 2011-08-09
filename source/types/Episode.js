@@ -40,3 +40,6 @@ Episode.prototype.isValid = function(xmlTree) {
 		this.helper.has(xmlTree, XmlHelper.PUBDATE) &&
 		this.helper.has(xmlTree, XmlHelper.DESCRIPTION);
 }
+
+Episode.MARKED_ICON = "icons/star-off.png";
+Episode.UNMARKED_ICON = "icons/star-on.png";

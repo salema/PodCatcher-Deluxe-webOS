@@ -4,6 +4,7 @@
 		"url": "http://traffic.libsyn.com/linuxoutlaws/linuxoutlaws221.mp3",
 		"description": "Testbeschreibung"
 	},
+	"resumeMarked": true,
 	"resumeTime": 1234,
 	"returnValue": true
 }

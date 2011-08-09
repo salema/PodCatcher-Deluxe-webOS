@@ -40,7 +40,8 @@ enyo.kind({
 		]},
 		{kind: "Image", name: "podcastImage", className: "podcastImage", src: Podcast.DEFAULT_IMAGE},
 		{kind: "Toolbar", pack: "justify", className: "toolbar", components: [
-			{kind: "ToolButton", caption: $L("Add"), onclick: "showAddPodcastPopup", flex: 1}
+			{kind: "ToolButton", caption: $L("Add"), onclick: "showAddPodcastPopup", flex: 1},
+			//{kind: "ToolButton", caption: $L("Select all"), onclick: "", flex: 1}
 		]}
 	],
 
@@ -69,8 +70,8 @@ enyo.kind({
 		}
 		// podcast list restored
 		else {
-			for (var index = 0; index < inResponse.storedPodcastList.length; index++) {
-				this.podcastList.push(inResponse.storedPodcastList[index]);
+			for (var index = 0; index < list.length; index++) {
+				this.podcastList.push(list[index]);
 			}
 			
 			this.$.podcastListVR.render();

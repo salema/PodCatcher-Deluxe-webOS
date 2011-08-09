@@ -26,6 +26,7 @@ enyo.kind({
 		onSelectEpisode: ""
 	},
 	components: [
+		{kind: "SystemService", name: "preferencesService", subscribe : false},
 		{kind: "WebService", name: "grabPodcast", onSuccess: "grabPodcastSuccess", onFailure: "grabPodcastFailed"},
 		{kind: "Header", layoutKind: "HFlexLayout", className: "header", components: [
 			{content: $L("Select"), name: "selectedPodcastName", className: "nowrap", flex: 1},
@@ -41,7 +42,8 @@ enyo.kind({
 			]}
 		]},
 		{kind: "Toolbar", className: "toolbar", components: [
-			{kind: "GrabButton"}
+			{kind: "GrabButton", style: "position: static"},
+			{kind: "ToolButton", name: "showAllButton", caption: $L("New only"), onclick: "toggleShowAll", flex: 1}
 		]}
 	],
 
@@ -51,9 +53,39 @@ enyo.kind({
 		this.helper = new XmlHelper();
 		this.episodeList = [];
 		this.selectedIndex = -1;
+		this.showAll = true;
+		this.markedEpisodes = [];
+		
 		// add weekday makes this crash
 		//this.formatter = new enyo.g11n.DateFmt({date: "long", time: "short", weekday: true});
 		this.formatter = new enyo.g11n.DateFmt({date: "long", time: "short"});
+		
+		this.$.preferencesService.call(
+		{
+			keys: ["markedEpisodes"]
+		},
+		{
+			method: "getPreferences",
+			onSuccess: "restoreMarkedEpisodes",
+		});
+	},
+	
+	restoreMarkedEpisodes: function(inSender, inResponse) {
+		var list = inResponse.markedEpisodes;
+		
+		for (var index = 0; index < list.length; index++) {
+			this.markedEpisodes.push(list[index]);
+		}
+	},
+	
+	storeMarkedEpisodes: function() {
+		this.$.preferencesService.call(
+		{
+			"markedEpisodes": this.markedEpisodes
+		},
+		{
+			method: "setPreferences"
+		});
 	},
 	
 	setPodcast: function(podcast) {
@@ -71,14 +103,23 @@ enyo.kind({
 		
 	getEpisode: function(inSender, inIndex) {
 		var episode = this.episodeList[inIndex];
-
+		
 		if (episode) {
-			this.$.episodeTitle.setContent(episode.title);
-			if (this.selectedIndex == inIndex) this.$.episodeTitle.addClass("highlight");
+			var old = this.markedEpisodes.indexOf(episode.url) >= 0
 			
-			var pubDate = new Date(episode.pubDate);
-			if (this.formatter != undefined) this.$.episodePublished.setContent(this.formatter.format(pubDate));
-			else this.$.episodePublished.setContent(episode.pubDate);
+			if (!this.showAll && old) {
+				this.$.episodeTitle.parent.setStyle("display: none;");
+			} else {
+				this.$.episodeTitle.setContent(episode.title);
+				if (this.selectedIndex == inIndex) this.$.episodeTitle.addClass("highlight");
+				if (old) this.$.episodeTitle.addClass("marked");
+				
+				var pubDate = new Date(episode.pubDate);
+				if (this.formatter != undefined) this.$.episodePublished.setContent(this.formatter.format(pubDate));
+				else this.$.episodePublished.setContent(episode.pubDate);
+				
+				if (old) this.$.episodePublished.addClass("marked");
+			}
 			
 			return true;
 		}
@@ -89,7 +130,31 @@ enyo.kind({
 		else this.selectedIndex = this.$.episodeListVR.fetchRowIndex();
 		
 		var episode = this.episodeList[this.selectedIndex];
-		if (episode) this.doSelectEpisode(episode);
+		if (episode) {
+			episode.marked = this.markedEpisodes.indexOf(episode.url) >= 0;
+			this.doSelectEpisode(episode);
+		}
+		
+		this.$.episodeListVR.render();
+	},
+	
+	markEpisode: function(episode, marked) {
+		if (marked && this.markedEpisodes.indexOf(episode.url) < 0) 
+			this.markedEpisodes.push(episode.url);
+		else if (!marked) {
+			var index = this.markedEpisodes.indexOf(episode.url);
+			if (index >= 0) this.markedEpisodes.splice(index, 1);
+		}
+		
+		this.storeMarkedEpisodes();
+		this.$.episodeListVR.render();
+	},
+	
+	toggleShowAll: function(inSender, inEvent) {
+		this.showAll = !this.showAll;
+		
+		if (this.showAll) this.$.showAllButton.setCaption($L("New only"))
+		else this.$.showAllButton.setCaption($L("Show all"))
 		
 		this.$.episodeListVR.render();
 	},

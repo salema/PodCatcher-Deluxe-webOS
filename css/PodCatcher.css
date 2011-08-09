@@ -29,6 +29,9 @@
 .highlight {
 	font-weight: bold
 }
+.marked {
+	color: gray
+}
 .error {
 	color: red;
 	font-size: smaller;

@@ -21,11 +21,15 @@
 enyo.kind({
 	name: "Net.Alliknow.PodCatcher.EpisodeView",
 	kind: "SlidingView",
+	events: {
+		onMarkEpisode: ""
+	},
 	components: [
 		{kind: "SystemService", name: "preferencesService", subscribe : false},
 		{kind: "ApplicationEvents", onUnload: "storeResumeInformation"},
 		{kind: "PalmService", name: "launchBrowserCall", service: "palm://com.palm.applicationManager/", method: "launch"},
 		{kind: "Header", layoutKind: "HFlexLayout", className: "header", components: [
+			{kind: "Image", name: "markButton", src: Episode.UNMARKED_ICON, onclick: "toggleMarked", style: "margin-right: 10px;"},
 			{name: "episodeName", content: $L("Listen"), className: "nowrap", flex: 1},
 			{kind: "Spinner", name: "stalledSpinner", align: "right"}
 		]},
@@ -47,7 +51,7 @@ enyo.kind({
 		
 		this.$.preferencesService.call(
 		{
-			keys: ["resumeEpisode", "resumeTime"]
+			keys: ["resumeEpisode", "resumeMarked", "resumeTime"]
 		},
 		{
 			method: "getPreferences",
@@ -59,6 +63,9 @@ enyo.kind({
 		if (inResponse.resumeEpisode == undefined) return;
 		else {
 			this.setEpisode(inResponse.resumeEpisode);
+			this.doMarkEpisode(inResponse.resumeEpisode, inResponse.resumeMarked);
+			
+			if (inResponse.resumeMarked) this.$.markButton.setSrc(Episode.MARKED_ICON);
 			
 			if (inResponse.resumeTime > 0) {
 				this.resumeOnce = inResponse.resumeTime;
@@ -73,6 +80,7 @@ enyo.kind({
 		this.$.preferencesService.call(
 		{
 			"resumeEpisode": this.episode,
+			"resumeMarked": this.$.markButton.getSrc() == Episode.MARKED_ICON,
 			"resumeTime": this.$.sound.audio.currentTime
 		},
 		{
@@ -97,8 +105,18 @@ enyo.kind({
 		this.$.episodeScroller.scrollTo(0, 0);
 		this.$.playSlider.setPosition(0);
 		this.$.playSlider.setBarPosition(0);
+		if (episode.marked) this.$.markButton.setSrc(Episode.MARKED_ICON);
+		else this.$.markButton.setSrc(Episode.UNMARKED_ICON);
+		
 		// Set sound source
 		this.$.sound.setSrc(episode.url);
+	},
+	
+	toggleMarked: function() {
+		if (this.$.markButton.getSrc() == Episode.MARKED_ICON) this.$.markButton.setSrc(Episode.UNMARKED_ICON);
+		else this.$.markButton.setSrc(Episode.MARKED_ICON);
+		
+		this.doMarkEpisode(this.episode, this.$.markButton.getSrc() == Episode.MARKED_ICON);
 	},
 
 	togglePlay: function() {
@@ -148,6 +166,8 @@ enyo.kind({
 		this.$.playButton.setCaption($L("Playback complete"));
 		this.$.playButton.setDisabled(true);
 		this.$.stalledSpinner.hide();
+		
+		if (this.$.markButton.getSrc() == Episode.UNMARKED_ICON) toggleMarked();
 		
 		clearInterval(this.interval);
 		this.plays = false;

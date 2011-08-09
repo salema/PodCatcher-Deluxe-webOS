@@ -31,7 +31,7 @@ enyo.kind({
 		{kind: "SlidingPane", flex: 1, components: [
 			{kind: "Net.Alliknow.PodCatcher.PodcastList", name: "podcastListPane", width: "230px", onSelectPodcast: "podcastSelected"},
 			{kind: "Net.Alliknow.PodCatcher.EpisodeList", name: "episodeListPane", width: "350px", peekWidth: 100, onSelectEpisode: "episodeSelected"},
-			{kind: "Net.Alliknow.PodCatcher.EpisodeView", name: "episodeViewPane", flex: 1, peekWidth: 250}
+			{kind: "Net.Alliknow.PodCatcher.EpisodeView", name: "episodeViewPane", flex: 1, peekWidth: 250, onMarkEpisode: "episodeMarked"}
 		]}
 	],
 	
@@ -49,6 +49,10 @@ enyo.kind({
 	
 	episodeSelected: function(inSender, episode) {
 		this.$.episodeViewPane.setEpisode(episode);
+	},
+	
+	episodeMarked: function(inSender, episode, marked) {
+		this.$.episodeListPane.markEpisode(episode, marked);
 	},
 	
 	openAppMenuHandler: function() {
