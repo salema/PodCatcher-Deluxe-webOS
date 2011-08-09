@@ -167,7 +167,7 @@ enyo.kind({
 		this.$.playButton.setDisabled(true);
 		this.$.stalledSpinner.hide();
 		
-		if (this.$.markButton.getSrc() == Episode.UNMARKED_ICON) toggleMarked();
+		if (this.$.markButton.getSrc() == Episode.UNMARKED_ICON) this.toggleMarked();
 		
 		clearInterval(this.interval);
 		this.plays = false;
