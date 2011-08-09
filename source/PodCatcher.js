@@ -25,6 +25,7 @@ enyo.kind({
 	components: [
 		{kind: "PalmService", name: "launchBrowserCall", service: "palm://com.palm.applicationManager/", method: "launch"},
 		{kind: "AppMenu", components: [
+			{kind: "AppMenuItem", caption: "PodCatcher Deluxe", onclick: "openDeluxe"},
 			{kind: "AppMenuItem", caption: $L("About"), onclick: "openAbout"},
 			{kind: "AppMenuItem", caption: $L("Help"), onclick: "openHelp"}
 		]},
@@ -34,6 +35,10 @@ enyo.kind({
 			{kind: "Net.Alliknow.PodCatcher.EpisodeView", name: "episodeViewPane", flex: 1, peekWidth: 250}
 		]}
 	],
+	
+	openDeluxe: function(inSender) {
+		this.$.launchBrowserCall.call({"id": "com.palm.app.browser", "params":{"target": "http://developer.palm.com/appredirect/?packageid=net.alliknow.podcatcher"}});
+	},
 	
 	openAbout: function(inSender) {
 		this.$.launchBrowserCall.call({"id": "com.palm.app.browser", "params":{"target": "http://salema.github.com/Yet-Another-Simple-Pod-Catcher"}});
