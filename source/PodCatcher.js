@@ -31,24 +31,24 @@ enyo.kind({
 		{kind: "SlidingPane", flex: 1, components: [
 			{kind: "Net.Alliknow.PodCatcher.PodcastList", name: "podcastListPane", width: "230px", onSelectPodcast: "podcastSelected"},
 			{kind: "Net.Alliknow.PodCatcher.EpisodeList", name: "episodeListPane", width: "350px", peekWidth: 100, onSelectEpisode: "episodeSelected"},
-			{kind: "Net.Alliknow.PodCatcher.EpisodeView", name: "episodeViewPane", flex: 1, peekWidth: 250, onMarkEpisode: "episodeMarked"}
+			{kind: "Net.Alliknow.PodCatcher.EpisodeView", name: "episodeViewPane", flex: 1, peekWidth: 250, onMarkEpisode: "episodeMarked", onOpenInBrowser: "openInBrowser"}
 		]}
 	],
 	
-	openAbout: function(inSender) {
-		this.$.launchBrowserCall.call({"id": "com.palm.app.browser", "params": {"target": "http://salema.github.com/Yet-Another-Simple-Pod-Catcher"}});
+	openAbout: function() {
+		this.openInBrowser(PodCatcher.HOME_PAGE);
 	},
 	
-	openHelp: function(inSender) {
-		this.$.launchBrowserCall.call({"id": "com.palm.app.browser", "params": {"target": "http://salema.github.com/Yet-Another-Simple-Pod-Catcher/help.html"}});
+	openHelp: function() {
+		this.openInBrowser(PodCatcher.HELP_PAGE);
 	},
 	
 	podcastSelected: function(inSender, podcast) {
 		this.$.episodeListPane.setPodcast(podcast);
 	},
 	
-	episodeSelected: function(inSender, episode) {
-		this.$.episodeViewPane.setEpisode(episode);
+	episodeSelected: function(inSender, episode, marked) {
+		this.$.episodeViewPane.setEpisode(episode, marked);
 	},
 	
 	episodeMarked: function(inSender, episode, marked) {
@@ -61,5 +61,14 @@ enyo.kind({
 	
 	closeAppMenuHandler: function() {
 		this.$.appMenu.close();
+	},
+	
+	openInBrowser: function(inUrl) {
+		this.$.launchBrowserCall.call({"id": "com.palm.app.browser", "params": {"target": inUrl}});
 	}
 });
+
+function PodCatcher() {}
+
+PodCatcher.HOME_PAGE = "http://salema.github.com/Yet-Another-Simple-Pod-Catcher";
+PodCatcher.HELP_PAGE = "http://salema.github.com/Yet-Another-Simple-Pod-Catcher/help.html";

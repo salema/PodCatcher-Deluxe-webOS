@@ -56,9 +56,8 @@ enyo.kind({
 		this.showAll = true;
 		this.markedEpisodes = [];
 		
-		// add weekday makes this crash
-		//this.formatter = new enyo.g11n.DateFmt({date: "long", time: "short", weekday: true});
-		this.formatter = new enyo.g11n.DateFmt({date: "long", time: "short"});
+		this.formatter = new enyo.g11n.DateFmt({date: "long", time: "short", weekday: true});
+		// this.formatter = new enyo.g11n.DateFmt({date: "long", time: "short"});
 		
 		this.$.preferencesService.call(
 		{
@@ -72,6 +71,7 @@ enyo.kind({
 	
 	restoreMarkedEpisodes: function(inSender, inResponse) {
 		var list = inResponse.markedEpisodes;
+		if (list == undefined) return;
 		
 		for (var index = 0; index < list.length; index++) {
 			this.markedEpisodes.push(list[index]);
@@ -130,11 +130,8 @@ enyo.kind({
 		else this.selectedIndex = this.$.episodeListVR.fetchRowIndex();
 		
 		var episode = this.episodeList[this.selectedIndex];
-		if (episode) {
-			episode.marked = this.markedEpisodes.indexOf(episode.url) >= 0;
-			this.doSelectEpisode(episode);
-		}
-		
+		if (episode) this.doSelectEpisode(episode, this.markedEpisodes.indexOf(episode.url) >= 0);
+				
 		this.$.episodeListVR.render();
 	},
 	
