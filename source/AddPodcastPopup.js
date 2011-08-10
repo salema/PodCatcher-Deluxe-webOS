@@ -55,7 +55,7 @@ enyo.kind({
 	},
 	
 	gotClipboard: function(inText) {
-		if (inText && inText.length > 7 && inText.substring(0, 7) === "http://")
+		if (inText && inText.length > 7 && inText.substring(0, 7) == "http://")
 			this.$.urlInput.setValue(inText);
 	},
 
@@ -67,7 +67,7 @@ enyo.kind({
 		this.$.addButton.setDisabled(true);
 
 		// Check for protocol and add http if none is given
-		if (!(this.$.urlInput.getValue().substring(0, 7) === "http://"))
+		if (!(this.$.urlInput.getValue().substring(0, 7) == "http://"))
 			this.$.urlInput.setValue("http://" + this.$.urlInput.getValue());
 		
 		// Try to grab podcast
