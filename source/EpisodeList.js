@@ -118,6 +118,7 @@ enyo.kind({
 				if (this.formatter != undefined) this.$.episodePublished.setContent(this.formatter.format(pubDate));
 				else this.$.episodePublished.setContent(episode.pubDate);
 				
+				if (this.selectedIndex == inIndex) this.$.episodePublished.addClass("highlight");
 				if (old) this.$.episodePublished.addClass("marked");
 			}
 			
