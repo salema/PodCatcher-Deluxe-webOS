@@ -62,7 +62,7 @@ enyo.kind({
 	
 	closeAppMenuHandler: function() {
 		this.$.appMenu.close();
-	}
+	},
 	
 	openInBrowser: function(inUrl) {
 		this.$.launchBrowserCall.call({"id": "com.palm.app.browser", "params": {"target": inUrl}});
