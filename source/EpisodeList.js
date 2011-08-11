@@ -51,9 +51,9 @@ enyo.kind({
 		this.helper = new XmlHelper();
 		this.episodeList = [];
 		this.selectedIndex = -1;
-		// add weekday makes this crash
-		//this.formatter = new enyo.g11n.DateFmt({date: "long", time: "short", weekday: true});
-		this.formatter = new enyo.g11n.DateFmt({date: "long", time: "short"});
+		
+		this.formatter = new enyo.g11n.DateFmt({date: "long", time: "short", weekday: true});
+		//this.formatter = new enyo.g11n.DateFmt({date: "long", time: "short"});
 	},
 	
 	setPodcast: function(podcast) {

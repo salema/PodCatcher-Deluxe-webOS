@@ -21,6 +21,9 @@
 enyo.kind({
 	name: "Net.Alliknow.PodCatcher.EpisodeView",
 	kind: "SlidingView",
+	events: {
+		onOpenInBrowser: ""
+	},
 	components: [
 		{kind: "PalmService", name: "launchBrowserCall", service: "palm://com.palm.applicationManager/", method: "launch"},
 		{kind: "Header", layoutKind: "HFlexLayout", className: "header", components: [
@@ -29,7 +32,7 @@ enyo.kind({
 		]},
 		{kind: "Sound"},
 		{kind: "Scroller", name: "episodeScroller", flex: 1, style: "margin: 5px 12px", components: [
-			{kind: "HtmlContent", name: "episodeDescription", onLinkClick: "openBrowser", flex: 1}
+			{kind: "HtmlContent", name: "episodeDescription", onLinkClick: "doOpenInBrowser", flex: 1}
 		]},
 		{kind: "Toolbar", className: "toolbar", components: [
 			{kind: "GrabButton", style: "position: static"},
@@ -110,9 +113,5 @@ enyo.kind({
 		else if (seconds < 10) seconds = "0" + seconds;
 		
 		return  minutes + ":" + seconds; 
-	},
-	
-	openBrowser: function(inSender, inUrl) {
-		this.$.launchBrowserCall.call({"id": "com.palm.app.browser", "params": {"target": inUrl}});
 	}
 });
