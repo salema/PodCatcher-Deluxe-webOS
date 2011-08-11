@@ -33,7 +33,7 @@ enyo.kind({
 			{kind: "Spinner", name: "episodeSpinner", align: "right"}
 		]},
 		{name: "error", style: "display: none", className: "error"},
-		{kind: "Scroller", flex: 1, components: [
+		{kind: "Scroller", name: "episodeListScroller", flex: 1, components: [
 			{kind: "VirtualRepeater", name: "episodeListVR", onSetupRow: "getEpisode", onclick: "selectEpisode", components: [
 				{kind: "Item", layout: "HFlexBox", components: [
 					{name: "episodeTitle", className: "nowrap"},
@@ -54,6 +54,7 @@ enyo.kind({
 		this.episodeList = [];
 		this.selectedIndex = -1;
 		this.showAll = true;
+		this.showPodcastTitle = false;
 		this.markedEpisodes = [];
 		
 		this.formatter = new enyo.g11n.DateFmt({date: "long", time: "short", weekday: true});
@@ -93,12 +94,20 @@ enyo.kind({
 		this.$.episodeSpinner.show();
 		this.$.error.setStyle("display: none;");
 		
+		this.showPodcastTitle = false;
 		this.selectedIndex = -1;
 		this.episodeList = [];
 		this.$.episodeListVR.render();
 		
 		this.$.grabPodcast.setUrl(encodeURI(podcast.url));
 		this.$.grabPodcast.call();
+	},
+	
+	setPodcastList: function(podcastList) {
+		for (var index = 0; index < podcastList.length; index++)
+			this.setPodcast(podcastList[index]);
+		
+		this.$.selectedPodcastName.setContent($L("Select"));
 	},
 		
 	getEpisode: function(inSender, inIndex) {
@@ -110,16 +119,24 @@ enyo.kind({
 			if (!this.showAll && old) {
 				this.$.episodeTitle.parent.setStyle("display: none;");
 			} else {
+				// Put title
 				this.$.episodeTitle.setContent(episode.title);
 				if (this.selectedIndex == inIndex) this.$.episodeTitle.addClass("highlight");
 				if (old) this.$.episodeTitle.addClass("marked");
 				
+				// Put date
 				var pubDate = new Date(episode.pubDate);
 				if (this.formatter != undefined) this.$.episodePublished.setContent(this.formatter.format(pubDate));
 				else this.$.episodePublished.setContent(episode.pubDate);
 				
 				if (this.selectedIndex == inIndex) this.$.episodePublished.addClass("highlight");
 				if (old) this.$.episodePublished.addClass("marked");
+				
+				// Put podcast title if wanted
+				if (this.showPodcastTitle) {
+					var title = getPodcastTitle(episode.url) + " - ";
+					this.$.episodePublished.setContent(title + this.$.episodePublished.getContent());
+				}
 			}
 			
 			return true;
@@ -171,6 +188,10 @@ enyo.kind({
 		
 		if (this.episodeList.length == 0) this.grabPodcastFailed();
 		
+		this.episodeList.sort(function (a, b) {
+			return Date.parse(b.pubDate) - Date.parse(a.pubDate);
+		});
+		this.$.episodeListScroller.scrollTo(0, 0);
 		this.$.episodeListVR.render();
 		this.$.episodeSpinner.hide();
 	},
@@ -180,5 +201,9 @@ enyo.kind({
 		this.$.error.setContent($L("The podcast feed failed to load. Please make sure you are online."));
 		this.$.error.setStyle("display: block;");
 		this.$.episodeSpinner.hide();
+	},
+	
+	getPodcastTitle: function(podcastUrl) {
+		return "Title";
 	}
 }); 

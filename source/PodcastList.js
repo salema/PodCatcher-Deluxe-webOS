@@ -24,7 +24,8 @@ enyo.kind({
 	kind: "SlidingView",
 	layoutKind: "VFlexLayout",
 	events: {
-		onSelectPodcast: ""
+		onSelectPodcast: "",
+		onSelectAll: ""
 	},
 	components: [
 		{kind: "SystemService", name: "preferencesService", onFailure: "preferencesFailure", subscribe : false},
@@ -41,7 +42,7 @@ enyo.kind({
 		{kind: "Image", name: "podcastImage", className: "podcastImage", src: Podcast.DEFAULT_IMAGE},
 		{kind: "Toolbar", pack: "justify", className: "toolbar", components: [
 			{kind: "ToolButton", caption: $L("Add"), onclick: "showAddPodcastPopup", flex: 1},
-			//{kind: "ToolButton", caption: $L("Select all"), onclick: "", flex: 1}
+			{kind: "ToolButton", name: "selectAllButton", caption: $L("All"), onclick: "selectAllPodcasts", disabled: true}
 		]}
 	],
 
@@ -50,6 +51,7 @@ enyo.kind({
 		
 		this.selectedIndex = -1;
 		this.podcastList = [];
+		this.selectAll = false;
 		
 		this.$.preferencesService.call(
 		{
@@ -74,6 +76,7 @@ enyo.kind({
 				this.podcastList.push(list[index]);
 			}
 			
+			this.$.selectAllButton.setDisabled(! (this.podcastList.length > 1));
 			this.$.podcastListVR.render();
 		}
 	},
@@ -94,16 +97,17 @@ enyo.kind({
 		
 		if (podcast) {
 			this.$.podcastTitle.setContent(podcast.title);
-			if (this.selectedIndex == inIndex) this.$.podcastTitle.addClass("highlight");
+			if (this.selectedIndex == inIndex || this.selectAll) this.$.podcastTitle.addClass("highlight");
 			return true;
 		}
 	},
 	
 	selectPodcast: function(inSender, inEvent) {
 		// No action if current podcast is tapped on again
-		if (this.$.podcastListVR.fetchRowIndex() == this.selectedIndex) return;
+		if (!this.selectAll && this.$.podcastListVR.fetchRowIndex() == this.selectedIndex) return;
 		else this.selectedIndex = this.$.podcastListVR.fetchRowIndex();
 		
+		this.selectAll = false;
 		var podcast = this.podcastList[this.selectedIndex];
 		
 		if (podcast) {
@@ -114,6 +118,17 @@ enyo.kind({
 			this.doSelectPodcast(podcast);
 		}
 		
+		this.$.selectAllButton.setDisabled(! (this.podcastList.length > 1));
+		this.$.podcastListVR.render();
+	},
+	
+	selectAllPodcasts: function(inSender, inEvent) {
+		this.selectAll = true;
+		
+		this.doSelectAll(this.podcastList);
+		
+		this.$.podcastImage.setSrc(Podcast.DEFAULT_IMAGE);
+		this.$.selectAllButton.setDisabled(true);
 		this.$.podcastListVR.render();
 	},
 
@@ -123,15 +138,19 @@ enyo.kind({
 	
 	addPodcast: function(inSender, podcast) {
 		if (this.isPodcastInList(podcast)) return;
+		if (this.selectAll) this.selectAll = false;
 		
 		this.podcastList.push(podcast);
 		this.storePodcastList();
-				
+		
+		this.$.selectAllButton.setDisabled(! (this.podcastList.length > 1));
 		this.$.podcastListVR.render();
 		this.$.podcastListScroller.scrollToBottom();
 	},
 
 	deletePodcast: function(inSender, inIndex) {
+		if (this.selectAll) this.selectAll = false;
+		
 		this.podcastList.splice(inIndex, 1);
 		
 		// Swipe on selected
@@ -143,6 +162,7 @@ enyo.kind({
 		else if (inIndex < this.selectedIndex) this.selectedIndex--;
 		
 		this.storePodcastList();
+		this.$.selectAllButton.setDisabled(! (this.podcastList.length > 1));
 		this.$.podcastListVR.render();	
 	},
 	
