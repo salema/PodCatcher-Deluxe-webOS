@@ -42,7 +42,7 @@ enyo.kind({
 		{kind: "Image", name: "podcastImage", className: "podcastImage", src: Podcast.DEFAULT_IMAGE},
 		{kind: "Toolbar", pack: "justify", className: "toolbar", components: [
 			{kind: "ToolButton", caption: $L("Add"), onclick: "showAddPodcastPopup", flex: 1},
-			{kind: "ToolButton", name: "selectAllButton", caption: $L("All"), onclick: "selectAllPodcasts", disabled: true}
+			{kind: "ToolButton", name: "selectAllButton", caption: $L("All"), onclick: "selectAllPodcasts", flex: 1, disabled: true}
 		]}
 	],
 

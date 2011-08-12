@@ -23,10 +23,16 @@ enyo.kind({
 	kind: "SlidingView",
 	events: {
 		onMarkEpisode: "",
+		onDownloaded: "",
+		onDelete: "",
 		onOpenInBrowser: ""
 	},
 	components: [
 		{kind: "SystemService", name: "preferencesService", subscribe : false},
+		{kind: "PalmService", name: "episodeDownload", service: "palm://com.palm.downloadmanager/", method: "download", 
+				onSuccess: "downloadSuccess", onFailure: "downloadFail", subscribe: true},
+		{kind: "PalmService", name: "episodeDelete", service: "palm://com.palm.downloadmanager/", method: "deleteDownloadedFile", onFailure: "genericFail"},
+		{kind: "PalmService", name: "cancel", service: "palm://com.palm.downloadmanager/", method: "cancelDownload", onSuccess: "cancelSuccess", onFailure: "genericFail"},
 		{kind: "ApplicationEvents", onUnload: "storeResumeInformation"},
 		{kind: "PalmService", name: "launchBrowserCall", service: "palm://com.palm.applicationManager/", method: "launch"},
 		{kind: "Header", layoutKind: "HFlexLayout", className: "header", components: [
@@ -35,6 +41,7 @@ enyo.kind({
 			{kind: "Spinner", name: "stalledSpinner", align: "right"}
 		]},
 		{kind: "Sound"},
+		{kind: "Button", name: "downloadButton", caption: $L("Download"), onclick: "startStopDelete"},
 		{kind: "Scroller", name: "episodeScroller", flex: 1, style: "margin: 5px 12px", components: [
 			{kind: "HtmlContent", name: "episodeDescription", onLinkClick: "doOpenInBrowser", flex: 1}
 		]},
@@ -49,6 +56,7 @@ enyo.kind({
 		this.inherited(arguments);
 		
 		this.plays = false;
+		this.downloads = false;
 		
 		this.$.preferencesService.call(
 		{
@@ -61,8 +69,7 @@ enyo.kind({
 	},
 	
 	resume: function(inSender, inResponse) {
-		if (inResponse.resumeEpisode == undefined) return;
-		else {
+		if (inResponse.resumeEpisode != undefined) {
 			this.setEpisode(inResponse.resumeEpisode, inResponse.resumeMarked);
 			this.doMarkEpisode(inResponse.resumeEpisode, inResponse.resumeMarked);
 			
@@ -86,8 +93,10 @@ enyo.kind({
 	},
 	
 	setEpisode: function(episode, marked) {
+		// Don't do anything if downloading
+		if (this.downloads) return;
 		// Don't do anything if same episode is set again
-		if (episode.url == this.$.sound.getSrc()) return;
+		if (this.episode != undefined && episode.url == this.episode.url) return;
 		if (this.plays) this.togglePlay();
 		
 		this.episode = episode;
@@ -96,6 +105,8 @@ enyo.kind({
 		// Update UI
 		this.$.playButton.setCaption($L("Play"));
 		this.$.playButton.setDisabled(false);
+		if (episode.isDownloaded) this.$.downloadButton.setCaption($L("Delete from device"));
+		else this.$.downloadButton.setCaption($L("Download"));
 		this.$.stalledSpinner.hide();
 		this.$.episodeName.setContent($L("Listen to") + " \"" + episode.title + "\"");
 		this.$.episodeDescription.setContent(episode.description);
@@ -106,7 +117,59 @@ enyo.kind({
 		else this.$.markButton.setSrc(Episode.UNMARKED_ICON);
 		
 		// Set sound source
-		this.$.sound.setSrc(episode.url);
+		if (episode.isDownloaded) this.$.sound.setSrc(episode.file);
+		else this.$.sound.setSrc(episode.url);
+		
+		this.log(this.$.sound.getSrc());
+	},
+	
+	startStopDelete: function(inSender, inResponse) {
+		// Download episode 
+		if (!this.downloads && !this.episode.isDownloaded) {
+			this.downloads = true;
+			this.$.downloadButton.setCaption($L("Cancel"));		
+			this.$.episodeDownload.call({target: this.episode.url});
+		} // Delete downloaded file
+		else if (!this.downloads && this.episode.isDownloaded) {
+			this.$.episodeDelete.call({ticket: this.episode.ticket});
+			this.doDelete(this.episode);
+			this.downloads = false;
+			this.$.downloadButton.setCaption($L("Download"));
+		} // Cancel download
+		else if (this.downloads) {
+			this.$.cancel.call({ticket: this.currentDownloadTicket});
+			this.$.episodeDelete.call({ticket: this.currentDownloadTicket});
+			this.downloads = false;
+		}
+	},
+	
+	downloadSuccess: function(inSender, inResponse) {
+		this.currentDownloadTicket = inResponse.ticket;
+		
+		var percent = Math.floor(inResponse.amountReceived / inResponse.amountTotal * 100);
+		if (isNaN(percent)) percent = "?";
+		this.$.downloadButton.setCaption($L("Cancel at") + ": " + percent + "%");
+		
+		if (percent == 100) {
+			this.downloads = false;
+			this.$.downloadButton.setCaption($L("Delete from device"));
+			this.doDownloaded(this.episode, inResponse);
+			this.$.sound.setSrc(inResponse.target);
+		}
+	},
+	
+	cancelSuccess: function(inSender, inResponse) {
+		this.$.downloadButton.setCaption($L("Download"));
+	},
+   
+	downloadFail: function(inSender, inResponse) {
+		this.$.downloadButton.setCaption($L("Download failed"));
+		
+		this.log("Download failure, results=" + enyo.json.stringify(inResponse));
+	},
+	
+	genericFail: function(inSender, inResponse) {
+		this.log("Service failure, results=" + enyo.json.stringify(inResponse));
 	},
 	
 	toggleMarked: function() {
@@ -175,7 +238,7 @@ enyo.kind({
 		this.$.stalledSpinner.hide();
 		if (this.$.markButton.getSrc() == Episode.UNMARKED_ICON) this.toggleMarked();		
 	},
-	
+		
 	createTimeString: function() {
 		return this.formatTime(this.$.sound.audio.currentTime) + " " +  $L("of") + " " +
 			this.formatTime(this.$.sound.audio.duration);

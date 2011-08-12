@@ -31,7 +31,8 @@ enyo.kind({
 		{kind: "SlidingPane", flex: 1, components: [
 			{kind: "Net.Alliknow.PodCatcher.PodcastList", name: "podcastListPane", width: "230px", onSelectPodcast: "podcastSelected", onSelectAll: "allPodcastsSelected"},
 			{kind: "Net.Alliknow.PodCatcher.EpisodeList", name: "episodeListPane", width: "350px", peekWidth: 100, onSelectEpisode: "episodeSelected"},
-			{kind: "Net.Alliknow.PodCatcher.EpisodeView", name: "episodeViewPane", flex: 1, peekWidth: 250, onMarkEpisode: "episodeMarked", onOpenInBrowser: "openInBrowser"}
+			{kind: "Net.Alliknow.PodCatcher.EpisodeView", name: "episodeViewPane", flex: 1, peekWidth: 250, 
+					onMarkEpisode: "episodeMarked", onOpenInBrowser: "openInBrowser", onDownloaded: "episodeDownloaded", onDelete: "deleteDownloadedEpisode"}
 		]}
 	],
 	
@@ -53,6 +54,14 @@ enyo.kind({
 	
 	episodeSelected: function(inSender, episode, marked) {
 		this.$.episodeViewPane.setEpisode(episode, marked);
+	},
+	
+	episodeDownloaded: function(inSender, episode, inResponse) {
+		this.$.episodeListPane.addToDownloaded(episode, inResponse);
+	},
+	
+	deleteDownloadedEpisode: function(inSender, episode) {
+		this.$.episodeListPane.removeFromDownloaded(episode);
 	},
 	
 	episodeMarked: function(inSender, episode, marked) {
