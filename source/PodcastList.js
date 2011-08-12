@@ -104,9 +104,10 @@ enyo.kind({
 	
 	selectPodcast: function(inSender, inEvent) {
 		// No action if current podcast is tapped on again
-		if (!this.selectAll && this.$.podcastListVR.fetchRowIndex() == this.selectedIndex) return;
-		else this.selectedIndex = this.$.podcastListVR.fetchRowIndex();
+		//if (!this.selectAll && this.$.podcastListVR.fetchRowIndex() == this.selectedIndex) return;
+		//else this.selectedIndex = this.$.podcastListVR.fetchRowIndex();
 		
+		this.selectedIndex = this.$.podcastListVR.fetchRowIndex();
 		this.selectAll = false;
 		var podcast = this.podcastList[this.selectedIndex];
 		
@@ -164,6 +165,10 @@ enyo.kind({
 		this.storePodcastList();
 		this.$.selectAllButton.setDisabled(! (this.podcastList.length > 1));
 		this.$.podcastListVR.render();	
+	},
+	
+	downloadsSelected: function() {
+		this.$.selectAllButton.setDisabled(! (this.podcastList.length > 1));
 	},
 	
 	isPodcastInList: function(podcast) {

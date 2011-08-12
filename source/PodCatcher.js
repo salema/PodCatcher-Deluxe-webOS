@@ -29,8 +29,10 @@ enyo.kind({
 			{kind: "AppMenuItem", caption: $L("Help"), onclick: "openHelp"}
 		]},
 		{kind: "SlidingPane", flex: 1, components: [
-			{kind: "Net.Alliknow.PodCatcher.PodcastList", name: "podcastListPane", width: "230px", onSelectPodcast: "podcastSelected", onSelectAll: "allPodcastsSelected"},
-			{kind: "Net.Alliknow.PodCatcher.EpisodeList", name: "episodeListPane", width: "350px", peekWidth: 100, onSelectEpisode: "episodeSelected"},
+			{kind: "Net.Alliknow.PodCatcher.PodcastList", name: "podcastListPane", width: "230px", 
+					onSelectPodcast: "podcastSelected", onSelectAll: "allPodcastsSelected"},
+			{kind: "Net.Alliknow.PodCatcher.EpisodeList", name: "episodeListPane", width: "350px", peekWidth: 100, 
+					onSelectEpisode: "episodeSelected", onDownloadsSelected: "downloadsSelected"},
 			{kind: "Net.Alliknow.PodCatcher.EpisodeView", name: "episodeViewPane", flex: 1, peekWidth: 250, 
 					onMarkEpisode: "episodeMarked", onOpenInBrowser: "openInBrowser", onDownloaded: "episodeDownloaded", onDelete: "deleteDownloadedEpisode"}
 		]}
@@ -50,6 +52,10 @@ enyo.kind({
 	
 	allPodcastsSelected: function(inSender, podcastList) {
 		this.$.episodeListPane.setPodcastList(podcastList);
+	},
+	
+	downloadsSelected: function(inSender) {
+		this.$.podcastListPane.downloadsSelected();
 	},
 	
 	episodeSelected: function(inSender, episode, marked) {

@@ -23,7 +23,8 @@ enyo.kind({
 	kind: "SlidingView",
 	layoutKind: "VFlexLayout",
 	events: {
-		onSelectEpisode: ""
+		onSelectEpisode: "",
+		onDownloadsSelected: ""
 	},
 	components: [
 		{kind: "SystemService", name: "preferencesService", subscribe : false},
@@ -44,7 +45,7 @@ enyo.kind({
 		{kind: "Toolbar", className: "toolbar", components: [
 			{kind: "GrabButton", style: "position: static"},
 			{kind: "ToolButton", name: "showAllButton", caption: $L("New only"), onclick: "toggleShowAll", flex: 1},
-			{kind: "ToolButton", name: "showDownloadedButton", caption: $L("Downloads"), onclick: "setShowDownloads", flex: 1}
+			{kind: "ToolButton", name: "showDownloadedButton", caption: $L("Downloads"), onclick: "setShowDownloads", disabled: true, flex: 1}
 		]}
 	],
 
@@ -80,10 +81,10 @@ enyo.kind({
 			for (var index = 0; index < inResponse.markedEpisodes.length; index++)
 				this.markedEpisodes.push(inResponse.markedEpisodes[index]);
 				
-		if (inResponse.downloadedEpisodes != undefined)
+		if (inResponse.downloadedEpisodes != undefined) {
 			this.downloadedEpisodes = inResponse.downloadedEpisodes;
-			
-		this.log(enyo.json.stringify(this.downloadedEpisodes));
+			if (this.downloadedEpisodes.length > 0) this.$.showDownloadedButton.setDisabled(false);
+		}
 	},
 	
 	store: function() {
@@ -118,11 +119,11 @@ enyo.kind({
 	setShowDownloads: function() {
 		this.prepareLoad($L("Select"), false, true);
 		
-		for (var index = 0; index < this.downloadedEpisodes.length; index++) {
+		for (var index = 0; index < this.downloadedEpisodes.length; index++)
 			this.episodeList.push(this.downloadedEpisodes[index]);
-		}
 		
 		this.afterLoad();
+		this.doDownloadsSelected();
 	},
 		
 	getEpisode: function(inSender, inIndex) {
@@ -206,9 +207,6 @@ enyo.kind({
 			
 			episode.read(items[index]);
 			episode.podcastUrl = inRequest.url;
-			episode.isDownloaded = this.isDownloaded(episode);
-			if (episode.isDownloaded) episode.file = this.getPathToDownload(episode);
-			if (episode.isDownloaded) episode.ticket = this.getDownloadTicket(episode);
 			this.episodeList.push(episode);
 		}
 		
@@ -230,8 +228,8 @@ enyo.kind({
 			title: episode.title, description: episode.description, pubDate: episode.pubDate, 
 			podcastUrl: episode.podcastURL, isDownloaded: true});
 		
+		this.$.showDownloadedButton.setDisabled(this.showDownloads || this.downloadedEpisodes.length == 0);
 		this.store();
-		this.log(this.downloadedEpisodes);
 	},
 	
 	removeFromDownloaded: function(episode) {
@@ -241,9 +239,11 @@ enyo.kind({
 			if (this.downloadedEpisodes[index].url == episode.url)
 				remove = index;
 				
-		if (index >= 0) this.downloadedEpisodes.splice(remove);
-		
-		this.store();
+		if (index >= 0) {
+			this.downloadedEpisodes.splice(remove);
+			this.$.showDownloadedButton.setDisabled(this.showDownloads || this.downloadedEpisodes.length == 0);
+			this.store();
+		}
 	},
 	
 	isDownloaded: function(episode) {
@@ -268,7 +268,7 @@ enyo.kind({
 	
 	prepareLoad: function (paneTitle, showPodcastTitles, showDownloads) {
 		this.$.selectedPodcastName.setContent(paneTitle);
-		this.$.showDownloadedButton.setDisabled(showDownloads);
+		this.$.showDownloadedButton.setDisabled(showDownloads || this.downloadedEpisodes.length == 0);
 		this.$.episodeSpinner.show();
 		this.$.error.setStyle("display: none;");
 		
@@ -283,8 +283,8 @@ enyo.kind({
 	},
 	
 	afterLoad: function () {
-		this.episodeList.sort(function (a, b) {
-			return Date.parse(b.pubDate) - Date.parse(a.pubDate);
+		this.episodeList.sort(function (e1, e2) {
+			return Date.parse(e2.pubDate) - Date.parse(e1.pubDate);
 		});
 		
 		this.$.episodeListScroller.scrollTo(0, 0);

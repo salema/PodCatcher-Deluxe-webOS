@@ -119,8 +119,6 @@ enyo.kind({
 		// Set sound source
 		if (episode.isDownloaded) this.$.sound.setSrc(episode.file);
 		else this.$.sound.setSrc(episode.url);
-		
-		this.log(this.$.sound.getSrc());
 	},
 	
 	startStopDelete: function(inSender, inResponse) {
@@ -133,6 +131,9 @@ enyo.kind({
 		else if (!this.downloads && this.episode.isDownloaded) {
 			this.$.episodeDelete.call({ticket: this.episode.ticket});
 			this.doDelete(this.episode);
+			this.episode.isDownloaded = false;
+			this.episode.ticket = undefined;
+			this.episode.file = undefined;
 			this.downloads = false;
 			this.$.downloadButton.setCaption($L("Download"));
 		} // Cancel download
@@ -154,6 +155,9 @@ enyo.kind({
 			this.downloads = false;
 			this.$.downloadButton.setCaption($L("Delete from device"));
 			this.doDownloaded(this.episode, inResponse);
+			this.episode.isDownloaded = true;
+			this.episode.ticket = inResponse.ticket;
+			this.episode.file = inResponse.target;
 			this.$.sound.setSrc(inResponse.target);
 		}
 	},
