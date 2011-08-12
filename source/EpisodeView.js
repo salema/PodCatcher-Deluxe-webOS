@@ -151,14 +151,14 @@ enyo.kind({
 		if (isNaN(percent)) percent = "?";
 		this.$.downloadButton.setCaption($L("Cancel at") + ": " + percent + "%");
 		
-		if (percent == 100) {
+		if (inResponse.completed) {
 			this.downloads = false;
 			this.$.downloadButton.setCaption($L("Delete from device"));
 			this.doDownloaded(this.episode, inResponse);
 			this.episode.isDownloaded = true;
 			this.episode.ticket = inResponse.ticket;
 			this.episode.file = inResponse.target;
-			this.$.sound.setSrc(inResponse.target);
+			if (!this.plays) this.$.sound.setSrc(inResponse.target);
 		}
 	},
 	
@@ -168,7 +168,7 @@ enyo.kind({
    
 	downloadFail: function(inSender, inResponse) {
 		this.$.downloadButton.setCaption($L("Download failed"));
-		
+		this.downloads = false;
 		this.log("Download failure, results=" + enyo.json.stringify(inResponse));
 	},
 	
