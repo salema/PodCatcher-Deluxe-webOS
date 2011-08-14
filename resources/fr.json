@@ -7,8 +7,11 @@
 	"Your podcast failed to load. Please check the URL and make sure you are online. Tap anywhere outside this window to cancel.": "Votre podcast échoué à charger. S'il vous plaît vérifier l'URL et assurez-vous que vous êtes en ligne. Tapez n'importe où en dehors de cette fenêtre pour annuler.",
 	"Discover Podcasts": "Découvrir Podcasts",
 	"Add": "Ajouter",
+	"All": "Tous",
 	"Select": "Sélectionner",
 	"Select from": "Sélectionner dans",
+	"Select from all": "Sélectionner dans tous",
+	"Select from Downloads": "Sélectionner dans Downloads",
 	"The podcast feed failed to load. Please make sure you are online.": "Le podcast échoué à charger. S'il vous plaît assurez-vous que vous êtes en ligne.",
 	"New only": "Montrer nouveaux",
 	"Show all": "Montrer tous",
@@ -21,5 +24,11 @@
 	"Pause at": "Arrêter à",
 	"Resume": "Reprendre",
 	"Resume at": "Reprendre à",
-	"of": "de"
+	"of": "de",
+	"Delete from device": "???",
+	"Cancel": "???",
+	"Cancel at": "???",
+	"Download active, please wait or cancel.": "???",
+	"Please stop playback before deleting.": "???",
+	"Download failed": "???"
 }

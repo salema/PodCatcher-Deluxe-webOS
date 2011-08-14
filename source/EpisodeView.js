@@ -134,7 +134,7 @@ enyo.kind({
 		} // Delete downloaded file
 		else if (!this.downloads && this.episode.isDownloaded) {
 			if (this.plays) {
-				this.showError($L("Please stop playback before delete"));
+				this.showError($L("Please stop playback before deleting."));
 				return;
 			}	else {
 				this.$.sound.setSrc(this.episode.url);

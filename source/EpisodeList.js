@@ -107,7 +107,7 @@ enyo.kind({
 	},
 	
 	setPodcastList: function(podcastList) {
-		this.prepareLoad($L("Select"), true, false);
+		this.prepareLoad($L("Select from all"), true, false);
 		
 		for (var index = 0; index < podcastList.length; index++) {
 			this.podcastList.push(podcastList[index]);
@@ -117,7 +117,7 @@ enyo.kind({
 	},
 	
 	setShowDownloads: function() {
-		this.prepareLoad($L("Select"), true, true);
+		this.prepareLoad($L("Select from Downloads"), true, true);
 		
 		for (var index = 0; index < this.downloadedEpisodes.length; index++)
 			this.episodeList.push(this.downloadedEpisodes[index]);
