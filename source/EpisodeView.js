@@ -41,6 +41,7 @@ enyo.kind({
 			{kind: "Spinner", name: "stalledSpinner", align: "right"}
 		]},
 		{kind: "Sound"},
+		{kind: "CustomButton", name: "error", style: "display: none", className: "error"},
 		{kind: "Button", name: "downloadButton", caption: $L("Download"), onclick: "startStopDelete"},
 		{kind: "Scroller", name: "episodeScroller", flex: 1, style: "margin: 5px 12px", components: [
 			{kind: "HtmlContent", name: "episodeDescription", onLinkClick: "doOpenInBrowser", flex: 1}
@@ -94,7 +95,10 @@ enyo.kind({
 	
 	setEpisode: function(episode, marked) {
 		// Don't do anything if downloading
-		if (this.downloads) return;
+		if (this.downloads) {
+			this.showError($L("Download active, please wait or cancel."));
+			return;
+		} this.$.error.setStyle("display: none;");
 		// Don't do anything if same episode is set again
 		if (this.episode != undefined && episode.url == this.episode.url) return;
 		if (this.plays) this.togglePlay();
@@ -129,6 +133,13 @@ enyo.kind({
 			this.$.episodeDownload.call({target: this.episode.url});
 		} // Delete downloaded file
 		else if (!this.downloads && this.episode.isDownloaded) {
+			if (this.plays) {
+				this.showError($L("Please stop playback before delete"));
+				return;
+			}	else {
+				this.$.sound.setSrc(this.episode.url);
+				this.$.error.setStyle("display: none;");
+			}
 			this.$.episodeDelete.call({ticket: this.episode.ticket});
 			this.doDelete(this.episode);
 			this.episode.isDownloaded = false;
@@ -146,13 +157,11 @@ enyo.kind({
 	
 	downloadSuccess: function(inSender, inResponse) {
 		this.currentDownloadTicket = inResponse.ticket;
-		
-		var percent = Math.floor(inResponse.amountReceived / inResponse.amountTotal * 100);
-		if (isNaN(percent)) percent = "?";
-		this.$.downloadButton.setCaption($L("Cancel at") + ": " + percent + "%");
+		this.$.downloadButton.setCaption($L("Cancel at") + " " + this.formatDownloadStatus(inResponse));
 		
 		if (inResponse.completed) {
 			this.downloads = false;
+			this.$.error.setStyle("display: none;");
 			this.$.downloadButton.setCaption($L("Delete from device"));
 			this.doDownloaded(this.episode, inResponse);
 			this.episode.isDownloaded = true;
@@ -163,12 +172,14 @@ enyo.kind({
 	},
 	
 	cancelSuccess: function(inSender, inResponse) {
+		this.$.error.setStyle("display: none;");
 		this.$.downloadButton.setCaption($L("Download"));
 	},
    
 	downloadFail: function(inSender, inResponse) {
 		this.$.downloadButton.setCaption($L("Download failed"));
 		this.downloads = false;
+		this.$.error.setStyle("display: none;");
 		this.log("Download failure, results=" + enyo.json.stringify(inResponse));
 	},
 	
@@ -242,6 +253,11 @@ enyo.kind({
 		this.$.stalledSpinner.hide();
 		if (this.$.markButton.getSrc() == Episode.UNMARKED_ICON) this.toggleMarked();		
 	},
+	
+	showError: function(text) {
+		this.$.error.setContent(text);
+		this.$.error.setStyle("display: block; width: 100%; text-align: center;");
+	},
 		
 	createTimeString: function() {
 		return this.formatTime(this.$.sound.audio.currentTime) + " " +  $L("of") + " " +
@@ -262,5 +278,23 @@ enyo.kind({
 		
 		if (!isNaN(hours) && isFinite(hours) && hours > 0) return hours + ":" + minutes + ":" + seconds;
 		else return minutes + ":" + seconds; 
+	},
+	
+	formatDownloadStatus: function(inResponse) {
+		var percent = Math.floor(inResponse.amountReceived / inResponse.amountTotal * 100);
+		percent = this.formatNumber(percent);
+		
+		var received = Math.round(inResponse.amountReceived / (1024*1024));
+		received = this.formatNumber(received);
+		
+		var total = Math.round(inResponse.amountTotal / (1024*1024));
+		total = this.formatNumber(total);
+		
+		return percent + "% (" + received + " " + $L("of") + " " + total + "MB)";
+	},
+	
+	formatNumber: function(number) {
+		if (isNaN(number) || !isFinite(number)) return "--";
+		else return number;
 	}
 });

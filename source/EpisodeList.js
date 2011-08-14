@@ -117,7 +117,7 @@ enyo.kind({
 	},
 	
 	setShowDownloads: function() {
-		this.prepareLoad($L("Select"), false, true);
+		this.prepareLoad($L("Select"), true, true);
 		
 		for (var index = 0; index < this.downloadedEpisodes.length; index++)
 			this.episodeList.push(this.downloadedEpisodes[index]);
@@ -150,7 +150,7 @@ enyo.kind({
 				
 				// Put podcast title if wanted
 				if (this.showPodcastTitle) {
-					var title = this.getPodcastTitle(episode.podcastUrl) + " - ";
+					var title = episode.podcastTitle + " - ";
 					this.$.episodePublished.setContent(title + this.$.episodePublished.getContent());
 				}
 			}
@@ -206,7 +206,7 @@ enyo.kind({
 			if (! episode.isValid(items[index])) continue;
 			
 			episode.read(items[index]);
-			episode.podcastUrl = inRequest.url;
+			episode.podcastTitle = this.getPodcastTitle(inRequest.url);
 			this.episodeList.push(episode);
 		}
 		
@@ -226,9 +226,10 @@ enyo.kind({
 	addToDownloaded: function(episode, inResponse) {
 		this.downloadedEpisodes.push({ticket: inResponse.ticket, url: inResponse.url, file: inResponse.target,
 			title: episode.title, description: episode.description, pubDate: episode.pubDate, 
-			podcastUrl: episode.podcastURL, isDownloaded: true});
+			podcastTitle: episode.podcastTitle, isDownloaded: true});
 		
 		this.$.showDownloadedButton.setDisabled(this.showDownloads || this.downloadedEpisodes.length == 0);
+		if (this.showDownloads) this.setShowDownloads();
 		this.store();
 	},
 	
@@ -240,8 +241,9 @@ enyo.kind({
 				remove = index;
 				
 		if (index >= 0) {
-			this.downloadedEpisodes.splice(remove);
+			this.downloadedEpisodes.splice(remove, 1);
 			this.$.showDownloadedButton.setDisabled(this.showDownloads || this.downloadedEpisodes.length == 0);
+			if (this.showDownloads) this.setShowDownloads();
 			this.store();
 		}
 	},
