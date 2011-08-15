@@ -32,14 +32,18 @@ Episode.prototype.read = function(xmlTree) {
 	if (this.helper.getFirst(xmlTree, XmlHelper.DESCRIPTION).firstChild != undefined)
 		this.description = this.helper.getFirstValue(xmlTree, XmlHelper.DESCRIPTION);
 	else this.description = "<i>" + $L("No description available.") + "</i>";
-}
+};
 
 Episode.prototype.isValid = function(xmlTree) {
 	return this.helper.has(xmlTree, XmlHelper.TITLE) &&
 		this.helper.has(xmlTree, XmlHelper.ENCLOSURE) &&
 		this.helper.has(xmlTree, XmlHelper.PUBDATE) &&
 		this.helper.has(xmlTree, XmlHelper.DESCRIPTION);
-}
+};
+
+Episode.prototype.compare = function(episodeA, episodeB) {
+	return Date.parse(episodeB.pubDate) - Date.parse(episodeA.pubDate);
+};
 
 Episode.MARKED_ICON = "icons/star-off.png";
 Episode.UNMARKED_ICON = "icons/star-on.png";

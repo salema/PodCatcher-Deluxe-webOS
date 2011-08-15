@@ -63,7 +63,7 @@ enyo.kind({
 		this.showDownloads = false;
 		this.downloadedEpisodes = [];
 				
-		this.formatter = new enyo.g11n.DateFmt({date: "long", time: "short", weekday: true});
+		//this.formatter = new enyo.g11n.DateFmt({date: "long", time: "short", weekday: true});
 		// this.formatter = new enyo.g11n.DateFmt({date: "long", time: "short"});
 		
 		this.$.preferencesService.call(
@@ -130,7 +130,7 @@ enyo.kind({
 		var episode = this.episodeList[inIndex];
 		
 		if (episode) {
-			var old = this.markedEpisodes.indexOf(episode.url) >= 0
+			var old = this.markedEpisodes.indexOf(episode.url) >= 0;
 			
 			if (!this.showAll && old) {
 				this.$.episodeTitle.parent.setStyle("display: none;");
@@ -189,8 +189,8 @@ enyo.kind({
 	toggleShowAll: function(inSender, inEvent) {
 		this.showAll = !this.showAll;
 		
-		if (this.showAll) this.$.showAllButton.setCaption($L("New only"))
-		else this.$.showAllButton.setCaption($L("Show all"))
+		if (this.showAll) this.$.showAllButton.setCaption($L("New only"));
+		else this.$.showAllButton.setCaption($L("Show all"));
 		
 		this.$.episodeListVR.render();
 	},
@@ -285,9 +285,7 @@ enyo.kind({
 	},
 	
 	afterLoad: function () {
-		this.episodeList.sort(function (e1, e2) {
-			return Date.parse(e2.pubDate) - Date.parse(e1.pubDate);
-		});
+		this.episodeList.sort(new Episode().compare);
 		
 		this.$.episodeListScroller.scrollTo(0, 0);
 		this.$.episodeListVR.render();
