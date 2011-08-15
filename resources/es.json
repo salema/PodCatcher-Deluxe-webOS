@@ -13,8 +13,8 @@
 	"Select from all": "Seleccionar de todos",
 	"Select from Downloads": "Seleccionar de Downloads",
 	"The podcast feed failed to load. Please make sure you are online.": "El podcast no se pudo cargar. Por favor, asegúrese de que está en línea.",
-	"New only": "Mostrar nuevos",
-	"Show all": "Mostrar todos",
+	"New only": "Nuevos",
+	"Show all": "Todos",
 	"Listen": "Escuchar",
 	"Listen to": "Escuchar",
 	"No description available.": "No hay ninguna descripción disponible.",
@@ -25,10 +25,10 @@
 	"Resume":"Continuar",
 	"Resume at": "Continuar a",
 	"of": "de",
-	"Delete from device": "???",
-	"Cancel": "???",
-	"Cancel at": "???",
-	"Download active, please wait or cancel.": "???",
-	"Please stop playback before deleting.": "???",
-	"Download failed": "???"
+	"Delete from device": "Eliminar del dispositivo",
+	"Cancel": "Cancelar",
+	"Cancel at": "Cancelar el",
+	"Download active, please wait or cancel.": "Descargar activa, por favor espere o cancelar.",
+	"Please stop playback before deleting.": "Por favor, detener la reproducción antes de borrarla.",
+	"Download failed": "Descarga fallida"
 }
