@@ -29,6 +29,7 @@ enyo.kind({
 			{kind: "AppMenuItem", caption: $L("About"), onclick: "openAbout"},
 			{kind: "AppMenuItem", caption: $L("Help"), onclick: "openHelp"}
 		]},
+		{kind: "Dashboard", name: "dashboard", smallIcon: "icons/icon48.png", onTap: "togglePlay"},
 		{kind: "SlidingPane", flex: 1, components: [
 			{kind: "Net.Alliknow.PodCatcher.PodcastList", name: "podcastListPane", width: "230px", onSelectPodcast: "podcastSelected"},
 			{kind: "Net.Alliknow.PodCatcher.EpisodeList", name: "episodeListPane", width: "350px", peekWidth: 100, onSelectEpisode: "episodeSelected"},
@@ -53,7 +54,15 @@ enyo.kind({
 	},
 	
 	episodeSelected: function(inSender, episode) {
+		this.updateDashboard(this, episode);
 		this.$.episodeViewPane.setEpisode(episode);
+	},
+	
+	togglePlay: function() {
+		this.$.episodeViewPane.togglePlay();
+		
+		var text = this.$.episodeViewPane.plays ? $L("Tap to pause") : $L("Tap to resume");
+		this.updateDashboard(this, this.$.episodeViewPane.episode, text);
 	},
 	
 	openAppMenuHandler: function() {
@@ -66,6 +75,12 @@ enyo.kind({
 	
 	openInBrowser: function(inUrl) {
 		this.$.launchBrowserCall.call({"id": "com.palm.app.browser", "params": {"target": inUrl}});
+	},
+	
+	updateDashboard: function(inSender, episode, text) {
+		if (text == undefined) text = $L("Tap to play");
+		
+		this.$.dashboard.setLayers([{icon: "icons/icon48.png", title: episode.title, text: text}]);
 	}
 });
 

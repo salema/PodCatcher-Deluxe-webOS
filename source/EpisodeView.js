@@ -51,6 +51,8 @@ enyo.kind({
 		if (episode.url == this.$.sound.getSrc()) return;
 		if (this.plays) this.togglePlay();
 		
+		this.episode = episode;
+		
 		// Update UI
 		this.$.playButton.setCaption($L("Play"));
 		this.$.playButton.setDisabled(false);
