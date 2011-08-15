@@ -32,7 +32,7 @@ enyo.kind({
 			{kind: "Spinner", name: "episodeSpinner", align: "right"}
 		]},
 		{name: "error", style: "display: none", className: "error"},
-		{kind: "Scroller", flex: 1, components: [
+		{kind: "Scroller", name: "episodeListScroller", flex: 1, components: [
 			{kind: "VirtualRepeater", name: "episodeListVR", onSetupRow: "getEpisode", onclick: "selectEpisode", components: [
 				{kind: "Item", layout: "HFlexBox", components: [
 					{name: "episodeTitle", className: "nowrap"},
@@ -110,6 +110,7 @@ enyo.kind({
 		
 		if (this.episodeList.length == 0) this.grabPodcastFailed();
 		
+		this.$.episodeListScroller.scrollTo(0, 0);
 		this.$.episodeListVR.render();
 		this.$.episodeSpinner.hide();
 	},
