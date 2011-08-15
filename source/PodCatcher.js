@@ -28,12 +28,13 @@ enyo.kind({
 			{kind: "AppMenuItem", caption: $L("About"), onclick: "openAbout"},
 			{kind: "AppMenuItem", caption: $L("Help"), onclick: "openHelp"}
 		]},
+		{kind: "Dashboard", name: "dashboard", smallIcon: "icons/icon48.png", onTap: "togglePlay"},
 		{kind: "SlidingPane", flex: 1, components: [
 			{kind: "Net.Alliknow.PodCatcher.PodcastList", name: "podcastListPane", width: "230px", 
 					onSelectPodcast: "podcastSelected", onSelectAll: "allPodcastsSelected"},
 			{kind: "Net.Alliknow.PodCatcher.EpisodeList", name: "episodeListPane", width: "350px", peekWidth: 100, 
 					onSelectEpisode: "episodeSelected", onDownloadsSelected: "downloadsSelected"},
-			{kind: "Net.Alliknow.PodCatcher.EpisodeView", name: "episodeViewPane", flex: 1, peekWidth: 250, 
+			{kind: "Net.Alliknow.PodCatcher.EpisodeView", name: "episodeViewPane", flex: 1, peekWidth: 250, onResume: "updateDashboard",
 					onMarkEpisode: "episodeMarked", onOpenInBrowser: "openInBrowser", onDownloaded: "episodeDownloaded", onDelete: "deleteDownloadedEpisode"}
 		]}
 	],
@@ -59,6 +60,7 @@ enyo.kind({
 	},
 	
 	episodeSelected: function(inSender, episode, marked) {
+		this.updateDashboard(this, episode);
 		this.$.episodeViewPane.setEpisode(episode, marked);
 	},
 	
@@ -74,6 +76,13 @@ enyo.kind({
 		this.$.episodeListPane.markEpisode(episode, marked);
 	},
 	
+	togglePlay: function() {
+		this.$.episodeViewPane.togglePlay();
+		
+		var text = this.$.episodeViewPane.plays ? $L("Tap to pause") : $L("Tap to resume");
+		this.updateDashboard(this, this.$.episodeViewPane.episode, text);
+	},
+	
 	openAppMenuHandler: function() {
 		this.$.appMenu.open();
 	},
@@ -84,6 +93,12 @@ enyo.kind({
 	
 	openInBrowser: function(inUrl) {
 		this.$.launchBrowserCall.call({"id": "com.palm.app.browser", "params": {"target": inUrl}});
+	},
+	
+	updateDashboard: function(inSender, episode, text) {
+		if (text == undefined) text = $L("Tap to play");
+		
+		this.$.dashboard.setLayers([{icon: "icons/icon48.png", title: episode.title, text: text}]);
 	}
 });
 

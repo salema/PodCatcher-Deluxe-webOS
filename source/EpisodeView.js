@@ -22,6 +22,7 @@ enyo.kind({
 	name: "Net.Alliknow.PodCatcher.EpisodeView",
 	kind: "SlidingView",
 	events: {
+		onResume: "",
 		onMarkEpisode: "",
 		onDownloaded: "",
 		onDelete: "",
@@ -72,6 +73,7 @@ enyo.kind({
 	resume: function(inSender, inResponse) {
 		if (inResponse.resumeEpisode != undefined) {
 			this.setEpisode(inResponse.resumeEpisode, inResponse.resumeMarked);
+			this.doResume(inResponse.resumeEpisode);
 			this.doMarkEpisode(inResponse.resumeEpisode, inResponse.resumeMarked);
 			
 			if (inResponse.resumeTime > 0) {
