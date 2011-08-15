@@ -25,7 +25,7 @@ function Podcast(url) {
 
 Podcast.prototype.setUrl = function(url) {
 	this.url = url;
-}
+};
 
 // Read podcast information from feed
 // Make sure to call isValid() before reading
@@ -35,13 +35,13 @@ Podcast.prototype.read = function(xmlDocument) {
 	this.title = this.helper.getFirstValue(xmlTree, XmlHelper.TITLE);
 	this.description = this.helper.getFirstValue(xmlTree, XmlHelper.DESCRIPTION);
 	this.image = this.findImage(xmlTree);
-}
+};
 
 Podcast.prototype.isValid = function(xmlDocument) {
 	var xmlTree = this.helper.parse(xmlDocument);
 		
-	return this.helper.has(xmlTree, XmlHelper.TITLE) && this.helper.has(xmlTree, XmlHelper.DESCRIPTION)
-}
+	return this.helper.has(xmlTree, XmlHelper.TITLE) && this.helper.has(xmlTree, XmlHelper.DESCRIPTION);
+};
 
 Podcast.prototype.findImage = function(xmlTree) {
 	// Image is in image tag
@@ -57,6 +57,6 @@ Podcast.prototype.findImage = function(xmlTree) {
 	// Image is in thumbnail tag
 	else if (this.helper.get(xmlTree, XmlHelper.THUMBNAIL).length > 0)
 		return this.helper.getFirst(xmlTree, XmlHelper.THUMBNAIL).getAttribute(XmlHelper.URL);
-}
+};
 
 Podcast.DEFAULT_IMAGE = "icons/icon128.png";
