@@ -63,7 +63,7 @@ enyo.kind({
 		this.showDownloads = false;
 		this.downloadedEpisodes = [];
 				
-		//this.formatter = new enyo.g11n.DateFmt({date: "long", time: "short", weekday: true});
+		this.formatter = new enyo.g11n.DateFmt({date: "long", time: "short", weekday: true});
 		// this.formatter = new enyo.g11n.DateFmt({date: "long", time: "short"});
 		
 		this.$.preferencesService.call(

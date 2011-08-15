@@ -138,22 +138,20 @@ enyo.kind({
 			if (this.plays) {
 				this.showError($L("Please stop playback before deleting."));
 				return;
-			}	else {
+			} else {
 				this.$.sound.setSrc(this.episode.url);
 				this.$.error.setStyle("display: none;");
 			}
+			
 			this.$.episodeDelete.call({ticket: this.episode.ticket});
 			this.doDelete(this.episode);
-			this.episode.isDownloaded = false;
-			this.episode.ticket = undefined;
-			this.episode.file = undefined;
-			this.downloads = false;
+			this.episode.setDownloaded(false);
+			
 			this.$.downloadButton.setCaption($L("Download"));
 		} // Cancel download
 		else if (this.downloads) {
 			this.$.cancel.call({ticket: this.currentDownloadTicket});
 			this.$.episodeDelete.call({ticket: this.currentDownloadTicket});
-			this.downloads = false;
 		}
 	},
 	
@@ -165,24 +163,25 @@ enyo.kind({
 			this.downloads = false;
 			this.$.error.setStyle("display: none;");
 			this.$.downloadButton.setCaption($L("Delete from device"));
+			
 			this.doDownloaded(this.episode, inResponse);
-			this.episode.isDownloaded = true;
-			this.episode.ticket = inResponse.ticket;
-			this.episode.file = inResponse.target;
+			this.episode.setDownloaded(true, inResponse.ticket, inResponse.target);
+			
 			if (!this.plays) this.$.sound.setSrc(inResponse.target);
 		}
 	},
 	
 	cancelSuccess: function(inSender, inResponse) {
+		this.downloads = false;
 		this.$.error.setStyle("display: none;");
 		this.$.downloadButton.setCaption($L("Download"));
 	},
    
 	downloadFail: function(inSender, inResponse) {
-		this.$.downloadButton.setCaption($L("Download failed"));
 		this.downloads = false;
+		this.$.downloadButton.setCaption($L("Download failed"));
 		this.$.error.setStyle("display: none;");
-		this.log("Download failure, results=" + enyo.json.stringify(inResponse));
+		this.genericFail(inSender, inResponse);
 	},
 	
 	genericFail: function(inSender, inResponse) {

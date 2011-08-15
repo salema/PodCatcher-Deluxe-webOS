@@ -41,6 +41,18 @@ Episode.prototype.isValid = function(xmlTree) {
 		this.helper.has(xmlTree, XmlHelper.DESCRIPTION);
 };
 
+Episode.prototype.setDownloaded = function(downloaded, ticket, file) {
+	this.isDownloaded = downloaded;
+	
+	if (downloaded) {
+		this.ticket = ticket;
+		this.file = file;
+	} else {
+		this.ticket = undefined;
+		this.file = undefined;
+	};
+};
+
 Episode.prototype.compare = function(episodeA, episodeB) {
 	return Date.parse(episodeB.pubDate) - Date.parse(episodeA.pubDate);
 };
