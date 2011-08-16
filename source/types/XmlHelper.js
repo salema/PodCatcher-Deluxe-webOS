@@ -18,27 +18,26 @@
 /**
  * Some helper functions to work on XML documents (like podcast feeds)
  */
-function XmlHelper() {
-}
+function XmlHelper() {}
 
-XmlHelper.prototype.get = function(xmlTree, tagName) {
+XmlHelper.get = function(xmlTree, tagName) {
 	return xmlTree.getElementsByTagName(tagName);
 };
 
-XmlHelper.prototype.has = function(xmlTree, tagName) {
+XmlHelper.has = function(xmlTree, tagName) {
 	return this.get(xmlTree, tagName).length > 0;
 };
 
-XmlHelper.prototype.getFirst = function(xmlTree, tagName) {
+XmlHelper.getFirst = function(xmlTree, tagName) {
 	return this.get(xmlTree, tagName)[0];
 };
 
-XmlHelper.prototype.getFirstValue = function(xmlTree, tagName) {
+XmlHelper.getFirstValue = function(xmlTree, tagName) {
 	return this.getFirst(xmlTree, tagName).firstChild.data;
 };
 
-XmlHelper.prototype.parse = function(xmlDocument) {
-  var parser = new DOMParser();
+XmlHelper.parse = function(xmlDocument) {
+	var parser = new DOMParser();
 	
 	return parser.parseFromString(xmlDocument, "text/xml");
 };

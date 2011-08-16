@@ -48,12 +48,10 @@ enyo.kind({
 	create: function() {
 		this.inherited(arguments);
 		
-		this.helper = new XmlHelper();
 		this.episodeList = [];
 		this.selectedIndex = -1;
 		
 		this.formatter = new enyo.g11n.DateFmt({date: "long", time: "short", weekday: true});
-		//this.formatter = new enyo.g11n.DateFmt({date: "long", time: "short"});
 	},
 	
 	setPodcast: function(podcast) {
@@ -97,8 +95,8 @@ enyo.kind({
 	},
 	
 	grabPodcastSuccess: function(inSender, inResponse, inRequest) {
-		var xmlTree = this.helper.parse(inResponse);
-		var items = this.helper.get(xmlTree, XmlHelper.ITEM);
+		var xmlTree = XmlHelper.parse(inResponse);
+		var items = XmlHelper.get(xmlTree, XmlHelper.ITEM);
 		
 		for (var index = 0; index < items.length; index++) {
 			var episode = new Episode();
