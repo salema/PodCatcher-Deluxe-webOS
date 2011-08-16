@@ -98,7 +98,7 @@ enyo.kind({
 	updateDashboard: function(inSender, episode, text) {
 		if (text == undefined) text = $L("Tap to play");
 		
-		//this.$.dashboard.setLayers([{icon: "icons/icon48.png", title: episode.title, text: episode.podcastTitle + " - " + text}]);
+		this.$.dashboard.setLayers([{icon: "icons/icon48.png", title: episode.title, text: episode.podcastTitle + " - " + text}]);
 	}
 });
 
