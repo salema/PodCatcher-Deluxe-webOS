@@ -62,8 +62,7 @@ enyo.kind({
 		this.showDownloads = false;
 		this.downloadedEpisodes = [];
 				
-		this.formatter = new enyo.g11n.DateFmt({date: "long", time: "short", weekday: true});
-		// this.formatter = new enyo.g11n.DateFmt({date: "long", time: "short"});
+		//this.formatter = new enyo.g11n.DateFmt({date: "long", time: "short", weekday: true});
 		
 		this.$.preferencesService.call(
 		{
@@ -77,8 +76,7 @@ enyo.kind({
 	
 	restore: function(inSender, inResponse) {
 		if (inResponse.markedEpisodes != undefined) 		
-			for (var index = 0; index < inResponse.markedEpisodes.length; index++)
-				this.markedEpisodes.push(inResponse.markedEpisodes[index]);
+			this.markedEpisodes = inResponse.markedEpisodes;
 				
 		if (inResponse.downloadedEpisodes != undefined) {
 			this.downloadedEpisodes = inResponse.downloadedEpisodes;
@@ -144,14 +142,11 @@ enyo.kind({
 				if (this.formatter != undefined) this.$.episodePublished.setContent(this.formatter.format(pubDate));
 				else this.$.episodePublished.setContent(episode.pubDate);
 				
+				// Put podcast title if wanted
+				if (this.showPodcastTitle) this.$.episodePublished.setContent(episode.podcastTitle + " - " + this.$.episodePublished.getContent());
+				
 				if (this.selectedIndex == inIndex) this.$.episodePublished.addClass("highlight");
 				if (old) this.$.episodePublished.addClass("marked");
-				
-				// Put podcast title if wanted
-				if (this.showPodcastTitle) {
-					var title = episode.podcastTitle + " - ";
-					this.$.episodePublished.setContent(title + this.$.episodePublished.getContent());
-				}
 			}
 			
 			return true;
@@ -165,18 +160,19 @@ enyo.kind({
 		var episode = this.episodeList[this.selectedIndex];
 		if (episode) {
 			episode.isDownloaded = this.isDownloaded(episode);
-			if (episode.isDownloaded) episode.file = this.getPathToDownload(episode);
-			if (episode.isDownloaded) episode.ticket = this.getDownloadTicket(episode);
-			this.doSelectEpisode(episode, this.markedEpisodes.indexOf(episode.url) >= 0);
+			episode.ticket = this.getDownloadTicket(episode);
+			episode.file = this.getPathToDownload(episode);
+			episode.marked = this.markedEpisodes.indexOf(episode.url) >= 0;
+			this.doSelectEpisode(episode);
 		}
 				
 		this.$.episodeListVR.render();
 	},
 	
-	markEpisode: function(episode, marked) {
-		if (marked && this.markedEpisodes.indexOf(episode.url) < 0) 
+	markEpisode: function(episode) {
+		if (episode.marked && this.markedEpisodes.indexOf(episode.url) < 0) 
 			this.markedEpisodes.push(episode.url);
-		else if (!marked) {
+		else if (!episode.marked) {
 			var index = this.markedEpisodes.indexOf(episode.url);
 			if (index >= 0) this.markedEpisodes.splice(index, 1);
 		}
@@ -225,10 +221,11 @@ enyo.kind({
 	addToDownloaded: function(episode, inResponse) {
 		this.downloadedEpisodes.push({ticket: inResponse.ticket, url: inResponse.url, file: inResponse.target,
 			title: episode.title, description: episode.description, pubDate: episode.pubDate, 
-			podcastTitle: episode.podcastTitle, isDownloaded: true});
+			podcastTitle: episode.podcastTitle, isDownloaded: true, marked: episode.marked});
 		
 		this.$.showDownloadedButton.setDisabled(this.showDownloads || this.downloadedEpisodes.length == 0);
 		if (this.showDownloads) this.setShowDownloads();
+		
 		this.store();
 	},
 	
@@ -239,10 +236,12 @@ enyo.kind({
 			if (this.downloadedEpisodes[index].url == episode.url)
 				remove = index;
 				
-		if (index >= 0) {
+		if (remove >= 0) {
 			this.downloadedEpisodes.splice(remove, 1);
+			
 			this.$.showDownloadedButton.setDisabled(this.showDownloads || this.downloadedEpisodes.length == 0);
 			if (this.showDownloads) this.setShowDownloads();
+			
 			this.store();
 		}
 	},
@@ -253,6 +252,12 @@ enyo.kind({
 				return true;
 				
 		return false;
+	},
+	
+	getPodcastTitle: function(podcastUrl) {
+		for (var index = 0; index < this.podcastList.length; index++)
+			if (this.podcastList[index].url == podcastUrl)
+				return this.podcastList[index].title;
 	},
 	
 	getPathToDownload: function(episode) {
@@ -289,11 +294,5 @@ enyo.kind({
 		this.$.episodeListScroller.scrollTo(0, 0);
 		this.$.episodeListVR.render();
 		this.$.episodeSpinner.hide();
-	},
-	
-	getPodcastTitle: function(podcastUrl) {
-		for (var index = 0; index < this.podcastList.length; index++)
-			if (this.podcastList[index].url == podcastUrl)
-				return this.podcastList[index].title;
 	}
 }); 

@@ -62,7 +62,7 @@ enyo.kind({
 		
 		this.$.preferencesService.call(
 		{
-			keys: ["resumeEpisode", "resumeMarked", "resumeTime"]
+			keys: ["resumeEpisode", "resumeTime"]
 		},
 		{
 			method: "getPreferences",
@@ -72,13 +72,13 @@ enyo.kind({
 	
 	resume: function(inSender, inResponse) {
 		if (inResponse.resumeEpisode != undefined) {
-			this.setEpisode(inResponse.resumeEpisode, inResponse.resumeMarked);
+			this.setEpisode(inResponse.resumeEpisode);
 			this.doResume(inResponse.resumeEpisode);
-			this.doMarkEpisode(inResponse.resumeEpisode, inResponse.resumeMarked);
+			this.doMarkEpisode(inResponse.resumeEpisode);
 			
 			if (inResponse.resumeTime > 0) {
 				this.resumeOnce = inResponse.resumeTime;
-				this.$.playButton.setCaption($L("Resume at") + " " + this.formatTime(inResponse.resumeTime));
+				this.$.playButton.setCaption($L("Resume at") + " " + Utilities.formatTime(inResponse.resumeTime));
 			}
 		}
 	},
@@ -87,7 +87,6 @@ enyo.kind({
 		this.$.preferencesService.call(
 		{
 			"resumeEpisode": this.episode,
-			"resumeMarked": this.$.markButton.getSrc() == Episode.MARKED_ICON,
 			"resumeTime": this.$.sound.audio.currentTime
 		},
 		{
@@ -95,36 +94,21 @@ enyo.kind({
 		});
 	},
 	
-	setEpisode: function(episode, marked) {
+	setEpisode: function(episode) {
 		// Don't do anything if downloading
-		if (this.downloads) {
-			this.showError($L("Download active, please wait or cancel."));
-			return;
-		} this.$.error.setStyle("display: none;");
-		// Don't do anything if same episode is set again
-		if (this.episode != undefined && episode.url == this.episode.url) return;
-		if (this.plays) this.togglePlay();
-		
-		this.episode = episode;
-		this.resumeOnce = -1;
-		
-		// Update UI
-		this.$.playButton.setCaption($L("Play"));
-		this.$.playButton.setDisabled(false);
-		if (episode.isDownloaded) this.$.downloadButton.setCaption($L("Delete from device"));
-		else this.$.downloadButton.setCaption($L("Download"));
-		this.$.stalledSpinner.hide();
-		this.$.episodeName.setContent($L("Listen to") + " \"" + episode.title + "\"");
-		this.$.episodeDescription.setContent(episode.description);
-		this.$.episodeScroller.scrollTo(0, 0);
-		this.$.playSlider.setPosition(0);
-		this.$.playSlider.setBarPosition(0);
-		if (marked) this.$.markButton.setSrc(Episode.MARKED_ICON);
-		else this.$.markButton.setSrc(Episode.UNMARKED_ICON);
-		
-		// Set sound source
-		if (episode.isDownloaded) this.$.sound.setSrc(episode.file);
-		else this.$.sound.setSrc(episode.url);
+		if (this.downloads) this.showError($L("Download active, please wait or cancel."));
+		else if (this.episode == undefined || episode.url != this.episode.url) {
+			if (this.plays) this.togglePlay();
+			
+			this.episode = episode;
+			this.resumeOnce = -1;
+			
+			this.updateUIOnSetEpisode();
+			
+			// Set sound source
+			if (episode.isDownloaded) this.$.sound.setSrc(episode.file);
+			else this.$.sound.setSrc(episode.url);
+		}
 	},
 	
 	startStopDelete: function(inSender, inResponse) {
@@ -133,23 +117,20 @@ enyo.kind({
 			this.downloads = true;
 			this.$.downloadButton.setCaption($L("Cancel"));		
 			this.$.episodeDownload.call({target: this.episode.url});
+		} // Cannot delete file since it is playing
+		else if (!this.downloads && this.episode.isDownloaded && this.plays && this.$.sound.getSrc() == this.episode.file) {
+			this.showError($L("Please stop playback before deleting."));
 		} // Delete downloaded file
 		else if (!this.downloads && this.episode.isDownloaded) {
-			if (this.plays) {
-				this.showError($L("Please stop playback before deleting."));
-				return;
-			} else {
-				this.$.sound.setSrc(this.episode.url);
-				this.$.error.setStyle("display: none;");
-			}
-			
+			this.$.sound.setSrc(this.episode.url);
+			this.$.error.setStyle("display: none;");
+			this.$.downloadButton.setCaption($L("Download"));
+						
 			this.$.episodeDelete.call({ticket: this.episode.ticket});
 			this.doDelete(this.episode);
 			this.episode.setDownloaded(false);
-			
-			this.$.downloadButton.setCaption($L("Download"));
 		} // Cancel download
-		else if (this.downloads) {
+		else {
 			this.$.cancel.call({ticket: this.currentDownloadTicket});
 			this.$.episodeDelete.call({ticket: this.currentDownloadTicket});
 		}
@@ -157,7 +138,7 @@ enyo.kind({
 	
 	downloadSuccess: function(inSender, inResponse) {
 		this.currentDownloadTicket = inResponse.ticket;
-		this.$.downloadButton.setCaption($L("Cancel at") + " " + this.formatDownloadStatus(inResponse));
+		this.$.downloadButton.setCaption($L("Cancel at") + " " + Utilities.formatDownloadStatus(inResponse));
 		
 		if (inResponse.completed) {
 			this.downloads = false;
@@ -189,12 +170,12 @@ enyo.kind({
 	},
 	
 	toggleMarked: function() {
-		if (this.episode == undefined) return; 
+		this.episode.marked = !this.episode.marked;
 		
-		if (this.$.markButton.getSrc() == Episode.MARKED_ICON) this.$.markButton.setSrc(Episode.UNMARKED_ICON);
-		else this.$.markButton.setSrc(Episode.MARKED_ICON);
+		if (this.episode.marked) this.$.markButton.setSrc(Episode.MARKED_ICON);
+		else this.$.markButton.setSrc(Episode.UNMARKED_ICON);
 		
-		this.doMarkEpisode(this.episode, this.$.markButton.getSrc() == Episode.MARKED_ICON);
+		this.doMarkEpisode(this.episode);
 	},
 
 	togglePlay: function() {
@@ -259,43 +240,25 @@ enyo.kind({
 		this.$.error.setContent(text);
 		this.$.error.setStyle("display: block; width: 100%; text-align: center;");
 	},
+	
+	updateUIOnSetEpisode: function() {
+		this.$.error.setStyle("display: none;");
+		this.$.playButton.setCaption($L("Play"));
+		this.$.playButton.setDisabled(false);
+		if (this.episode.isDownloaded) this.$.downloadButton.setCaption($L("Delete from device"));
+		else this.$.downloadButton.setCaption($L("Download"));
+		this.$.stalledSpinner.hide();
+		this.$.episodeName.setContent($L("Listen to") + " \"" + this.episode.title + "\"");
+		this.$.episodeDescription.setContent(this.episode.description);
+		this.$.episodeScroller.scrollTo(0, 0);
+		this.$.playSlider.setPosition(0);
+		this.$.playSlider.setBarPosition(0);
+		if (this.episode.marked) this.$.markButton.setSrc(Episode.MARKED_ICON);
+		else this.$.markButton.setSrc(Episode.UNMARKED_ICON);
+	},
 		
 	createTimeString: function() {
-		return this.formatTime(this.$.sound.audio.currentTime) + " " +  $L("of") + " " +
-			this.formatTime(this.$.sound.audio.duration);
-	},
-	
-	// Convert a time given in seconds with many digits to HH:MM:SS
-	formatTime: function(time) {
-		var hours = Math.floor(Math.floor(time) / 3600);
-		var minutes = Math.floor(Math.floor(time) / 60) - 60 * hours;
-		var seconds = Math.floor(time) % 60;
-		
-		if (isNaN(minutes) || !isFinite(minutes)) minutes = "--";
-		else if (minutes < 10 && hours > 0) minutes = "0" + minutes;
-		
-		if (isNaN(seconds) || !isFinite(seconds)) seconds = "--"; 
-		else if (seconds < 10) seconds = "0" + seconds;
-		
-		if (!isNaN(hours) && isFinite(hours) && hours > 0) return hours + ":" + minutes + ":" + seconds;
-		else return minutes + ":" + seconds; 
-	},
-	
-	formatDownloadStatus: function(inResponse) {
-		var percent = Math.floor(inResponse.amountReceived / inResponse.amountTotal * 100);
-		percent = this.formatNumber(percent);
-		
-		var received = Math.round(inResponse.amountReceived / (1024*1024));
-		received = this.formatNumber(received);
-		
-		var total = Math.round(inResponse.amountTotal / (1024*1024));
-		total = this.formatNumber(total);
-		
-		return percent + "% (" + received + " " + $L("of") + " " + total + "MB)";
-	},
-	
-	formatNumber: function(number) {
-		if (isNaN(number) || !isFinite(number)) return "--";
-		else return number;
+		return Utilities.formatTime(this.$.sound.audio.currentTime) + " " +  $L("of") + " " +
+			Utilities.formatTime(this.$.sound.audio.duration);
 	}
 });

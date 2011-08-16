@@ -6,9 +6,9 @@
 		"file": "/home/kevin/Downloads/Escape - Der Experte/ee_20110813_190000.mp3",
 		"pubDate": "08/13/2011 07:00 PM",
 		"podcastTitle": "Test",
-		"isDownloaded": true
+		"isDownloaded": true,
+		"marked": true
 	},
-	"resumeMarked": true,
 	"resumeTime": 1234,
 	"returnValue": true
 }

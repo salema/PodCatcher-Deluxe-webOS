@@ -7,6 +7,7 @@
 		"description": "Testbeschreibung",
 		"pubDate": "08/13/2011 07:00 PM",
 		"podcastTitle": "Test",
-		"isDownloaded": true}],
+		"isDownloaded": true,
+		"marked": true}],
 	"returnValue": true
 }
