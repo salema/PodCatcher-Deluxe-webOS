@@ -169,6 +169,7 @@ enyo.kind({
 	
 	downloadsSelected: function() {
 		this.$.selectAllButton.setDisabled(! (this.podcastList.length > 1));
+		this.$.podcastImage.setSrc(Podcast.DEFAULT_IMAGE);
 	},
 	
 	isPodcastInList: function(podcast) {
