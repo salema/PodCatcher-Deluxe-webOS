@@ -23,33 +23,29 @@ function Utilities() {}
 // Convert a time given in seconds with many digits to HH:MM:SS
 Utilities.formatTime = function(time) {
 	var hours = Math.floor(Math.floor(time) / 3600);
+	var hasHours = !isNaN(hours) && isFinite(hours) && hours > 0;
+	
 	var minutes = Math.floor(Math.floor(time) / 60) - 60 * hours;
 	var seconds = Math.floor(time) % 60;
 	
-	if (isNaN(minutes) || !isFinite(minutes)) minutes = "--";
-	else if (minutes < 10 && hours > 0) minutes = "0" + minutes;
+	minutes = this.formatNumber(minutes, hasHours);
+	seconds = this.formatNumber(seconds, true);
 	
-	if (isNaN(seconds) || !isFinite(seconds)) seconds = "--"; 
-	else if (seconds < 10) seconds = "0" + seconds;
-	
-	if (!isNaN(hours) && isFinite(hours) && hours > 0) return hours + ":" + minutes + ":" + seconds;
+	if (hasHours) return hours + ":" + minutes + ":" + seconds;
 	else return minutes + ":" + seconds; 
 };
 	
-Utilities.formatDownloadStatus = function(inResponse) {
-	var percent = Math.floor(inResponse.amountReceived / inResponse.amountTotal * 100);
-	percent = this.formatNumber(percent);
+Utilities.formatDownloadStatus = function(data) {
+	var percent = Math.floor(data.amountReceived / data.amountTotal * 100);
+	var received = Math.round(data.amountReceived / (1024*1024));
+	var total = Math.round(data.amountTotal / (1024*1024));
 	
-	var received = Math.round(inResponse.amountReceived / (1024*1024));
-	received = this.formatNumber(received);
-	
-	var total = Math.round(inResponse.amountTotal / (1024*1024));
-	total = this.formatNumber(total);
-	
-	return percent + "% (" + received + " " + $L("of") + " " + total + "MB)";
+	return this.formatNumber(percent) + "% (" + this.formatNumber(received) +
+			" " + $L("of") + " " + this.formatNumber(total) + "MB)";
 };
 	
-Utilities.formatNumber = function(number) {
+Utilities.formatNumber = function(number, makeTwoDigits) {
 	if (isNaN(number) || !isFinite(number)) return "--";
+	else if (number < 10 && makeTwoDigits) return "0" + number;
 	else return number;
 };
