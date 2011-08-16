@@ -22,7 +22,7 @@ function Episode() {}
 
 // Read episode information from feed
 // Make sure to call isValid() before reading
-Episode.prototype.read = function(xmlTree) {
+Episode.prototype.readFromXML = function(xmlTree) {
 	this.title = XmlHelper.getFirstValue(xmlTree, XmlHelper.TITLE);
 	this.url = XmlHelper.getFirst(xmlTree, XmlHelper.ENCLOSURE).getAttribute(XmlHelper.URL);
 	this.pubDate = XmlHelper.getFirstValue(xmlTree, XmlHelper.PUBDATE);
@@ -32,7 +32,23 @@ Episode.prototype.read = function(xmlTree) {
 	else this.description = "<i>" + $L("No description available.") + "</i>";
 };
 
-Episode.prototype.isValid = function(xmlTree) {
+// Read episode information from JSON data
+Episode.prototype.readFromJSON = function(data) {
+	this.title = data.title;
+	this.url = data.url;
+	this.pubDate = data.pubDate;
+	
+	if (data.description != undefined) this.description = data.description;
+	else this.description = "<i>" + $L("No description available.") + "</i>";
+	
+	if (data.ticket != undefined) this.ticket = data.ticket;
+	if (data.file != undefined) this.file = data.file;
+	if (data.podcastTitle != undefined) this.podcastTitle = data.podcastTitle;
+	if (data.isDownloaded != undefined) this.isDownloaded = data.isDownloaded;
+	if (data.marked != undefined) this.marked = data.marked;
+};
+
+Episode.prototype.isValidXML = function(xmlTree) {
 	return XmlHelper.has(xmlTree, XmlHelper.TITLE) &&
 		XmlHelper.has(xmlTree, XmlHelper.ENCLOSURE) &&
 		XmlHelper.has(xmlTree, XmlHelper.PUBDATE) &&

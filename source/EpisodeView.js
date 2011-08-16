@@ -72,9 +72,12 @@ enyo.kind({
 	
 	resume: function(inSender, inResponse) {
 		if (inResponse.resumeEpisode != undefined) {
-			this.setEpisode(inResponse.resumeEpisode);
-			this.doResume(inResponse.resumeEpisode);
-			this.doMarkEpisode(inResponse.resumeEpisode);
+			var episode = new Episode();
+			episode.readFromJSON(inResponse.resumeEpisode);
+			
+			this.setEpisode(episode);
+			this.doResume(episode);
+			this.doMarkEpisode(episode);
 			
 			if (inResponse.resumeTime > 0) {
 				this.resumeOnce = inResponse.resumeTime;
