@@ -62,7 +62,7 @@ enyo.kind({
 		this.showDownloads = false;
 		this.downloadedEpisodes = [];
 				
-		//this.formatter = new enyo.g11n.DateFmt({date: "long", time: "short", weekday: true});
+		this.formatter = new enyo.g11n.DateFmt({date: "long", time: "short", weekday: true});
 		
 		this.$.preferencesService.call(
 		{
@@ -122,7 +122,8 @@ enyo.kind({
 		this.afterLoad();
 		this.doDownloadsSelected();
 	},
-		
+	
+	// Method called for item creation from virtual repeater
 	getEpisode: function(inSender, inIndex) {
 		var episode = this.episodeList[inIndex];
 		
