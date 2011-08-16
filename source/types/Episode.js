@@ -18,27 +18,25 @@
 /**
  * Represent a podcast episode
  */
-function Episode() {
-	this.helper = new XmlHelper();
-}
+function Episode() {}
 
 // Read episode information from feed
 // Make sure to call isValid() before reading
 Episode.prototype.read = function(xmlTree) {
-	this.title = this.helper.getFirstValue(xmlTree, XmlHelper.TITLE);
-	this.url = this.helper.getFirst(xmlTree, XmlHelper.ENCLOSURE).getAttribute(XmlHelper.URL);
-	this.pubDate = this.helper.getFirstValue(xmlTree, XmlHelper.PUBDATE);
+	this.title = XmlHelper.getFirstValue(xmlTree, XmlHelper.TITLE);
+	this.url = XmlHelper.getFirst(xmlTree, XmlHelper.ENCLOSURE).getAttribute(XmlHelper.URL);
+	this.pubDate = XmlHelper.getFirstValue(xmlTree, XmlHelper.PUBDATE);
 	
-	if (this.helper.getFirst(xmlTree, XmlHelper.DESCRIPTION).firstChild != undefined)
-		this.description = this.helper.getFirstValue(xmlTree, XmlHelper.DESCRIPTION);
+	if (XmlHelper.getFirst(xmlTree, XmlHelper.DESCRIPTION).firstChild != undefined)
+		this.description = XmlHelper.getFirstValue(xmlTree, XmlHelper.DESCRIPTION);
 	else this.description = "<i>" + $L("No description available.") + "</i>";
 };
 
 Episode.prototype.isValid = function(xmlTree) {
-	return this.helper.has(xmlTree, XmlHelper.TITLE) &&
-		this.helper.has(xmlTree, XmlHelper.ENCLOSURE) &&
-		this.helper.has(xmlTree, XmlHelper.PUBDATE) &&
-		this.helper.has(xmlTree, XmlHelper.DESCRIPTION);
+	return XmlHelper.has(xmlTree, XmlHelper.TITLE) &&
+		XmlHelper.has(xmlTree, XmlHelper.ENCLOSURE) &&
+		XmlHelper.has(xmlTree, XmlHelper.PUBDATE) &&
+		XmlHelper.has(xmlTree, XmlHelper.DESCRIPTION);
 };
 
 Episode.prototype.setDownloaded = function(downloaded, ticket, file) {
