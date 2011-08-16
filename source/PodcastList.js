@@ -27,12 +27,12 @@ enyo.kind({
 		onSelectPodcast: ""
 	},
 	components: [
-		{kind: "SystemService", name: "preferencesService", onFailure: "preferencesFailure", subscribe : false},
+		{kind: "SystemService", name: "preferencesService", subscribe : false},
 		{kind: "WebService", name: "grabPodcastImage", onSuccess: "grabPodcastImageSuccess"},
 		{kind: "Net.Alliknow.PodCatcher.AddPodcastPopup", name: "addPodcastPopup", onAddPodcast: "addPodcast"},
 		{kind: "Header", content: $L("Discover Podcasts"), className: "header"},
 		{kind: "Scroller", name: "podcastListScroller", flex: 1, components: [
-			{kind: "VirtualRepeater", name: "podcastListVR", onSetupRow: "getPodcast", onclick: "selectPodcast", components: [
+			{kind: "VirtualRepeater", name: "podcastListVR", onSetupRow: "getPodcast", onclick: "selectPodcastClick", components: [
 				{kind: "SwipeableItem", layoutKind: "HFlexLayout", onConfirm: "deletePodcast", components: [
 					{name: "podcastTitle", className: "nowrap"}
 				]}
@@ -50,41 +50,24 @@ enyo.kind({
 		this.selectedIndex = -1;
 		this.podcastList = [];
 		
-		this.$.preferencesService.call(
-		{
-			keys: ["storedPodcastList"]
-		},
-		{
-			method: "getPreferences",
-			onSuccess: "restorePodcastList",
-		});
+		this.$.preferencesService.call({keys: ["storedPodcastList"]}, {method: "getPreferences", onSuccess: "restorePodcastList"});
 	},
 	
 	restorePodcastList: function(inSender, inResponse) {
 		var list = inResponse.storedPodcastList;
 		
 		// first start of app (or empty podcast list)
-		if (list == undefined || list.length == 0) {
-			 this.showAddPodcastPopup();
-		}
+		if (list == undefined || list.length == 0) this.showAddPodcastPopup();
 		// podcast list restored
 		else {
-			for (var index = 0; index < list.length; index++) {
-				this.podcastList.push(list[index]);
-			}
+			this.podcastList = list;
 			
 			this.$.podcastListVR.render();
 		}
 	},
 	
 	storePodcastList: function() {
-		this.$.preferencesService.call(
-		{
-			"storedPodcastList": this.podcastList
-		},
-		{
-			method: "setPreferences"
-		});
+		this.$.preferencesService.call({"storedPodcastList": this.podcastList},	{method: "setPreferences"});
 	},
 	
 	// Method called for item creation from virtual repeater
@@ -98,11 +81,15 @@ enyo.kind({
 		}
 	},
 	
-	selectPodcast: function(inSender, inEvent) {
+	selectPodcastClick: function(inSender, inEvent) {
 		// No action if current podcast is tapped on again
-		if (this.$.podcastListVR.fetchRowIndex() == this.selectedIndex) return;
-		else this.selectedIndex = this.$.podcastListVR.fetchRowIndex();
-		
+		if (this.$.podcastListVR.fetchRowIndex() != this.selectedIndex) {
+			this.selectedIndex = this.$.podcastListVR.fetchRowIndex();
+			this.selectPodcast();
+		}
+	},
+	
+	selectPodcast: function() {
 		var podcast = this.podcastList[this.selectedIndex];
 		
 		if (podcast) {
@@ -121,13 +108,20 @@ enyo.kind({
 	},
 	
 	addPodcast: function(inSender, podcast) {
-		if (this.isPodcastInList(podcast)) return;
-		
-		this.podcastList.push(podcast);
-		this.storePodcastList();
-				
-		this.$.podcastListVR.render();
-		this.$.podcastListScroller.scrollToBottom();
+		// podcast is already in list
+		if (this.isPodcastInList(podcast)) {
+			this.selectedIndex = this.getPodcastIndexInList(podcast);
+			this.selectPodcast();
+		} // podcast is new
+		else {
+			this.podcastList.push(podcast);
+			this.storePodcastList();
+			
+			this.selectedIndex = this.podcastList.length - 1;
+			this.selectPodcast();
+			
+			this.$.podcastListScroller.scrollToBottom();
+		}
 	},
 
 	deletePodcast: function(inSender, inIndex) {
@@ -152,15 +146,14 @@ enyo.kind({
 		return false;	
 	},
 	
+	getPodcastIndexInList: function(podcast) {
+		for (var index = 0; index < this.podcastList.length; index++)
+			if (this.podcastList[index].url == podcast.url) return index;	
+	},
+	
 	grabPodcastImageSuccess: function(inSender, inResponse, inRequest) {
 		var podcast = this.podcastList[this.selectedIndex];
 		
 		if (podcast.image != undefined && inResponse.length != 0) this.$.podcastImage.setSrc(podcast.image);
-	},
-	
-	preferencesFailure: function(inSender, inResponse) {
-		this.warn("got failure from preferencesService");
-		this.warn(JSON.stringify(inSender));
-		this.warn(JSON.stringify(inResponse));
 	}
 }); 
