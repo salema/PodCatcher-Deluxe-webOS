@@ -87,17 +87,19 @@ enyo.kind({
 		
 		// Update play button
 		if (this.$.sound.audio.currentTime == 0) this.$.playButton.setCaption($L("Pause"));
-		else if (this.$.sound.audio.currentTime == this.$.sound.audio.duration) this.playbackEnded();
+		else if (this.$.sound.audio.currentTime == this.$.sound.audio.duration) this.stopPlayback($L("Playback complete"));
 		else this.$.playButton.setCaption($L("Pause at") + " " + this.createTimeString());
+		
+		if (this.$.sound.audio.error > 0) this.stopPlayback($L("Playback failed"));
 	},
 	
-	playbackEnded: function() {
-		this.$.playButton.setCaption($L("Playback complete"));
-		this.$.playButton.setDisabled(true);
-		this.$.stalledSpinner.hide();
-		
+	stopPlayback: function(buttonText) {
 		clearInterval(this.interval);
 		this.plays = false;
+		
+		this.$.playButton.setCaption(buttonText);
+		this.$.playButton.setDisabled(true);
+		this.$.stalledSpinner.hide();
 	},
 	
 	createTimeString: function() {
