@@ -34,5 +34,6 @@
 	"Cancel at": "Cancelar el",
 	"Download active, please wait or cancel.": "Descargar activa, por favor espere o cancelar.",
 	"Please stop playback before deleting.": "Por favor, detener la reproducción antes de borrarla.",
-	"Download failed": "Descarga fallida"
+	"Download failed": "Descarga fallida",
+	"Playback active, please pause before switching.": "Reproducción activa."
 }

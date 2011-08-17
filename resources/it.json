@@ -34,5 +34,6 @@
 	"Cancel at": "???",
 	"Download active, please wait or cancel.": "???",
 	"Please stop playback before deleting.": "???",
-	"Download failed": "???"
+	"Download failed": "???",
+	"Playback active, please pause before switching.":"???"
 }

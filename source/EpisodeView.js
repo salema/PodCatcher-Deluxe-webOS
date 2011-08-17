@@ -42,8 +42,8 @@ enyo.kind({
 			{kind: "Spinner", name: "stalledSpinner", align: "right"}
 		]},
 		{kind: "Sound"},
-		{kind: "CustomButton", name: "error", style: "display: none", className: "error"},
 		{kind: "Button", name: "downloadButton", caption: $L("Download"), onclick: "startStopDelete"},
+		{name: "error", style: "display: none", className: "error"},
 		{kind: "Scroller", name: "episodeScroller", flex: 1, style: "margin: 5px 12px", components: [
 			{kind: "HtmlContent", name: "episodeDescription", onLinkClick: "doOpenInBrowser", flex: 1}
 		]},
@@ -107,6 +107,10 @@ enyo.kind({
 	setEpisode: function(episode) {
 		// Don't do anything if downloading
 		if (this.downloads) this.showError($L("Download active, please wait or cancel."));
+		else if (this.plays && episode.url != this.episode.url) 
+			this.showError($L("Playback active, please pause before switching."));
+		else if (this.plays && episode.url == this.episode.url) 
+			this.$.error.setStyle("display: none;");
 		else if (this.episode == undefined || episode.url != this.episode.url) {
 			if (this.plays) this.togglePlay();
 			
@@ -240,23 +244,22 @@ enyo.kind({
 	},
 	
 	playbackEnded: function() {
-		clearInterval(this.playtimeInterval);
-		this.plays = false;
-		
-		this.$.playButton.setCaption($L("Playback complete"));
-		this.$.playButton.setDisabled(true);
-		this.$.stalledSpinner.hide();
+		this.stopPlayback($L("Playback complete"));
 		if (! this.episode.marked) this.toggleMarked();		
 	},
 	
 	playbackFailed: function() {
+		this.stopPlayback($L("Playback failed"));	
+		this.showError($L("Playback failed"));
+	},
+	
+	stopPlayback: function(buttonText) {
 		clearInterval(this.playtimeInterval);
 		this.plays = false;
 		
-		this.$.playButton.setCaption($L("Playback failed"));
+		this.$.playButton.setCaption(buttonText);
 		this.$.playButton.setDisabled(true);
 		this.$.stalledSpinner.hide();
-		this.showError($L("Playback failed"));
 	},
 	
 	showError: function(text) {
