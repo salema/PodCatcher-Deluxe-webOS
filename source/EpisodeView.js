@@ -59,7 +59,7 @@ enyo.kind({
 		
 		this.plays = false;
 		this.downloads = false;
-		this.sliderInterval = setInterval(enyo.bind(this, this.updatePlaySlider), 1000);
+		this.sliderInterval = setInterval(enyo.bind(this, this.updatePlaySlider), 250);
 		
 		this.$.preferencesService.call(
 		{
@@ -193,17 +193,16 @@ enyo.kind({
 		
 		if (this.plays) {
 			// This happens only once after startup to allow resume of last episode
-			if (this.resumeOnce > 0) {
-				this.$.sound.audio.currentTime = this.resumeOnce;
-				this.resumeOnce = -1;
-			}
+			if (this.resumeOnce > 0) this.$.sound.audio.currentTime = this.resumeOnce;
+			this.resumeOnce = -1;
+			
 			this.$.sound.play();
 			this.updatePlaytime();
-			this.interval = setInterval(enyo.bind(this, this.updatePlaytime), 1000);
+			this.playtimeInterval = setInterval(enyo.bind(this, this.updatePlaytime), 1000);
 		} else {
 			this.$.sound.audio.pause();
 			this.updatePlaytime();
-			clearInterval(this.interval);
+			clearInterval(this.playtimeInterval);
 		}		
 	},
 	
@@ -228,6 +227,8 @@ enyo.kind({
 			if (this.$.sound.audio.currentTime == 0) this.$.playButton.setCaption($L("Resume"));
 			else this.$.playButton.setCaption($L("Resume at") + " " + this.createTimeString());
 		}
+		
+		if (this.$.sound.audio.error > 0) this.playbackFailed();
 	},
 		
 	updatePlaySlider: function () {
@@ -239,13 +240,23 @@ enyo.kind({
 	},
 	
 	playbackEnded: function() {
-		clearInterval(this.interval);
+		clearInterval(this.playtimeInterval);
 		this.plays = false;
 		
 		this.$.playButton.setCaption($L("Playback complete"));
 		this.$.playButton.setDisabled(true);
 		this.$.stalledSpinner.hide();
-		if (this.$.markButton.getSrc() == Episode.UNMARKED_ICON) this.toggleMarked();		
+		if (! this.episode.marked) this.toggleMarked();		
+	},
+	
+	playbackFailed: function() {
+		clearInterval(this.playtimeInterval);
+		this.plays = false;
+		
+		this.$.playButton.setCaption($L("Playback failed"));
+		this.$.playButton.setDisabled(true);
+		this.$.stalledSpinner.hide();
+		this.showError($L("Playback failed"));
 	},
 	
 	showError: function(text) {
