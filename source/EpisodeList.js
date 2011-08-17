@@ -159,8 +159,7 @@ enyo.kind({
 	},
 	
 	selectEpisode: function(inSender, inIndex) {
-		if (this.$.episodeListVR.fetchRowIndex() == this.selectedIndex) return; 
-		else this.selectedIndex = this.$.episodeListVR.fetchRowIndex();
+		this.selectedIndex = this.$.episodeListVR.fetchRowIndex();
 		
 		var episode = this.episodeList[this.selectedIndex];
 		if (episode) {
