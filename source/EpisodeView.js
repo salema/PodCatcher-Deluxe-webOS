@@ -59,6 +59,7 @@ enyo.kind({
 		
 		this.plays = false;
 		this.downloads = false;
+		this.sliderInterval = setInterval(enyo.bind(this, this.updatePlaySlider), 1000);
 		
 		this.$.preferencesService.call(
 		{
@@ -68,6 +69,12 @@ enyo.kind({
 			method: "getPreferences",
 			onSuccess: "resume",
 		});
+	},
+	
+	destroy: function() {
+		clearInterval(this.sliderInterval);
+		
+		this.inherited(arguments);
 	},
 	
 	resume: function(inSender, inResponse) {
@@ -221,8 +228,9 @@ enyo.kind({
 			if (this.$.sound.audio.currentTime == 0) this.$.playButton.setCaption($L("Resume"));
 			else this.$.playButton.setCaption($L("Resume at") + " " + this.createTimeString());
 		}
+	},
 		
-		// Update play slider
+	updatePlaySlider: function () {
 		this.$.playSlider.setMaximum(this.$.sound.audio.duration);
 		this.$.playSlider.setBarMaximum(this.$.sound.audio.duration);
 		this.$.playSlider.setPosition(this.$.sound.audio.currentTime);
