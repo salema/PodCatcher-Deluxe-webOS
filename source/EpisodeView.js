@@ -226,7 +226,8 @@ enyo.kind({
 		this.$.playSlider.setMaximum(this.$.sound.audio.duration);
 		this.$.playSlider.setBarMaximum(this.$.sound.audio.duration);
 		this.$.playSlider.setPosition(this.$.sound.audio.currentTime);
-		this.$.playSlider.setBarPosition(this.$.sound.audio.currentTime);
+		if (this.$.sound.audio.buffered.length > 0)
+			this.$.playSlider.setBarPosition(this.$.sound.audio.buffered.end(this.$.sound.audio.buffered.length - 1));
 	},
 	
 	playbackEnded: function() {
