@@ -22,6 +22,8 @@ enyo.kind({
 	name: "Net.Alliknow.PodCatcher.EpisodeView",
 	kind: "SlidingView",
 	events: {
+		onTogglePlay: "",
+		onPlaybackEnded: "",
 		onOpenInBrowser: ""
 	},
 	components: [
@@ -78,6 +80,7 @@ enyo.kind({
 		}
 		
 		this.plays = !this.plays;
+		this.doTogglePlay();
 	},
 	
 	updatePlaytime: function() {
@@ -96,6 +99,7 @@ enyo.kind({
 	stopPlayback: function(buttonText) {
 		clearInterval(this.interval);
 		this.plays = false;
+		this.doPlaybackEnded();
 		
 		this.$.playButton.setCaption(buttonText);
 		this.$.playButton.setDisabled(true);

@@ -33,7 +33,8 @@ enyo.kind({
 		{kind: "SlidingPane", flex: 1, components: [
 			{kind: "Net.Alliknow.PodCatcher.PodcastList", name: "podcastListPane", width: "230px", onSelectPodcast: "podcastSelected"},
 			{kind: "Net.Alliknow.PodCatcher.EpisodeList", name: "episodeListPane", width: "350px", peekWidth: 100, onSelectEpisode: "episodeSelected"},
-			{kind: "Net.Alliknow.PodCatcher.EpisodeView", name: "episodeViewPane", flex: 1, peekWidth: 250, onOpenInBrowser: "openInBrowser"}
+			{kind: "Net.Alliknow.PodCatcher.EpisodeView", name: "episodeViewPane", flex: 1, peekWidth: 250, onTogglePlay: "updateDashboard", 
+					onPlaybackEnded: "updateDashboard", onOpenInBrowser: "openInBrowser"}
 		]}
 	],
 	
@@ -54,15 +55,17 @@ enyo.kind({
 	},
 	
 	episodeSelected: function(inSender, episode) {
-		this.updateDashboard(this, episode);
 		this.$.episodeViewPane.setEpisode(episode);
+		this.updateDashboard(this, episode);
 	},
 	
 	togglePlay: function() {
-		this.$.episodeViewPane.togglePlay();
+		var audio = this.$.episodeViewPane.$.sound.audio;
 		
-		var text = this.$.episodeViewPane.plays ? $L("Tap to pause") : $L("Tap to resume");
-		this.updateDashboard(this, this.$.episodeViewPane.episode, text);
+		if (audio.currentTime != audio.duration)
+			this.$.episodeViewPane.togglePlay();
+		
+		this.updateDashboard();
 	},
 	
 	openAppMenuHandler: function() {
@@ -77,10 +80,17 @@ enyo.kind({
 		this.$.launchBrowserCall.call({"id": "com.palm.app.browser", "params": {"target": inUrl}});
 	},
 	
-	updateDashboard: function(inSender, episode, text) {
-		if (text == undefined) text = $L("Tap to play");
+	updateDashboard: function() {
+		var playText = $L("Tap to pause");
+		var audio = this.$.episodeViewPane.$.sound.audio;
 		
-		this.$.dashboard.setLayers([{icon: "icons/icon48.png", title: episode.title, text: text}]);
+		if (!this.$.episodeViewPane.plays && audio.currentTime == 0) playText = $L("Tap to play");
+		else if (!this.$.episodeViewPane.plays && audio.currentTime == audio.duration) playText = $L("Playback complete");
+		else if (this.$.episodeViewPane.plays && audio.currentTime > 0) playText = $L("Tap to pause"); 
+		else if (! this.$.episodeViewPane.plays && audio.currentTime > 0) playText = $L("Tap to resume");
+		
+		var episode = this.$.episodeViewPane.episode;
+		this.$.dashboard.setLayers([{icon: "icons/icon48.png", title: episode.title, text: playText}]);
 	}
 });
 
