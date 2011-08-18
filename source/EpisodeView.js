@@ -22,6 +22,7 @@ enyo.kind({
 	name: "Net.Alliknow.PodCatcher.EpisodeView",
 	kind: "SlidingView",
 	events: {
+		onTogglePlay: "",
 		onResume: "",
 		onMarkEpisode: "",
 		onDownloaded: "",
@@ -194,6 +195,7 @@ enyo.kind({
 
 	togglePlay: function() {
 		this.plays = !this.plays;
+		this.doTogglePlay();
 		
 		if (this.plays) {
 			// This happens only once after startup to allow resume of last episode
@@ -264,7 +266,7 @@ enyo.kind({
 	
 	showError: function(text) {
 		this.$.error.setContent(text);
-		this.$.error.setStyle("display: block; width: 100%; text-align: center;");
+		this.$.error.setStyle("display: block; width: 100%; text-align: center; padding-bottom: 5px; border-bottom: 1px solid gray;");
 	},
 	
 	updateUIOnSetEpisode: function() {

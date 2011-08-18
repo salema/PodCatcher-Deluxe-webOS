@@ -34,7 +34,7 @@ enyo.kind({
 					onSelectPodcast: "podcastSelected", onSelectAll: "allPodcastsSelected"},
 			{kind: "Net.Alliknow.PodCatcher.EpisodeList", name: "episodeListPane", width: "350px", peekWidth: 100, 
 					onSelectEpisode: "episodeSelected", onDownloadsSelected: "downloadsSelected"},
-			{kind: "Net.Alliknow.PodCatcher.EpisodeView", name: "episodeViewPane", flex: 1, peekWidth: 250, onResume: "updateDashboard",
+			{kind: "Net.Alliknow.PodCatcher.EpisodeView", name: "episodeViewPane", flex: 1, peekWidth: 250, onTogglePlay: "indirectTogglePlay", onResume: "updateDashboard",
 					onMarkEpisode: "episodeMarked", onOpenInBrowser: "openInBrowser", onDownloaded: "episodeDownloaded", onDelete: "deleteDownloadedEpisode"}
 		]}
 	],
@@ -60,8 +60,10 @@ enyo.kind({
 	},
 	
 	episodeSelected: function(inSender, episode, marked) {
-		this.updateDashboard(this, episode);
 		this.$.episodeViewPane.setEpisode(episode, marked);
+		
+		if (!this.$.episodeViewPane.downloads && !this.$.episodeViewPane.plays)
+			this.updateDashboard(this, episode);
 	},
 	
 	episodeDownloaded: function(inSender, episode, inResponse) {
@@ -79,6 +81,11 @@ enyo.kind({
 	togglePlay: function() {
 		this.$.episodeViewPane.togglePlay();
 		
+		var text = this.$.episodeViewPane.plays ? $L("Tap to pause") : $L("Tap to resume");
+		this.updateDashboard(this, this.$.episodeViewPane.episode, text);
+	},
+	
+	indirectTogglePlay: function() {
 		var text = this.$.episodeViewPane.plays ? $L("Tap to pause") : $L("Tap to resume");
 		this.updateDashboard(this, this.$.episodeViewPane.episode, text);
 	},
