@@ -23,6 +23,7 @@ enyo.kind({
 	kind: "SlidingView",
 	events: {
 		onTogglePlay: "",
+		onPlaybackEnded: "",
 		onResume: "",
 		onMarkEpisode: "",
 		onDownloaded: "",
@@ -258,6 +259,7 @@ enyo.kind({
 	stopPlayback: function(buttonText) {
 		clearInterval(this.playtimeInterval);
 		this.plays = false;
+		this.doPlaybackEnded();
 		
 		this.$.playButton.setCaption(buttonText);
 		this.$.playButton.setDisabled(true);

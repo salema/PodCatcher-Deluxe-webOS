@@ -34,8 +34,9 @@ enyo.kind({
 					onSelectPodcast: "podcastSelected", onSelectAll: "allPodcastsSelected"},
 			{kind: "Net.Alliknow.PodCatcher.EpisodeList", name: "episodeListPane", width: "350px", peekWidth: 100, 
 					onSelectEpisode: "episodeSelected", onDownloadsSelected: "downloadsSelected"},
-			{kind: "Net.Alliknow.PodCatcher.EpisodeView", name: "episodeViewPane", flex: 1, peekWidth: 250, onTogglePlay: "indirectTogglePlay", onResume: "updateDashboard",
-					onMarkEpisode: "episodeMarked", onOpenInBrowser: "openInBrowser", onDownloaded: "episodeDownloaded", onDelete: "deleteDownloadedEpisode"}
+			{kind: "Net.Alliknow.PodCatcher.EpisodeView", name: "episodeViewPane", flex: 1, peekWidth: 250, onTogglePlay: "updateDashboard", 
+					onPlaybackEnded: "updateDashboard", onResume: "updateDashboard", onMarkEpisode: "episodeMarked", onOpenInBrowser: "openInBrowser", 
+					onDownloaded: "episodeDownloaded", onDelete: "deleteDownloadedEpisode"}
 		]}
 	],
 	
@@ -79,15 +80,12 @@ enyo.kind({
 	},
 	
 	togglePlay: function() {
-		this.$.episodeViewPane.togglePlay();
+		var audio = this.$.episodeViewPane.$.sound.audio;
 		
-		var text = this.$.episodeViewPane.plays ? $L("Tap to pause") : $L("Tap to resume");
-		this.updateDashboard(this, this.$.episodeViewPane.episode, text);
-	},
-	
-	indirectTogglePlay: function() {
-		var text = this.$.episodeViewPane.plays ? $L("Tap to pause") : $L("Tap to resume");
-		this.updateDashboard(this, this.$.episodeViewPane.episode, text);
+		if (audio.currentTime != audio.duration)
+			this.$.episodeViewPane.togglePlay();
+		
+		this.updateDashboard();
 	},
 	
 	openAppMenuHandler: function() {
@@ -102,10 +100,18 @@ enyo.kind({
 		this.$.launchBrowserCall.call({"id": "com.palm.app.browser", "params": {"target": inUrl}});
 	},
 	
-	updateDashboard: function(inSender, episode, text) {
-		if (text == undefined) text = $L("Tap to play");
+	updateDashboard: function() {
+		var playText = $L("Tap to pause");
+		var audio = this.$.episodeViewPane.$.sound.audio;
 		
-		this.$.dashboard.setLayers([{icon: "icons/icon48.png", title: episode.title, text: episode.podcastTitle + " - " + text}]);
+		if (!this.$.episodeViewPane.plays && audio.currentTime == 0) playText = $L("Tap to play");
+		else if (!this.$.episodeViewPane.plays && audio.currentTime == audio.duration) playText = $L("Playback complete");
+		else if (this.$.episodeViewPane.plays && audio.currentTime > 0) playText = $L("Tap to pause"); 
+		else if (! this.$.episodeViewPane.plays && audio.currentTime > 0) playText = $L("Tap to resume");
+		
+		var episode = this.$.episodeViewPane.episode;
+		this.$.dashboard.setLayers([{icon: "icons/icon48.png", title: episode.title, 
+				text: episode.podcastTitle + " - " + playText}]);
 	}
 });
 
