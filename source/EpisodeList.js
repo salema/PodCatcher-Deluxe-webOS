@@ -116,8 +116,12 @@ enyo.kind({
 	setShowDownloads: function() {
 		this.prepareLoad($L("Select from Downloads"), true, true);
 		
-		for (var index = 0; index < this.downloadedEpisodes.length; index++)
-			this.episodeList.push(this.downloadedEpisodes[index]);
+		for (var index = 0; index < this.downloadedEpisodes.length; index++) {
+			var episode = new Episode();
+			episode.readFromJSON(this.downloadedEpisodes[index]);
+			
+			this.episodeList.push(episode);
+		}
 		
 		this.afterLoad();
 		this.doDownloadsSelected();
@@ -155,20 +159,13 @@ enyo.kind({
 	},
 	
 	selectEpisode: function(inSender, inIndex) {
-		// No action if selected episode is tapped on again
-		if (this.$.episodeListVR.fetchRowIndex() != this.selectedIndex) {
-			this.selectedIndex = this.$.episodeListVR.fetchRowIndex();
+		this.selectedIndex = this.$.episodeListVR.fetchRowIndex();
 		
-			var episode = this.episodeList[this.selectedIndex];
-			if (episode) {
-				episode.isDownloaded = this.isDownloaded(episode);
-				episode.ticket = this.getDownloadTicket(episode);
-				episode.file = this.getPathToDownload(episode);
-				episode.marked = this.markedEpisodes.indexOf(episode.url) >= 0;
-				this.doSelectEpisode(episode);
-			}
-					
-			this.$.episodeListVR.render();
+		var episode = this.episodeList[this.selectedIndex];
+		if (episode) {
+			episode.setDownloaded(this.isDownloaded(episode), this.getDownloadTicket(episode), this.getPathToDownload(episode));
+			episode.marked = this.markedEpisodes.indexOf(episode.url) >= 0;
+			this.doSelectEpisode(episode);
 		}
 	},
 	
@@ -203,9 +200,9 @@ enyo.kind({
 		
 		for (var index = 0; index < items.length; index++) {
 			var episode = new Episode();
-			if (! episode.isValid(items[index])) continue;
+			if (! episode.isValidXML(items[index])) continue;
 			
-			episode.read(items[index]);
+			episode.readFromXML(items[index]);
 			episode.podcastTitle = this.getPodcastTitle(inRequest.url);
 			this.episodeList.push(episode);
 		}

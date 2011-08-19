@@ -22,6 +22,8 @@ enyo.kind({
 	name: "Net.Alliknow.PodCatcher.EpisodeView",
 	kind: "SlidingView",
 	events: {
+		onTogglePlay: "",
+		onPlaybackEnded: "",
 		onResume: "",
 		onMarkEpisode: "",
 		onDownloaded: "",
@@ -42,8 +44,8 @@ enyo.kind({
 			{kind: "Spinner", name: "stalledSpinner", align: "right"}
 		]},
 		{kind: "Sound"},
-		{kind: "CustomButton", name: "error", style: "display: none", className: "error"},
 		{kind: "Button", name: "downloadButton", caption: $L("Download"), onclick: "startStopDelete"},
+		{name: "error", style: "display: none", className: "error"},
 		{kind: "Scroller", name: "episodeScroller", flex: 1, style: "margin: 5px 12px", components: [
 			{kind: "HtmlContent", name: "episodeDescription", onLinkClick: "doOpenInBrowser", flex: 1}
 		]},
@@ -59,6 +61,7 @@ enyo.kind({
 		
 		this.plays = false;
 		this.downloads = false;
+		this.sliderInterval = setInterval(enyo.bind(this, this.updatePlaySlider), 250);
 		
 		this.$.preferencesService.call(
 		{
@@ -70,11 +73,20 @@ enyo.kind({
 		});
 	},
 	
+	destroy: function() {
+		clearInterval(this.sliderInterval);
+		
+		this.inherited(arguments);
+	},
+	
 	resume: function(inSender, inResponse) {
 		if (inResponse.resumeEpisode != undefined) {
-			this.setEpisode(inResponse.resumeEpisode);
-			this.doResume(inResponse.resumeEpisode);
-			this.doMarkEpisode(inResponse.resumeEpisode);
+			var episode = new Episode();
+			episode.readFromJSON(inResponse.resumeEpisode);
+			
+			this.setEpisode(episode);
+			this.doResume(episode);
+			this.doMarkEpisode(episode);
 			
 			if (inResponse.resumeTime > 0) {
 				this.resumeOnce = inResponse.resumeTime;
@@ -97,6 +109,10 @@ enyo.kind({
 	setEpisode: function(episode) {
 		// Don't do anything if downloading
 		if (this.downloads) this.showError($L("Download active, please wait or cancel."));
+		else if (this.plays && episode.url != this.episode.url) 
+			this.showError($L("Playback active, please pause before switching."));
+		else if (this.plays && episode.url == this.episode.url) 
+			this.$.error.setStyle("display: none;");
 		else if (this.episode == undefined || episode.url != this.episode.url) {
 			if (this.plays) this.togglePlay();
 			
@@ -180,20 +196,20 @@ enyo.kind({
 
 	togglePlay: function() {
 		this.plays = !this.plays;
+		this.doTogglePlay();
 		
 		if (this.plays) {
 			// This happens only once after startup to allow resume of last episode
-			if (this.resumeOnce > 0) {
-				this.$.sound.audio.currentTime = this.resumeOnce;
-				this.resumeOnce = -1;
-			}
+			if (this.resumeOnce > 0) this.$.sound.audio.currentTime = this.resumeOnce;
+			this.resumeOnce = -1;
+			
 			this.$.sound.play();
 			this.updatePlaytime();
-			this.interval = setInterval(enyo.bind(this, this.updatePlaytime), 1000);
+			this.playtimeInterval = setInterval(enyo.bind(this, this.updatePlaytime), 1000);
 		} else {
 			this.$.sound.audio.pause();
 			this.updatePlaytime();
-			clearInterval(this.interval);
+			clearInterval(this.playtimeInterval);
 		}		
 	},
 	
@@ -219,26 +235,40 @@ enyo.kind({
 			else this.$.playButton.setCaption($L("Resume at") + " " + this.createTimeString());
 		}
 		
-		// Update play slider
+		if (this.$.sound.audio.error > 0) this.playbackFailed();
+	},
+		
+	updatePlaySlider: function () {
 		this.$.playSlider.setMaximum(this.$.sound.audio.duration);
 		this.$.playSlider.setBarMaximum(this.$.sound.audio.duration);
 		this.$.playSlider.setPosition(this.$.sound.audio.currentTime);
-		this.$.playSlider.setBarPosition(this.$.sound.audio.currentTime);
+		if (this.$.sound.audio.buffered.length > 0)
+			this.$.playSlider.setBarPosition(this.$.sound.audio.buffered.end(this.$.sound.audio.buffered.length - 1));
 	},
 	
 	playbackEnded: function() {
-		clearInterval(this.interval);
+		this.stopPlayback($L("Playback complete"));
+		if (! this.episode.marked) this.toggleMarked();		
+	},
+	
+	playbackFailed: function() {
+		this.stopPlayback($L("Playback failed"));	
+		this.showError($L("Playback failed"));
+	},
+	
+	stopPlayback: function(buttonText) {
+		clearInterval(this.playtimeInterval);
 		this.plays = false;
+		this.doPlaybackEnded();
 		
-		this.$.playButton.setCaption($L("Playback complete"));
+		this.$.playButton.setCaption(buttonText);
 		this.$.playButton.setDisabled(true);
 		this.$.stalledSpinner.hide();
-		if (this.$.markButton.getSrc() == Episode.UNMARKED_ICON) this.toggleMarked();		
 	},
 	
 	showError: function(text) {
 		this.$.error.setContent(text);
-		this.$.error.setStyle("display: block; width: 100%; text-align: center;");
+		this.$.error.setStyle("display: block; width: 100%; text-align: center; padding-bottom: 5px; border-bottom: 1px solid gray;");
 	},
 	
 	updateUIOnSetEpisode: function() {

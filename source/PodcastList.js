@@ -158,8 +158,12 @@ enyo.kind({
 	},
 	
 	downloadsSelected: function() {
+		this.selectAll = false;
 		this.$.selectAllButton.setDisabled(! (this.podcastList.length > 1));
 		this.$.podcastImage.setSrc(Podcast.DEFAULT_IMAGE);
+		
+		this.selectedIndex = -1;
+		this.$.podcastListVR.render();
 	},
 	
 	isPodcastInList: function(podcast) {
