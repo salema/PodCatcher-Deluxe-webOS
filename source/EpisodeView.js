@@ -106,7 +106,7 @@ enyo.kind({
 		});
 	},
 	
-	setEpisode: function(episode) {
+	setEpisode: function(episode, start) {
 		// Don't do anything if downloading
 		if (this.downloads) this.showError($L("Download active, please wait or cancel."));
 		else if (this.plays && episode.url != this.episode.url) 
@@ -124,6 +124,8 @@ enyo.kind({
 			// Set sound source
 			if (episode.isDownloaded) this.$.sound.setSrc(episode.file);
 			else this.$.sound.setSrc(episode.url);
+			
+			if (start) this.togglePlay();
 		}
 	},
 	
@@ -227,11 +229,11 @@ enyo.kind({
 		
 		// Update play button
 		if (this.plays) {
-			if (this.$.sound.audio.currentTime == 0) this.$.playButton.setCaption($L("Pause"));
-			else if (this.$.sound.audio.currentTime == this.$.sound.audio.duration) this.playbackEnded();
+			if (this.isAtStartOfPlayback()) this.$.playButton.setCaption($L("Pause"));
+			else if (this.isAtEndOfPlayback()) this.playbackEnded();
 			else this.$.playButton.setCaption($L("Pause at") + " " + this.createTimeString());
 		} else {
-			if (this.$.sound.audio.currentTime == 0) this.$.playButton.setCaption($L("Resume"));
+			if (this.isAtStartOfPlayback()) this.$.playButton.setCaption($L("Resume"));
 			else this.$.playButton.setCaption($L("Resume at") + " " + this.createTimeString());
 		}
 		
@@ -247,8 +249,8 @@ enyo.kind({
 	},
 	
 	playbackEnded: function() {
+		if (! this.episode.marked) this.toggleMarked();	
 		this.stopPlayback($L("Playback complete"));
-		if (! this.episode.marked) this.toggleMarked();		
 	},
 	
 	playbackFailed: function() {
@@ -259,11 +261,25 @@ enyo.kind({
 	stopPlayback: function(buttonText) {
 		clearInterval(this.playtimeInterval);
 		this.plays = false;
-		this.doPlaybackEnded();
-		
+				
 		this.$.playButton.setCaption(buttonText);
 		this.$.playButton.setDisabled(true);
 		this.$.stalledSpinner.hide();
+		
+		this.doPlaybackEnded();
+	},
+	
+	isAtStartOfPlayback: function() {
+		return this.$.sound.audio.currentTime == 0;
+	},
+	
+	isInMiddleOfPlayback: function() {
+		return this.$.sound.audio.currentTime > 0 &&
+			this.$.sound.audio.currentTime != this.$.sound.audio.duration;
+	},
+	
+	isAtEndOfPlayback: function() {
+		return this.$.sound.audio.currentTime == this.$.sound.audio.duration;
 	},
 	
 	showError: function(text) {

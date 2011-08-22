@@ -27,10 +27,13 @@
 	white-space: nowrap;
 }
 .highlight {
-	font-weight: bold
+	font-weight: bold;
 }
 .marked {
-	color: gray
+	color: gray;
+}
+.playlist {
+	font-style: italic;
 }
 .error {
 	color: red;

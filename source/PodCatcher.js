@@ -32,10 +32,10 @@ enyo.kind({
 		{kind: "SlidingPane", flex: 1, components: [
 			{kind: "Net.Alliknow.PodCatcher.PodcastList", name: "podcastListPane", width: "230px", 
 					onSelectPodcast: "podcastSelected", onSelectAll: "allPodcastsSelected"},
-			{kind: "Net.Alliknow.PodCatcher.EpisodeList", name: "episodeListPane", width: "350px", peekWidth: 100, 
+			{kind: "Net.Alliknow.PodCatcher.EpisodeList", name: "episodeListPane", width: "370px", peekWidth: 100, 
 					onSelectEpisode: "episodeSelected", onDownloadsSelected: "downloadsSelected"},
 			{kind: "Net.Alliknow.PodCatcher.EpisodeView", name: "episodeViewPane", flex: 1, peekWidth: 250, onTogglePlay: "updateDashboard", 
-					onPlaybackEnded: "updateDashboard", onResume: "updateDashboard", onMarkEpisode: "episodeMarked", onOpenInBrowser: "openInBrowser", 
+					onPlaybackEnded: "episodePlaybackEnded", onResume: "updateDashboard", onMarkEpisode: "episodeMarked", onOpenInBrowser: "openInBrowser", 
 					onDownloaded: "episodeDownloaded", onDelete: "deleteDownloadedEpisode"}
 		]}
 	],
@@ -60,8 +60,8 @@ enyo.kind({
 		this.$.podcastListPane.downloadsSelected();
 	},
 	
-	episodeSelected: function(inSender, episode, marked) {
-		this.$.episodeViewPane.setEpisode(episode, marked);
+	episodeSelected: function(inSender, episode, start) {
+		this.$.episodeViewPane.setEpisode(episode, start);
 		
 		if (!this.$.episodeViewPane.downloads && !this.$.episodeViewPane.plays)
 			this.updateDashboard(this, episode);
@@ -80,12 +80,16 @@ enyo.kind({
 	},
 	
 	togglePlay: function() {
-		var audio = this.$.episodeViewPane.$.sound.audio;
-		
-		if (audio.currentTime != audio.duration)
+		if (! this.$.episodeViewPane.isAtEndOfPlayback())
 			this.$.episodeViewPane.togglePlay();
 		
 		this.updateDashboard();
+	},
+	
+	episodePlaybackEnded: function() {
+		this.updateDashboard();
+		
+		this.$.episodeListPane.nextInPlaylist();
 	},
 	
 	openAppMenuHandler: function() {
@@ -102,16 +106,15 @@ enyo.kind({
 	
 	updateDashboard: function() {
 		var playText = $L("Tap to pause");
-		var audio = this.$.episodeViewPane.$.sound.audio;
 		
-		if (!this.$.episodeViewPane.plays && audio.currentTime == 0) playText = $L("Tap to play");
-		else if (!this.$.episodeViewPane.plays && audio.currentTime == audio.duration) playText = $L("Playback complete");
-		else if (this.$.episodeViewPane.plays && audio.currentTime > 0) playText = $L("Tap to pause"); 
-		else if (! this.$.episodeViewPane.plays && audio.currentTime > 0) playText = $L("Tap to resume");
+		if (!this.$.episodeViewPane.plays && this.$.episodeViewPane.isAtStartOfPlayback()) playText = $L("Tap to play");
+		else if (!this.$.episodeViewPane.plays && this.$.episodeViewPane.isAtEndOfPlayback()) playText = $L("Playback complete");
+		else if (this.$.episodeViewPane.plays && this.$.episodeViewPane.isInMiddleOfPlayback()) playText = $L("Tap to pause"); 
+		else if (! this.$.episodeViewPane.plays && this.$.episodeViewPane.isInMiddleOfPlayback()) playText = $L("Tap to resume");
 		
 		var episode = this.$.episodeViewPane.episode;
-		this.$.dashboard.setLayers([{icon: "icons/icon48.png", title: episode.title, 
-				text: episode.podcastTitle + " - " + playText}]);
+		//this.$.dashboard.setLayers([{icon: "icons/icon48.png", title: episode.title, 
+		//		text: episode.podcastTitle + " - " + playText}]);
 	}
 });
 
