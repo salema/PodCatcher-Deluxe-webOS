@@ -60,9 +60,7 @@ enyo.kind({
 	},
 	
 	togglePlay: function() {
-		var audio = this.$.episodeViewPane.$.sound.audio;
-		
-		if (audio.currentTime != audio.duration)
+		if (! this.$.episodeViewPane.isAtEndOfPlayback())
 			this.$.episodeViewPane.togglePlay();
 		
 		this.updateDashboard();
@@ -82,12 +80,11 @@ enyo.kind({
 	
 	updateDashboard: function() {
 		var playText = $L("Tap to pause");
-		var audio = this.$.episodeViewPane.$.sound.audio;
 		
-		if (!this.$.episodeViewPane.plays && audio.currentTime == 0) playText = $L("Tap to play");
-		else if (!this.$.episodeViewPane.plays && audio.currentTime == audio.duration) playText = $L("Playback complete");
-		else if (this.$.episodeViewPane.plays && audio.currentTime > 0) playText = $L("Tap to pause"); 
-		else if (! this.$.episodeViewPane.plays && audio.currentTime > 0) playText = $L("Tap to resume");
+		if (!this.$.episodeViewPane.plays && this.$.episodeViewPane.isAtStartOfPlayback()) playText = $L("Tap to play");
+		else if (!this.$.episodeViewPane.plays && this.$.episodeViewPane.isAtEndOfPlayback()) playText = $L("Playback complete");
+		else if (this.$.episodeViewPane.plays && this.$.episodeViewPane.isInMiddleOfPlayback()) playText = $L("Tap to pause"); 
+		else if (! this.$.episodeViewPane.plays && this.$.episodeViewPane.isInMiddleOfPlayback()) playText = $L("Tap to resume");
 		
 		var episode = this.$.episodeViewPane.episode;
 		this.$.dashboard.setLayers([{icon: "icons/icon48.png", title: episode.title, text: playText}]);
