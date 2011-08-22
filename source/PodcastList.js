@@ -60,7 +60,7 @@ enyo.kind({
 		var list = inResponse.storedPodcastList;
 		
 		// first start of app (or empty podcast list)
-		if (list == undefined || list.length == 0) this.showAddPodcastPopup();
+		if (list == undefined || list.length === 0) this.showAddPodcastPopup();
 		// podcast list restored
 		else {
 			this.podcastList = list;

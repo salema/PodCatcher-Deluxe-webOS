@@ -61,16 +61,10 @@ enyo.kind({
 		
 		this.plays = false;
 		this.downloads = false;
+		this.player = this.$.sound.audio;
 		this.sliderInterval = setInterval(enyo.bind(this, this.updatePlaySlider), 250);
 		
-		this.$.preferencesService.call(
-		{
-			keys: ["resumeEpisode", "resumeTime"]
-		},
-		{
-			method: "getPreferences",
-			onSuccess: "resume",
-		});
+		this.$.preferencesService.call({keys: ["resumeEpisode", "resumeTime"]},	{method: "getPreferences", onSuccess: "resume"});
 	},
 	
 	destroy: function() {
@@ -96,14 +90,7 @@ enyo.kind({
 	},
 	
 	storeResumeInformation: function() {
-		this.$.preferencesService.call(
-		{
-			"resumeEpisode": this.episode,
-			"resumeTime": this.$.sound.audio.currentTime
-		},
-		{
-			method: "setPreferences"
-		});
+		this.$.preferencesService.call({"resumeEpisode": this.episode, "resumeTime": this.player.currentTime}, {method: "setPreferences"});
 	},
 	
 	setEpisode: function(episode, start) {
@@ -119,11 +106,11 @@ enyo.kind({
 			this.episode = episode;
 			this.resumeOnce = -1;
 			
-			this.updateUIOnSetEpisode();
+			this.updateUIOnSetEpisode(episode);
 			
 			// Set sound source
-			if (episode.isDownloaded) this.$.sound.setSrc(episode.file);
-			else this.$.sound.setSrc(episode.url);
+			if (episode.isDownloaded) this.player.src = episode.file;
+			else this.player.src = episode.url;
 			
 			if (start) this.togglePlay();
 		}
@@ -136,11 +123,11 @@ enyo.kind({
 			this.$.downloadButton.setCaption($L("Cancel"));		
 			this.$.episodeDownload.call({target: this.episode.url});
 		} // Cannot delete file since it is playing
-		else if (!this.downloads && this.episode.isDownloaded && this.plays && this.$.sound.getSrc() == this.episode.file) {
+		else if (!this.downloads && this.episode.isDownloaded && this.plays && this.player.src == this.episode.file) {
 			this.showError($L("Please stop playback before deleting."));
 		} // Delete downloaded file
 		else if (!this.downloads && this.episode.isDownloaded) {
-			this.$.sound.setSrc(this.episode.url);
+			this.playersrc = this.episode.url;
 			this.$.error.setStyle("display: none;");
 			this.$.downloadButton.setCaption($L("Download"));
 						
@@ -166,7 +153,7 @@ enyo.kind({
 			this.doDownloaded(this.episode, inResponse);
 			this.episode.setDownloaded(true, inResponse.ticket, inResponse.target);
 			
-			if (!this.plays) this.$.sound.setSrc(inResponse.target);
+			if (!this.plays) this.player.src = inResponse.target;
 		}
 	},
 	
@@ -202,29 +189,29 @@ enyo.kind({
 		
 		if (this.plays) {
 			// This happens only once after startup to allow resume of last episode
-			if (this.resumeOnce > 0) this.$.sound.audio.currentTime = this.resumeOnce;
+			if (this.resumeOnce > 0) this.player.currentTime = this.resumeOnce;
 			this.resumeOnce = -1;
 			
-			this.$.sound.play();
+			this.player.play();
 			this.updatePlaytime();
 			this.playtimeInterval = setInterval(enyo.bind(this, this.updatePlaytime), 1000);
 		} else {
-			this.$.sound.audio.pause();
+			this.player.pause();
 			this.updatePlaytime();
 			clearInterval(this.playtimeInterval);
 		}		
 	},
 	
 	seek: function(inSender, inEvent) {
-		if (this.$.sound.audio.readyState == 0 || this.$.playButton.getDisabled()) return;
+		if (this.player.readyState === 0 || this.$.playButton.getDisabled()) return;
 		
-		this.$.sound.audio.currentTime = inEvent;
+		this.player.currentTime = inEvent;
 		this.updatePlaytime();
 	},
 	
 	updatePlaytime: function() {
 		// Update stalled spinner
-		if (this.plays && (this.$.sound.audio.readyState != 4 || this.$.sound.audio.seeking)) this.$.stalledSpinner.show();
+		if (this.plays && (this.player.readyState != 4 || this.player.seeking)) this.$.stalledSpinner.show();
 		else this.$.stalledSpinner.hide();
 		
 		// Update play button
@@ -237,15 +224,15 @@ enyo.kind({
 			else this.$.playButton.setCaption($L("Resume at") + " " + this.createTimeString());
 		}
 		
-		if (this.$.sound.audio.error > 0) this.playbackFailed();
+		if (this.player.error > 0) this.playbackFailed();
 	},
 		
 	updatePlaySlider: function () {
-		this.$.playSlider.setMaximum(this.$.sound.audio.duration);
-		this.$.playSlider.setBarMaximum(this.$.sound.audio.duration);
-		this.$.playSlider.setPosition(this.$.sound.audio.currentTime);
-		if (this.$.sound.audio.buffered.length > 0)
-			this.$.playSlider.setBarPosition(this.$.sound.audio.buffered.end(this.$.sound.audio.buffered.length - 1));
+		this.$.playSlider.setMaximum(this.player.duration);
+		this.$.playSlider.setBarMaximum(this.player.duration);
+		this.$.playSlider.setPosition(this.player.currentTime);
+		if (this.player.buffered.length > 0)
+			this.$.playSlider.setBarPosition(this.player.buffered.end(this.player.buffered.length - 1));
 	},
 	
 	playbackEnded: function() {
@@ -266,20 +253,20 @@ enyo.kind({
 		this.$.playButton.setDisabled(true);
 		this.$.stalledSpinner.hide();
 		
-		this.doPlaybackEnded();
+		this.doPlaybackEnded(this.episode);
 	},
 	
 	isAtStartOfPlayback: function() {
-		return this.$.sound.audio.currentTime == 0;
+		return this.player.currentTime === 0;
 	},
 	
 	isInMiddleOfPlayback: function() {
-		return this.$.sound.audio.currentTime > 0 &&
-			this.$.sound.audio.currentTime != this.$.sound.audio.duration;
+		return this.player.currentTime > 0 &&
+			this.player.currentTime !== this.player.duration;
 	},
 	
 	isAtEndOfPlayback: function() {
-		return this.$.sound.audio.currentTime == this.$.sound.audio.duration;
+		return this.player.currentTime === this.player.duration;
 	},
 	
 	showError: function(text) {
@@ -287,24 +274,24 @@ enyo.kind({
 		this.$.error.setStyle("display: block; width: 100%; text-align: center; padding-bottom: 5px; border-bottom: 1px solid gray;");
 	},
 	
-	updateUIOnSetEpisode: function() {
+	updateUIOnSetEpisode: function(episode) {
 		this.$.error.setStyle("display: none;");
 		this.$.playButton.setCaption($L("Play"));
 		this.$.playButton.setDisabled(false);
-		if (this.episode.isDownloaded) this.$.downloadButton.setCaption($L("Delete from device"));
+		if (episode.isDownloaded) this.$.downloadButton.setCaption($L("Delete from device"));
 		else this.$.downloadButton.setCaption($L("Download"));
 		this.$.stalledSpinner.hide();
-		this.$.episodeName.setContent($L("Listen to") + " \"" + this.episode.title + "\"");
-		this.$.episodeDescription.setContent(this.episode.description);
+		this.$.episodeName.setContent($L("Listen to") + " \"" + episode.title + "\"");
+		this.$.episodeDescription.setContent(episode.description);
 		this.$.episodeScroller.scrollTo(0, 0);
 		this.$.playSlider.setPosition(0);
 		this.$.playSlider.setBarPosition(0);
-		if (this.episode.marked) this.$.markButton.setSrc(Episode.MARKED_ICON);
+		if (episode.marked) this.$.markButton.setSrc(Episode.MARKED_ICON);
 		else this.$.markButton.setSrc(Episode.UNMARKED_ICON);
 	},
 		
 	createTimeString: function() {
-		return Utilities.formatTime(this.$.sound.audio.currentTime) + " " +  $L("of") + " " +
-			Utilities.formatTime(this.$.sound.audio.duration);
+		return Utilities.formatTime(this.player.currentTime) + " " +  $L("of") + " " +
+			Utilities.formatTime(this.player.duration);
 	}
 });

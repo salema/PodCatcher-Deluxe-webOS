@@ -67,14 +67,8 @@ enyo.kind({
 		
 		//this.formatter = new enyo.g11n.DateFmt({date: "long", time: "short", weekday: true});
 		
-		this.$.preferencesService.call(
-		{
-			keys: ["episodePlaylist", "markedEpisodes", "downloadedEpisodes"]
-		},
-		{
-			method: "getPreferences",
-			onSuccess: "restore",
-		});
+		this.$.preferencesService.call({keys: ["episodePlaylist", "markedEpisodes", "downloadedEpisodes"]},
+				{method: "getPreferences", onSuccess: "restore"});
 	},
 	
 	restore: function(inSender, inResponse) {
@@ -93,15 +87,8 @@ enyo.kind({
 	},
 	
 	store: function() {
-		this.$.preferencesService.call(
-		{
-			"episodePlaylist": this.playlist,
-			"markedEpisodes": this.markedEpisodes,
-			"downloadedEpisodes": this.downloadedEpisodes
-		},
-		{
-			method: "setPreferences"
-		});
+		this.$.preferencesService.call({"episodePlaylist": this.playlist, "markedEpisodes": this.markedEpisodes,
+			"downloadedEpisodes": this.downloadedEpisodes},	{method: "setPreferences"});
 	},
 	
 	setPodcast: function(podcast) {
@@ -132,7 +119,7 @@ enyo.kind({
 			this.episodeList.push(episode);
 		}
 		
-		this.afterLoad();
+		this.afterLoad(true);
 		this.doDownloadsSelected();
 	},
 	
@@ -146,7 +133,7 @@ enyo.kind({
 			this.episodeList.push(episode);
 		}
 		
-		this.afterLoad();
+		this.afterLoad(false);
 	},
 	
 	// Method called for item creation from virtual repeater
@@ -235,8 +222,8 @@ enyo.kind({
 		}
 		
 		if (this.loadCounter == this.podcastList.length) {
-			if (this.episodeList.length == 0) this.grabPodcastFailed();
-			else this.afterLoad();
+			if (this.episodeList.length === 0) this.grabPodcastFailed();
+			else this.afterLoad(true);
 		}
 	},
 	
@@ -261,14 +248,17 @@ enyo.kind({
 			if (remove >= 0) this.playlist.splice(remove, 1);
 		}
 		
-		this.$.showPlaylistButton.setDisabled(this.showPlaylist || this.playlist.length == 0);
+		this.$.showPlaylistButton.setDisabled(this.showPlaylist || this.playlist.length === 0);
 		if (this.showPlaylist) this.setShowPlaylist();
 		
 		this.$.episodeListVR.render();
 		this.store();		
 	},
 	
-	nextInPlaylist: function() {
+	nextInPlaylist: function(lastEpisode) {
+		while (this.playlist.length > 0 && lastEpisode.url == this.playlist[0].url)
+			this.playlist.splice(0, 1);
+		
 		if (this.playlist.length > 0) {
 			var episode = new Episode();
 			episode.readFromJSON(this.playlist[0]);
@@ -278,6 +268,8 @@ enyo.kind({
 			this.playlist.splice(0, 1);
 			this.doSelectEpisode(episode, true);
 		}
+		
+		if (this.showPlaylist) this.setShowPlaylist();
 	},
 	
 	addToDownloaded: function(episode, inResponse) {
@@ -285,7 +277,7 @@ enyo.kind({
 			title: episode.title, description: episode.description, pubDate: episode.pubDate, 
 			podcastTitle: episode.podcastTitle, isDownloaded: true, marked: episode.marked});
 		
-		this.$.showDownloadedButton.setDisabled(this.showDownloads || this.downloadedEpisodes.length == 0);
+		this.$.showDownloadedButton.setDisabled(this.showDownloads || this.downloadedEpisodes.length === 0);
 		if (this.showDownloads) this.setShowDownloads();
 		
 		this.store();
@@ -301,7 +293,7 @@ enyo.kind({
 		if (remove >= 0) {
 			this.downloadedEpisodes.splice(remove, 1);
 			
-			this.$.showDownloadedButton.setDisabled(this.showDownloads || this.downloadedEpisodes.length == 0);
+			this.$.showDownloadedButton.setDisabled(this.showDownloads || this.downloadedEpisodes.length === 0);
 			if (this.showDownloads) this.setShowDownloads();
 			
 			this.store();
@@ -344,8 +336,8 @@ enyo.kind({
 	
 	prepareLoad: function (paneTitle, showPodcastTitles, showDownloads, showPlaylist) {
 		this.$.selectedPodcastName.setContent(paneTitle);
-		this.$.showPlaylistButton.setDisabled(showPlaylist || this.playlist.length == 0);
-		this.$.showDownloadedButton.setDisabled(showDownloads || this.downloadedEpisodes.length == 0);
+		this.$.showPlaylistButton.setDisabled(showPlaylist || this.playlist.length === 0);
+		this.$.showDownloadedButton.setDisabled(showDownloads || this.downloadedEpisodes.length === 0);
 		this.$.episodeSpinner.show();
 		this.$.error.setStyle("display: none;");
 		
@@ -360,8 +352,8 @@ enyo.kind({
 		this.$.episodeListVR.render();	
 	},
 	
-	afterLoad: function () {
-		this.episodeList.sort(new Episode().compare);
+	afterLoad: function (sort) {
+		if (sort) this.episodeList.sort(new Episode().compare);
 		
 		this.$.episodeListScroller.scrollTo(0, 0);
 		this.$.episodeListVR.render();

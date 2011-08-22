@@ -38,7 +38,7 @@ enyo.kind({
 				{kind: "Button", name: "addButton", content: $L("Add Podcast"), onclick: "addPodcast"}
 			]},
 			{name: "error", style: "display: none;", className: "error"}
-		]},
+		]}
 	],
 	
 	open: function() {
@@ -93,5 +93,5 @@ enyo.kind({
 		this.$.urlInput.setDisabled(false);
 		this.$.addButton.setDisabled(false);
 		this.$.loadSpinner.hide();
-	},
+	}
 });

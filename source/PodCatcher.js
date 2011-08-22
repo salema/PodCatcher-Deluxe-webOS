@@ -86,10 +86,10 @@ enyo.kind({
 		this.updateDashboard();
 	},
 	
-	episodePlaybackEnded: function() {
+	episodePlaybackEnded: function(inSender, episode) {
 		this.updateDashboard();
 		
-		this.$.episodeListPane.nextInPlaylist();
+		this.$.episodeListPane.nextInPlaylist(episode);
 	},
 	
 	openAppMenuHandler: function() {
