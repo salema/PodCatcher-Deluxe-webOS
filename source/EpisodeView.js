@@ -73,7 +73,7 @@ enyo.kind({
 			this.interval = setInterval(enyo.bind(this, this.updatePlaytime), 1000);
 		} else {
 			this.$.sound.audio.pause();
-			if (this.$.sound.audio.currentTime == 0) this.$.playButton.setCaption($L("Resume"));
+			if (this.isAtStartOfPlayback()) this.$.playButton.setCaption($L("Resume"));
 			else this.$.playButton.setCaption($L("Resume at") + " " + this.createTimeString());
 			// TODO what happens to the spinner?
 			clearInterval(this.interval);
@@ -89,8 +89,8 @@ enyo.kind({
 		else this.$.stalledSpinner.hide();
 		
 		// Update play button
-		if (this.$.sound.audio.currentTime == 0) this.$.playButton.setCaption($L("Pause"));
-		else if (this.$.sound.audio.currentTime == this.$.sound.audio.duration) this.stopPlayback($L("Playback complete"));
+		if (this.isAtStartOfPlayback()) this.$.playButton.setCaption($L("Pause"));
+		else if (this.isAtEndOfPlayback()) this.stopPlayback($L("Playback complete"));
 		else this.$.playButton.setCaption($L("Pause at") + " " + this.createTimeString());
 		
 		if (this.$.sound.audio.error > 0) this.stopPlayback($L("Playback failed"));
@@ -104,6 +104,19 @@ enyo.kind({
 		this.$.playButton.setCaption(buttonText);
 		this.$.playButton.setDisabled(true);
 		this.$.stalledSpinner.hide();
+	},
+	
+	isAtStartOfPlayback: function() {
+		return this.$.sound.audio.currentTime == 0;
+	},
+	
+	isInMiddleOfPlayback: function() {
+		return this.$.sound.audio.currentTime > 0 &&
+			this.$.sound.audio.currentTime != this.$.sound.audio.duration;
+	},
+	
+	isAtEndOfPlayback: function() {
+		return this.$.sound.audio.currentTime == this.$.sound.audio.duration;
 	},
 	
 	createTimeString: function() {
