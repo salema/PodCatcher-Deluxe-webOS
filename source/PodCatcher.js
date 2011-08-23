@@ -22,6 +22,8 @@
 enyo.kind({
 	name: "Net.Alliknow.PodCatcher",
 	kind: "VFlexBox",
+	HOME_PAGE: "http://salema.github.com/Yet-Another-Simple-Pod-Catcher",
+	HELP_PAGE: "http://salema.github.com/Yet-Another-Simple-Pod-Catcher/help.html",
 	components: [
 		{kind: "PalmService", name: "launchBrowserCall", service: "palm://com.palm.applicationManager/", method: "launch"},
 		{kind: "AppMenu", components: [
@@ -33,7 +35,7 @@ enyo.kind({
 			{kind: "Net.Alliknow.PodCatcher.PodcastList", name: "podcastListPane", width: "230px", 
 					onSelectPodcast: "podcastSelected", onSelectAll: "allPodcastsSelected"},
 			{kind: "Net.Alliknow.PodCatcher.EpisodeList", name: "episodeListPane", width: "370px", peekWidth: 100, 
-					onSelectEpisode: "episodeSelected", onDownloadsSelected: "downloadsSelected"},
+					onSelectEpisode: "episodeSelected", onSpecialListSelected: "specialListSelected"},
 			{kind: "Net.Alliknow.PodCatcher.EpisodeView", name: "episodeViewPane", flex: 1, peekWidth: 250, onTogglePlay: "updateDashboard", 
 					onPlaybackEnded: "episodePlaybackEnded", onResume: "updateDashboard", onMarkEpisode: "episodeMarked", onOpenInBrowser: "openInBrowser", 
 					onDownloaded: "episodeDownloaded", onDelete: "deleteDownloadedEpisode"}
@@ -41,11 +43,11 @@ enyo.kind({
 	],
 	
 	openAbout: function() {
-		this.openInBrowser(PodCatcher.HOME_PAGE);
+		this.openInBrowser(this.HOME_PAGE);
 	},
 	
 	openHelp: function() {
-		this.openInBrowser(PodCatcher.HELP_PAGE);
+		this.openInBrowser(this.HELP_PAGE);
 	},
 	
 	podcastSelected: function(inSender, podcast) {
@@ -56,8 +58,8 @@ enyo.kind({
 		this.$.episodeListPane.setPodcastList(podcastList);
 	},
 	
-	downloadsSelected: function(inSender) {
-		this.$.podcastListPane.downloadsSelected();
+	specialListSelected: function(inSender) {
+		this.$.podcastListPane.specialListSelected();
 	},
 	
 	episodeSelected: function(inSender, episode, start) {
@@ -110,15 +112,10 @@ enyo.kind({
 		if (!this.$.episodeViewPane.plays && this.$.episodeViewPane.isAtStartOfPlayback()) playText = $L("Tap to play");
 		else if (!this.$.episodeViewPane.plays && this.$.episodeViewPane.isAtEndOfPlayback()) playText = $L("Playback complete");
 		else if (this.$.episodeViewPane.plays && this.$.episodeViewPane.isInMiddleOfPlayback()) playText = $L("Tap to pause"); 
-		else if (! this.$.episodeViewPane.plays && this.$.episodeViewPane.isInMiddleOfPlayback()) playText = $L("Tap to resume");
+		else if (!this.$.episodeViewPane.plays && this.$.episodeViewPane.isInMiddleOfPlayback()) playText = $L("Tap to resume");
 		
 		var episode = this.$.episodeViewPane.episode;
-		//this.$.dashboard.setLayers([{icon: "icons/icon48.png", title: episode.title, 
-		//		text: episode.podcastTitle + " - " + playText}]);
+		this.$.dashboard.setLayers([{icon: "icons/icon48.png", title: episode.title, 
+				text: episode.podcastTitle + " - " + playText}]);
 	}
 });
-
-function PodCatcher() {}
-
-PodCatcher.HOME_PAGE = "http://salema.github.com/Yet-Another-Simple-Pod-Catcher";
-PodCatcher.HELP_PAGE = "http://salema.github.com/Yet-Another-Simple-Pod-Catcher/help.html";

@@ -49,3 +49,7 @@ Utilities.formatNumber = function(number, makeTwoDigits) {
 	else if (number < 10 && makeTwoDigits) return "0" + number;
 	else return number;
 };
+
+Utitities.startsWithValidProtocol = function(url) {
+	return url.substring(0, 7) == "http://" || url.substring(0, 8) == "https://";
+};

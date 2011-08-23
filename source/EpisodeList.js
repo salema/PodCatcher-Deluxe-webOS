@@ -22,9 +22,10 @@ enyo.kind({
 	name: "Net.Alliknow.PodCatcher.EpisodeList",
 	kind: "SlidingView",
 	layoutKind: "VFlexLayout",
+	LIMIT: 100,
 	events: {
 		onSelectEpisode: "",
-		onDownloadsSelected: ""
+		onSpecialListSelected: ""
 	},
 	components: [
 		{kind: "SystemService", name: "preferencesService", subscribe : false},
@@ -120,7 +121,7 @@ enyo.kind({
 		}
 		
 		this.afterLoad(true);
-		this.doDownloadsSelected();
+		this.doSpecialListSelected();
 	},
 	
 	setShowPlaylist: function() {
@@ -134,6 +135,7 @@ enyo.kind({
 		}
 		
 		this.afterLoad(false);
+		this.doSpecialListSelected();
 	},
 	
 	// Method called for item creation from virtual repeater
@@ -165,9 +167,9 @@ enyo.kind({
 				if (old) this.$.episodePublished.addClass("marked");
 				if (playlist) this.$.episodePublished.addClass("playlist");
 			}
-			
-			return true;
 		}
+		
+		return inIndex < this.episodeList.length && inIndex < this.LIMIT;
 	},
 	
 	selectEpisode: function(inSender, inIndex) {
@@ -223,7 +225,7 @@ enyo.kind({
 		
 		if (this.loadCounter == this.podcastList.length) {
 			if (this.episodeList.length === 0) this.grabPodcastFailed();
-			else this.afterLoad(true);
+			else this.afterLoad(this.showAll || this.showDownloads);
 		}
 	},
 	
@@ -359,4 +361,4 @@ enyo.kind({
 		this.$.episodeListVR.render();
 		this.$.episodeSpinner.hide();
 	}
-}); 
+});

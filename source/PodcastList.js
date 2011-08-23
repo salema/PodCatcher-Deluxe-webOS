@@ -157,7 +157,7 @@ enyo.kind({
 		this.$.podcastListVR.render();	
 	},
 	
-	downloadsSelected: function() {
+	specialListSelected: function() {
 		this.selectAll = false;
 		this.$.selectAllButton.setDisabled(! (this.podcastList.length > 1));
 		this.$.podcastImage.setSrc(Podcast.DEFAULT_IMAGE);
