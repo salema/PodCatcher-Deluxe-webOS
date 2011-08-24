@@ -66,7 +66,7 @@ enyo.kind({
 		this.showDownloads = false;
 		this.showPlaylist = false;
 		
-		//this.formatter = new enyo.g11n.DateFmt({date: "long", time: "short", weekday: true});
+		this.formatter = new enyo.g11n.DateFmt({date: "long", time: "short", weekday: true});
 		
 		this.$.preferencesService.call({keys: ["episodePlaylist", "markedEpisodes", "downloadedEpisodes"]},
 				{method: "getPreferences", onSuccess: "restore"});
@@ -190,7 +190,7 @@ enyo.kind({
 	
 	markEpisode: function(episode) {
 		// Add to list
-		if (episode.marked && !this.markedEpisodes.indexOf(episode.url) > 0) 
+		if (episode.marked && this.markedEpisodes.indexOf(episode.url) < 0) 
 			this.markedEpisodes.push(episode.url);
 		// Remove from list 
 		else if (!episode.marked) {
@@ -266,9 +266,9 @@ enyo.kind({
 	},
 	
 	nextInPlaylist: function(lastEpisode) {
-		// Remove all instances of last played episode from the top of playlist (just in case)
-		while (this.playlist.length > 0 && lastEpisode.url == this.playlist[0].url)
-			this.playlist.splice(0, 1);
+		// Remove last played episode from the playlist
+		if (Utilities.isInList(this.playlist, lastEpisode))
+			this.playlist.splice(Utilities.getIndexInList(this.playlist, lastEpisode), 1);
 		
 		// Play next item
 		if (this.playlist.length > 0) {

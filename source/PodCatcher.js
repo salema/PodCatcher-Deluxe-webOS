@@ -77,8 +77,8 @@ enyo.kind({
 		this.$.episodeListPane.removeFromDownloaded(episode);
 	},
 	
-	episodeMarked: function(sender, episode, marked) {
-		this.$.episodeListPane.markEpisode(episode, marked);
+	episodeMarked: function(sender, episode) {
+		this.$.episodeListPane.markEpisode(episode);
 	},
 	
 	togglePlay: function() {
