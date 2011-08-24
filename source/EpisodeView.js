@@ -112,6 +112,8 @@ enyo.kind({
 			if (episode.isDownloaded) this.player.src = episode.file;
 			else this.player.src = episode.url;
 			
+			//this.log(this.player.src);
+			
 			if (autoplay) this.togglePlay();
 		}
 	},

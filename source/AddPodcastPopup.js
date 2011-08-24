@@ -29,7 +29,7 @@ enyo.kind({
 	},
 	width: "70%",
 	components: [
-		{kind: "WebService", name: "grabPodcastService", onSuccess: "grabPodcastSuccess", onFailure: "grabPodcastFailed"},
+		{kind: "WebService", name: "grabPodcastService", onSuccess: "grabPodcastSuccess", onFailure: "grabPodcastFailed", handleAs: "xml"},
 		{kind: "VFlexBox", components: [
 			{kind: "HFlexBox", align: "center", components: [
 				{kind: "Input", name: "urlInput", hint: $L("Insert Podcast URL here"), inputType: "url", flex: 1,

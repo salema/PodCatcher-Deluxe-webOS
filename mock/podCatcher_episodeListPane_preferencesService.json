@@ -1,6 +1,6 @@
 {
 	"markedEpisodes": ["http://traffic.libsyn.com/linuxoutlaws/linuxoutlaws220.mp3", "http://traffic.libsyn.com/linuxoutlaws/linuxoutlaws219.mp3", "http://traffic.libsyn.com/linuxoutlaws/linuxoutlaws216.mp3"],
-	"episodePlaylist": [{"ticket": 1, 
+	"episodePlaylist": [{"ticket": 3, 
 		"url": "http://download.radioeins.de/podcast/escape_der_experte/ee_20110813_190000.mp3", 
 		"file": "/home/kevin/Downloads/Escape - Der Experte/ee_20110813_190000.mp3",
 		"title": "Der Experte: Vorsicht Kunde - DSL-Anbieter",
@@ -9,7 +9,7 @@
 		"podcastTitle": "Test",
 		"isDownloaded": true,
 		"marked": true}],
-	"downloadedEpisodes": [{"ticket": 1, 
+	"downloadedEpisodes": [{"ticket": 12, 
 		"url": "http://download.radioeins.de/podcast/escape_der_experte/ee_20110813_190000.mp3", 
 		"file": "/home/kevin/Downloads/Escape - Der Experte/ee_20110813_190000.mp3",
 		"title": "Der Experte: Vorsicht Kunde - DSL-Anbieter",
