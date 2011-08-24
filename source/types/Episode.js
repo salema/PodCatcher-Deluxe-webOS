@@ -67,6 +67,10 @@ Episode.prototype.setDownloaded = function(downloaded, ticket, file) {
 	};
 };
 
+Episode.prototype.equals = function(episode) {
+	return episode instanceof Episode && this.url == episode.url;
+};
+
 Episode.prototype.compare = function(episodeA, episodeB) {
 	return Date.parse(episodeB.pubDate) - Date.parse(episodeA.pubDate);
 };

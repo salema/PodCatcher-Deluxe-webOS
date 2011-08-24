@@ -53,40 +53,45 @@ enyo.kind({
 		this.podcastList = [];
 		this.selectAll = false;
 		
-		this.$.preferencesService.call({keys: ["storedPodcastList"]}, {method: "getPreferences", onSuccess: "restorePodcastList"});
+		this.$.preferencesService.call({keys: ["storedPodcastList"]}, {method: "getPreferences", onSuccess: "restore"});
 	},
 	
-	restorePodcastList: function(inSender, inResponse) {
-		var list = inResponse.storedPodcastList;
+	restore: function(sender, response) {
+		var list = response.storedPodcastList;
 		
 		// first start of app (or empty podcast list)
 		if (list == undefined || list.length === 0) this.showAddPodcastPopup();
 		// podcast list restored
 		else {
-			this.podcastList = list;
+			for (var index = 0; index < list.length; index++) {
+				var podcast = new Podcast(list[index].url);
+				podcast.readFromJSON(list[index]);
+				
+				this.podcastList.push(podcast);
+			}
 			
 			this.$.selectAllButton.setDisabled(! (this.podcastList.length > 1));
 			this.$.podcastListVR.render();
 		}
 	},
 	
-	storePodcastList: function() {
+	store: function() {
 		this.$.preferencesService.call({"storedPodcastList": this.podcastList},	{method: "setPreferences"});
 	},
 	
 	// Method called for item creation from virtual repeater
-	getPodcast: function(inSender, inIndex) {
-		var podcast = this.podcastList[inIndex];
+	getPodcast: function(sender, index) {
+		var podcast = this.podcastList[index];
 		
 		if (podcast) {
 			this.$.podcastTitle.setContent(podcast.title);
-			if (this.selectedIndex == inIndex || this.selectAll) this.$.podcastTitle.addClass("highlight");
-			
-			return true;
+			if (this.selectedIndex == index || this.selectAll) this.$.podcastTitle.addClass("highlight");
 		}
+		
+		return index < this.podcastList.length;
 	},
 	
-	selectPodcastClick: function(inSender, inEvent) {
+	selectPodcastClick: function(sender, event) {
 		this.selectedIndex = this.$.podcastListVR.fetchRowIndex();
 		this.selectPodcast();
 	},
@@ -103,13 +108,12 @@ enyo.kind({
 			this.doSelectPodcast(podcast);
 		}
 		
-		this.$.selectAllButton.setDisabled(! (this.podcastList.length > 1));
+		this.$.selectAllButton.setDisabled(this.podcastList.length === 0);
 		this.$.podcastListVR.render();
 	},
 	
-	selectAllPodcasts: function(inSender, inEvent) {
+	selectAllPodcasts: function(sender, event) {
 		this.selectAll = true;
-		
 		this.doSelectAll(this.podcastList);
 		
 		this.$.podcastImage.setSrc(Podcast.DEFAULT_IMAGE);
@@ -117,19 +121,19 @@ enyo.kind({
 		this.$.podcastListVR.render();
 	},
 
-	showAddPodcastPopup: function(inSender, inIndex) {
+	showAddPodcastPopup: function(sender, event) {
 		this.$.addPodcastPopup.openAtCenter();
 	},
 	
-	addPodcast: function(inSender, podcast) {
+	addPodcast: function(sender, podcast) {
 		// podcast is already in list
-		if (this.isPodcastInList(podcast)) {
-			this.selectedIndex = this.getPodcastIndexInList(podcast);
+		if (Utilities.isInList(this.podcastList, podcast)) {
+			this.selectedIndex = Utilities.getIndexInList(this.podcastList, podcast);
 			this.selectPodcast();
 		} // podcast is new
 		else {
 			this.podcastList.push(podcast);
-			this.storePodcastList();
+			this.store();
 			
 			this.selectedIndex = this.podcastList.length - 1;
 			this.selectPodcast();
@@ -138,49 +142,38 @@ enyo.kind({
 		}
 	},
 
-	deletePodcast: function(inSender, inIndex) {
-		this.podcastList.splice(inIndex, 1);
+	deletePodcast: function(sender, index) {
+		this.podcastList.splice(index, 1);
 		
 		// if select all is active
 		if (this.selectAll) {
 			this.selectAll = false;
 			this.selectedIndex = -1;
 		} // Swipe on selected
-		else if (inIndex == this.selectedIndex) {
+		else if (index == this.selectedIndex) {
 			this.selectedIndex = -1;
 			this.$.podcastImage.setSrc(Podcast.DEFAULT_IMAGE);
 		} // Via swipe and above in list
-		else if (inIndex < this.selectedIndex) this.selectedIndex--;
+		else if (index < this.selectedIndex) this.selectedIndex--;
 		
-		this.storePodcastList();
-		this.$.selectAllButton.setDisabled(! (this.podcastList.length > 1));
+		this.store();
+		this.$.selectAllButton.setDisabled(this.podcastList.length === 0);
 		this.$.podcastListVR.render();	
 	},
 	
 	specialListSelected: function() {
 		this.selectAll = false;
-		this.$.selectAllButton.setDisabled(! (this.podcastList.length > 1));
-		this.$.podcastImage.setSrc(Podcast.DEFAULT_IMAGE);
-		
 		this.selectedIndex = -1;
+		
+		this.$.selectAllButton.setDisabled(this.podcastList.length === 0);
+		this.$.podcastImage.setSrc(Podcast.DEFAULT_IMAGE);
 		this.$.podcastListVR.render();
 	},
 	
-	isPodcastInList: function(podcast) {
-		for (var index = 0; index < this.podcastList.length; index++)
-			if (this.podcastList[index].url == podcast.url) return true;
-			
-		return false;	
-	},
-	
-	getPodcastIndexInList: function(podcast) {
-		for (var index = 0; index < this.podcastList.length; index++)
-			if (this.podcastList[index].url == podcast.url) return index;	
-	},
-	
-	grabPodcastImageSuccess: function(inSender, inResponse, inRequest) {
+	grabPodcastImageSuccess: function(sender, response, request) {
 		var podcast = this.podcastList[this.selectedIndex];
 		
-		if (podcast.image != undefined && inResponse.length != 0) this.$.podcastImage.setSrc(podcast.image);
+		if (podcast.image != undefined && podcast.image == request.url &&
+				response.length != 0) this.$.podcastImage.setSrc(podcast.image);
 	}
 }); 

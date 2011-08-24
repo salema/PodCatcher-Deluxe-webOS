@@ -93,7 +93,7 @@ enyo.kind({
 		this.$.preferencesService.call({"resumeEpisode": this.episode, "resumeTime": this.player.currentTime}, {method: "setPreferences"});
 	},
 	
-	setEpisode: function(episode, start) {
+	setEpisode: function(episode, autoplay) {
 		// Don't do anything if downloading
 		if (this.downloads) this.showError($L("Download active, please wait or cancel."));
 		else if (this.plays && episode.url != this.episode.url) 
@@ -112,7 +112,7 @@ enyo.kind({
 			if (episode.isDownloaded) this.player.src = episode.file;
 			else this.player.src = episode.url;
 			
-			if (start) this.togglePlay();
+			if (autoplay) this.togglePlay();
 		}
 	},
 	
@@ -269,11 +269,6 @@ enyo.kind({
 		return this.player.currentTime === this.player.duration;
 	},
 	
-	showError: function(text) {
-		this.$.error.setContent(text);
-		this.$.error.setStyle("display: block; width: 100%; text-align: center; padding-bottom: 5px; border-bottom: 1px solid gray;");
-	},
-	
 	updateUIOnSetEpisode: function(episode) {
 		this.$.error.setStyle("display: none;");
 		this.$.playButton.setCaption($L("Play"));
@@ -293,5 +288,10 @@ enyo.kind({
 	createTimeString: function() {
 		return Utilities.formatTime(this.player.currentTime) + " " +  $L("of") + " " +
 			Utilities.formatTime(this.player.duration);
+	},
+	
+	showError: function(text) {
+		this.$.error.setContent(text);
+		this.$.error.setStyle("display: block; width: 100%; text-align: center; padding-bottom: 5px; border-bottom: 1px solid gray;");
 	}
 });

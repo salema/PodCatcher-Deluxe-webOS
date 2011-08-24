@@ -28,7 +28,7 @@ Podcast.prototype.setUrl = function(url) {
 
 // Read podcast information from feed
 // Make sure to call isValid() before reading
-Podcast.prototype.read = function(xmlDocument) {
+Podcast.prototype.readFromXML = function(xmlDocument) {
 	var xmlTree = XmlHelper.parse(xmlDocument);
 		
 	this.title = XmlHelper.getFirstValue(xmlTree, XmlHelper.TITLE);
@@ -36,7 +36,14 @@ Podcast.prototype.read = function(xmlDocument) {
 	this.image = this.findImage(xmlTree);
 };
 
-Podcast.prototype.isValid = function(xmlDocument) {
+//Read episode information from JSON data
+Podcast.prototype.readFromJSON = function(data) {
+	this.title = data.title;
+	this.description = data.description;
+	this.image = data.image;
+};
+
+Podcast.prototype.isValidXML = function(xmlDocument) {
 	var xmlTree = XmlHelper.parse(xmlDocument);
 		
 	return XmlHelper.has(xmlTree, XmlHelper.TITLE) && XmlHelper.has(xmlTree, XmlHelper.DESCRIPTION);
@@ -56,6 +63,10 @@ Podcast.prototype.findImage = function(xmlTree) {
 	// Image is in thumbnail tag
 	else if (XmlHelper.get(xmlTree, XmlHelper.THUMBNAIL).length > 0)
 		return XmlHelper.getFirst(xmlTree, XmlHelper.THUMBNAIL).getAttribute(XmlHelper.URL);
+};
+
+Podcast.prototype.equals = function(podcast) {
+	return podcast instanceof Podcast && this.url == podcast.url;
 };
 
 Podcast.DEFAULT_IMAGE = "icons/icon128.png";

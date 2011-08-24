@@ -34,10 +34,10 @@ enyo.kind({
 		{kind: "SlidingPane", flex: 1, components: [
 			{kind: "Net.Alliknow.PodCatcher.PodcastList", name: "podcastListPane", width: "230px", 
 					onSelectPodcast: "podcastSelected", onSelectAll: "allPodcastsSelected"},
-			{kind: "Net.Alliknow.PodCatcher.EpisodeList", name: "episodeListPane", width: "370px", peekWidth: 100, 
+			{kind: "Net.Alliknow.PodCatcher.EpisodeList", name: "episodeListPane", width: "370px", peekWidth: 100,
 					onSelectEpisode: "episodeSelected", onSpecialListSelected: "specialListSelected"},
-			{kind: "Net.Alliknow.PodCatcher.EpisodeView", name: "episodeViewPane", flex: 1, peekWidth: 250, onTogglePlay: "updateDashboard", 
-					onPlaybackEnded: "episodePlaybackEnded", onResume: "updateDashboard", onMarkEpisode: "episodeMarked", onOpenInBrowser: "openInBrowser", 
+			{kind: "Net.Alliknow.PodCatcher.EpisodeView", name: "episodeViewPane", flex: 1, peekWidth: 250, onTogglePlay: "updateDashboard",
+					onPlaybackEnded: "episodePlaybackEnded", onResume: "updateDashboard", onMarkEpisode: "episodeMarked", onOpenInBrowser: "openInBrowser",
 					onDownloaded: "episodeDownloaded", onDelete: "deleteDownloadedEpisode"}
 		]}
 	],
@@ -50,34 +50,34 @@ enyo.kind({
 		this.openInBrowser(this.HELP_PAGE);
 	},
 	
-	podcastSelected: function(inSender, podcast) {
+	podcastSelected: function(sender, podcast) {
 		this.$.episodeListPane.setPodcast(podcast);
 	},
 	
-	allPodcastsSelected: function(inSender, podcastList) {
+	allPodcastsSelected: function(sender, podcastList) {
 		this.$.episodeListPane.setPodcastList(podcastList);
 	},
 	
-	specialListSelected: function(inSender) {
+	specialListSelected: function(sender) {
 		this.$.podcastListPane.specialListSelected();
 	},
 	
-	episodeSelected: function(inSender, episode, start) {
-		this.$.episodeViewPane.setEpisode(episode, start);
+	episodeSelected: function(sender, episode, autoplay) {
+		this.$.episodeViewPane.setEpisode(episode, autoplay);
 		
 		if (!this.$.episodeViewPane.downloads && !this.$.episodeViewPane.plays)
 			this.updateDashboard(this, episode);
 	},
 	
-	episodeDownloaded: function(inSender, episode, inResponse) {
-		this.$.episodeListPane.addToDownloaded(episode, inResponse);
+	episodeDownloaded: function(sender, episode, response) {
+		this.$.episodeListPane.addToDownloaded(episode, response);
 	},
 	
-	deleteDownloadedEpisode: function(inSender, episode) {
+	deleteDownloadedEpisode: function(sender, episode) {
 		this.$.episodeListPane.removeFromDownloaded(episode);
 	},
 	
-	episodeMarked: function(inSender, episode, marked) {
+	episodeMarked: function(sender, episode, marked) {
 		this.$.episodeListPane.markEpisode(episode, marked);
 	},
 	
@@ -88,7 +88,7 @@ enyo.kind({
 		this.updateDashboard();
 	},
 	
-	episodePlaybackEnded: function(inSender, episode) {
+	episodePlaybackEnded: function(sender, episode) {
 		this.updateDashboard();
 		
 		this.$.episodeListPane.nextInPlaylist(episode);
@@ -102,20 +102,21 @@ enyo.kind({
 		this.$.appMenu.close();
 	},
 	
-	openInBrowser: function(inUrl) {
-		this.$.launchBrowserCall.call({"id": "com.palm.app.browser", "params": {"target": inUrl}});
+	openInBrowser: function(url) {
+		this.$.launchBrowserCall.call({"id": "com.palm.app.browser", "params": {"target": url}});
 	},
 	
 	updateDashboard: function() {
+		// Default: we are playing
 		var playText = $L("Tap to pause");
 		
-		if (!this.$.episodeViewPane.plays && this.$.episodeViewPane.isAtStartOfPlayback()) playText = $L("Tap to play");
-		else if (!this.$.episodeViewPane.plays && this.$.episodeViewPane.isAtEndOfPlayback()) playText = $L("Playback complete");
-		else if (this.$.episodeViewPane.plays && this.$.episodeViewPane.isInMiddleOfPlayback()) playText = $L("Tap to pause"); 
-		else if (!this.$.episodeViewPane.plays && this.$.episodeViewPane.isInMiddleOfPlayback()) playText = $L("Tap to resume");
+		// If not, figure out what else is the status
+		if (!this.$.episodeViewPane.plays)
+			if (this.$.episodeViewPane.isAtStartOfPlayback()) playText = $L("Tap to play");
+			else if (this.$.episodeViewPane.isAtEndOfPlayback()) playText = $L("Playback complete");
+			else if (this.$.episodeViewPane.isInMiddleOfPlayback()) playText = $L("Tap to resume");
 		
 		var episode = this.$.episodeViewPane.episode;
-		this.$.dashboard.setLayers([{icon: "icons/icon48.png", title: episode.title, 
-				text: episode.podcastTitle + " - " + playText}]);
+		this.$.dashboard.setLayers([{icon: "icons/icon48.png", title: episode.title, text: episode.podcastTitle + " - " + playText}]);
 	}
 });

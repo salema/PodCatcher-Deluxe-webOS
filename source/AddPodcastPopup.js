@@ -32,7 +32,7 @@ enyo.kind({
 		{kind: "WebService", name: "grabPodcastService", onSuccess: "grabPodcastSuccess", onFailure: "grabPodcastFailed"},
 		{kind: "VFlexBox", components: [
 			{kind: "HFlexBox", align: "center", components: [
-				{kind: "Input", name: "urlInput", hint: $L("Insert Podcast URL here"), inputType: "url", flex: 1, 
+				{kind: "Input", name: "urlInput", hint: $L("Insert Podcast URL here"), inputType: "url", flex: 1,
 						alwaysLooksFocused: true, selectAllOnFocus: true, spellcheck: false, autoCapitalize: "lowercase"},
 				{kind: "Spinner", name: "loadSpinner"},
 				{kind: "Button", name: "addButton", content: $L("Add Podcast"), onclick: "addPodcast"}
@@ -44,18 +44,19 @@ enyo.kind({
 	open: function() {
 		this.inherited(arguments);
 		
+		// update UI
 		this.$.urlInput.setValue("");
 		this.$.error.setStyle("display: none");
 		this.$.loadSpinner.hide();
 		this.$.urlInput.setDisabled(false);
 		this.$.addButton.setDisabled(false);
 		
+		// call for clipboard contents (maybe a podcast feed url?!)
 		enyo.dom.getClipboard(enyo.bind(this, this.gotClipboard));
 	},
 	
-	gotClipboard: function(inText) {
-		if (inText && inText.length > 7 && Utitities.startsWithValidProtocol(inText))
-			this.$.urlInput.setValue(inText);
+	gotClipboard: function(text) {
+		if (Utilities.startsWithValidProtocol(text)) this.$.urlInput.setValue(text);
 	},
 
 	addPodcast: function() {
@@ -66,7 +67,7 @@ enyo.kind({
 		this.$.addButton.setDisabled(true);
 
 		// Check for protocol and add http if none is given
-		if (! Utitities.startsWithValidProtocol(this.$.urlInput.getValue()))
+		if (! Utilities.startsWithValidProtocol(this.$.urlInput.getValue()))
 			this.$.urlInput.setValue("http://" + this.$.urlInput.getValue());
 		
 		// Try to grab podcast
@@ -74,15 +75,15 @@ enyo.kind({
 		this.$.grabPodcastService.call();
 	},
 	
-	grabPodcastSuccess: function(inSender, inResponse, inRequest) {
+	grabPodcastSuccess: function(sender, response, request) {
 		var podcast = new Podcast(this.$.urlInput.getValue());
 		
-		if (podcast.isValid(inResponse)) {
-			podcast.read(inResponse);
+		if (podcast.isValidXML(response)) {
+			podcast.readFromXML(response);
 			
 			this.doAddPodcast(podcast);
-			this.close();	
-		} else this.grabPodcastFailed();		
+			this.close();
+		} else this.grabPodcastFailed();
 	},
 	
 	grabPodcastFailed: function() {
