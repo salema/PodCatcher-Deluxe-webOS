@@ -2,7 +2,7 @@
 A simple pod catcher written for webOS using the enyo framework
 ===============================================================
 
-This software is a simple pod catcher targeted for devices
+This software is a podcatcher targeted for devices
 running HP's webOS. It features an intuitive three column 
 layout and basic playback functionality. Multiple feeds are 
 supported. Feeds can be searched while playing. The podcast 

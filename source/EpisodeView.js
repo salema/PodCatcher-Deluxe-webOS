@@ -73,18 +73,18 @@ enyo.kind({
 		this.inherited(arguments);
 	},
 	
-	resume: function(inSender, inResponse) {
-		if (inResponse.resumeEpisode != undefined) {
+	resume: function(sender, response) {
+		if (response.resumeEpisode != undefined) {
 			var episode = new Episode();
-			episode.readFromJSON(inResponse.resumeEpisode);
+			episode.readFromJSON(response.resumeEpisode);
 			
 			this.setEpisode(episode);
 			this.doResume(episode);
 			this.doMarkEpisode(episode);
 			
-			if (inResponse.resumeTime > 0) {
-				this.resumeOnce = inResponse.resumeTime;
-				this.$.playButton.setCaption($L("Resume at") + " " + Utilities.formatTime(inResponse.resumeTime));
+			if (response.resumeTime > 0) {
+				this.resumeOnce = response.resumeTime;
+				this.$.playButton.setCaption($L("Resume at") + " " + Utilities.formatTime(response.resumeTime));
 			}
 		}
 	},
@@ -118,7 +118,7 @@ enyo.kind({
 		}
 	},
 	
-	startStopDelete: function(inSender, inResponse) {
+	startStopDelete: function(sender, response) {
 		// Download episode 
 		if (!this.downloads && !this.episode.isDownloaded) {
 			this.downloads = true;
@@ -143,37 +143,37 @@ enyo.kind({
 		}
 	},
 	
-	downloadSuccess: function(inSender, inResponse) {
-		this.currentDownloadTicket = inResponse.ticket;
-		this.$.downloadButton.setCaption($L("Cancel at") + " " + Utilities.formatDownloadStatus(inResponse));
+	downloadSuccess: function(sender, response) {
+		this.currentDownloadTicket = response.ticket;
+		this.$.downloadButton.setCaption($L("Cancel at") + " " + Utilities.formatDownloadStatus(response));
 		
-		if (inResponse.completed) {
+		if (response.completed) {
 			this.downloads = false;
 			this.$.error.setStyle("display: none;");
 			this.$.downloadButton.setCaption($L("Delete from device"));
 			
-			this.doDownloaded(this.episode, inResponse);
-			this.episode.setDownloaded(true, inResponse.ticket, inResponse.target);
+			this.episode.setDownloaded(true, response.ticket, response.target);
+			this.doDownloaded(this.episode);
 			
-			if (!this.plays) this.player.src = inResponse.target;
+			if (!this.plays) this.player.src = response.target;
 		}
 	},
 	
-	cancelSuccess: function(inSender, inResponse) {
+	cancelSuccess: function(sender, response) {
 		this.downloads = false;
 		this.$.error.setStyle("display: none;");
 		this.$.downloadButton.setCaption($L("Download"));
 	},
    
-	downloadFail: function(inSender, inResponse) {
+	downloadFail: function(sender, response) {
 		this.downloads = false;
 		this.$.downloadButton.setCaption($L("Download failed"));
 		this.$.error.setStyle("display: none;");
-		this.genericFail(inSender, inResponse);
+		this.genericFail(sender, response);
 	},
 	
-	genericFail: function(inSender, inResponse) {
-		this.log("Service failure, results=" + enyo.json.stringify(inResponse));
+	genericFail: function(sender, response) {
+		this.log("Service failure, results=" + enyo.json.stringify(response));
 	},
 	
 	toggleMarked: function() {
@@ -204,10 +204,10 @@ enyo.kind({
 		}		
 	},
 	
-	seek: function(inSender, inEvent) {
+	seek: function(sender, event) {
 		if (this.player.readyState === 0 || this.$.playButton.getDisabled()) return;
 		
-		this.player.currentTime = inEvent;
+		this.player.currentTime = event;
 		this.updatePlaytime();
 	},
 	
