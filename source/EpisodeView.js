@@ -224,7 +224,7 @@ enyo.kind({
 			else if (this.isAtEndOfPlayback()) this.playbackEnded();
 			else this.$.playButton.setCaption($L("Pause at") + " " + this.createTimeString());
 		} else {
-			if (this.isAtStartOfPlayback()) this.$.playButton.setCaption($L("Resume"));
+			if (this.isAtStartOfPlayback()) this.$.playButton.setCaption($L("Play"));
 			else this.$.playButton.setCaption($L("Resume at") + " " + this.createTimeString());
 		}
 		

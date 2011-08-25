@@ -116,6 +116,6 @@ enyo.kind({
 			else if (this.$.episodeViewPane.isInMiddleOfPlayback()) playText = $L("Tap to resume");
 		
 		var episode = this.$.episodeViewPane.episode;
-		//this.$.dashboard.setLayers([{icon: "icons/icon48.png", title: episode.title, text: episode.podcastTitle + " - " + playText}]);
+		this.$.dashboard.setLayers([{icon: "icons/icon48.png", title: episode.title, text: episode.podcastTitle + " - " + playText}]);
 	}
 });
