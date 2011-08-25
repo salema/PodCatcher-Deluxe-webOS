@@ -89,9 +89,8 @@ enyo.kind({
 	},
 	
 	episodePlaybackEnded: function(sender, episode) {
-		this.updateDashboard();
-		
 		this.$.episodeListPane.nextInPlaylist(episode);
+		this.updateDashboard();
 	},
 	
 	openAppMenuHandler: function() {
