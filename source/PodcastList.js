@@ -173,7 +173,7 @@ enyo.kind({
 	grabPodcastImageSuccess: function(sender, response, request) {
 		var podcast = this.podcastList[this.selectedIndex];
 		
-		if (podcast.image != undefined && podcast.image == request.url &&
+		if (podcast && podcast.image != undefined && podcast.image == request.url &&
 				response.length != 0) this.$.podcastImage.setSrc(podcast.image);
 	}
 }); 

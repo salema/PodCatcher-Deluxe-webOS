@@ -66,7 +66,7 @@ enyo.kind({
 		this.showDownloads = false;
 		this.showPlaylist = false;
 		
-		this.formatter = new enyo.g11n.DateFmt({date: "long", time: "short", weekday: true});
+		//this.formatter = new enyo.g11n.DateFmt({date: "long", time: "short", weekday: true});
 		
 		this.$.preferencesService.call({keys: ["episodePlaylist", "markedEpisodes", "downloadedEpisodes"]},
 				{method: "getPreferences", onSuccess: "restore"});
@@ -239,15 +239,22 @@ enyo.kind({
 			this.episodeList.push(episode);
 		}
 		
-		if (this.loadCounter == this.podcastList.length) {
-			if (this.episodeList.length === 0) this.grabPodcastFailed();
-			else this.afterLoad(this.showAll || this.showDownloads);
-		}
+		this.checkLoadFinished();
 	},
 	
 	grabPodcastFailed: function() {
 		this.loadCounter++;
-		
+		this.checkLoadFinished();
+	},
+	
+	checkLoadFinished: function() {
+		if (this.loadCounter == this.podcastList.length) {
+			if (this.episodeList.length === 0) this.loadFailed();
+			else this.afterLoad(this.podcastList.length > 1);
+		}
+	},
+	
+	loadFailed: function() {
 		this.warn("Failed to load podcast feed");
 		this.$.error.setContent($L("The podcast feed failed to load. Please make sure you are online."));
 		this.$.error.setStyle("display: block; color: red;");
@@ -286,14 +293,19 @@ enyo.kind({
 		// Play next item
 		if (this.playlist.length > 0) {
 			var episode = this.playlist[0];
+			this.playlist.splice(0, 1);
+			
 			this.updateEpisodeMetadata(episode);
 			
-			this.playlist.splice(0, 1);
+			if (Utilities.isInList(this.episodeList, episode))
+				this.selectedIndex = Utilities.getIndexInList(this.episodeList, episode);
 			this.doSelectEpisode(episode, true);
 		}
 		
-		if (this.showPlaylist) this.setShowPlaylist();
 		this.store();
+		
+		if (this.showPlaylist) this.setShowPlaylist();
+		this.$.episodeListVR.render();
 	},
 	
 	addToDownloaded: function(episode) {

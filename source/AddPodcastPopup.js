@@ -29,7 +29,7 @@ enyo.kind({
 	},
 	width: "70%",
 	components: [
-		{kind: "WebService", name: "grabPodcastService", onSuccess: "grabPodcastSuccess", onFailure: "grabPodcastFailed", handleAs: "xml"},
+		{kind: "WebService", name: "grabPodcastService", onSuccess: "grabPodcastSuccess", onFailure: "grabPodcastFailed"},
 		{kind: "VFlexBox", components: [
 			{kind: "HFlexBox", align: "center", components: [
 				{kind: "Input", name: "urlInput", hint: $L("Insert Podcast URL here"), inputType: "url", flex: 1,
@@ -86,7 +86,8 @@ enyo.kind({
 		} else this.grabPodcastFailed();
 	},
 	
-	grabPodcastFailed: function() {
+	grabPodcastFailed: function(sender, response) {
+		this.warn(response);
 		this.$.error.setContent($L("Your podcast failed to load. Please check the URL and make sure you are online. Tap anywhere outside this window to cancel."));
 		this.$.error.setStyle("display: block");
 		
