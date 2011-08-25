@@ -100,7 +100,7 @@ enyo.kind({
 			this.showError($L("Playback active, please pause before switching."));
 		else if (this.plays && episode.url == this.episode.url) 
 			this.$.error.setStyle("display: none;");
-		else if (this.episode == undefined || episode.url != this.episode.url) {
+		else {
 			if (this.plays) this.togglePlay();
 			
 			this.episode = episode;
@@ -120,22 +120,24 @@ enyo.kind({
 	
 	startStopDelete: function(sender, response) {
 		// Download episode 
-		if (!this.downloads && !this.episode.isDownloaded) {
-			this.downloads = true;
-			this.$.downloadButton.setCaption($L("Cancel"));		
-			this.$.episodeDownload.call({target: this.episode.url});
-		} // Cannot delete file since it is playing
-		else if (!this.downloads && this.episode.isDownloaded && this.plays && this.player.src == this.episode.file) {
-			this.showError($L("Please stop playback before deleting."));
-		} // Delete downloaded file
-		else if (!this.downloads && this.episode.isDownloaded) {
-			this.playersrc = this.episode.url;
-			this.$.error.setStyle("display: none;");
-			this.$.downloadButton.setCaption($L("Download"));
+		if (!this.downloads) {
+			if (!this.episode.isDownloaded) {
+				this.downloads = true;
+				this.$.downloadButton.setCaption($L("Cancel"));		
+				this.$.episodeDownload.call({target: this.episode.url});
+			} // Cannot delete file since it is playing
+			else if (this.episode.isDownloaded && this.plays) {
+				this.showError($L("Please stop playback before deleting."));
+			} // Delete downloaded file
+			else if (this.episode.isDownloaded) {
+				this.player.src = this.episode.url;
+				this.$.error.setStyle("display: none;");
+				this.$.downloadButton.setCaption($L("Download"));
 						
-			this.$.episodeDelete.call({ticket: this.episode.ticket});
-			this.episode.setDownloaded(false);
-			this.doDelete(this.episode);
+				this.$.episodeDelete.call({ticket: this.episode.ticket});
+				this.episode.setDownloaded(false);
+				this.doDelete(this.episode);
+			}
 		} // Cancel download
 		else {
 			this.$.cancel.call({ticket: this.currentDownloadTicket});

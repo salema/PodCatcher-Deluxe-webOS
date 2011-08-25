@@ -137,7 +137,7 @@ enyo.kind({
 		
 		if (this.playlist.length === 0) {
 			this.$.error.setContent($L("Your playlist is empty. Swipe any episode to the right in order to add it to the playlist."));
-			this.$.error.setStyle("display: block;");
+			this.$.error.setStyle("display: block; color: gray;");
 			this.$.episodeSpinner.hide();
 		} else {
 			for (var index = 0; index < this.playlist.length; index++)
@@ -250,7 +250,7 @@ enyo.kind({
 		
 		this.warn("Failed to load podcast feed");
 		this.$.error.setContent($L("The podcast feed failed to load. Please make sure you are online."));
-		this.$.error.setStyle("display: block;");
+		this.$.error.setStyle("display: block; color: red;");
 		this.$.episodeSpinner.hide();
 	},
 	
