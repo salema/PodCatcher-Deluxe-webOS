@@ -69,8 +69,8 @@ enyo.kind({
 			this.updateDashboard(this, episode);
 	},
 	
-	episodeDownloaded: function(sender, episode, response) {
-		this.$.episodeListPane.addToDownloaded(episode, response);
+	episodeDownloaded: function(sender, episode) {
+		this.$.episodeListPane.addToDownloaded(episode);
 	},
 	
 	deleteDownloadedEpisode: function(sender, episode) {

@@ -46,7 +46,7 @@ enyo.kind({
 		]},
 		{kind: "Toolbar", className: "toolbar", components: [
 			{kind: "GrabButton", style: "position: static"},
-			{kind: "ToolButton", name: "showPlaylistButton", caption: $L("Playlist"), onclick: "setShowPlaylist", disabled: true, flex: 1},
+			{kind: "ToolButton", name: "showPlaylistButton", caption: $L("Playlist"), onclick: "setShowPlaylist", flex: 1},
 			{kind: "ToolButton", name: "showDownloadedButton", caption: $L("Downloads"), onclick: "setShowDownloads", disabled: true, flex: 1}
 		]}
 	],
@@ -81,7 +81,7 @@ enyo.kind({
 				this.playlist.push(episode);
 			}
 			
-			this.$.showPlaylistButton.setDisabled(this.playlist.length === 0);
+			//this.$.showPlaylistButton.setDisabled(this.playlist.length === 0);
 		}
 		
 		if (response.markedEpisodes != undefined)
@@ -135,10 +135,17 @@ enyo.kind({
 	setShowPlaylist: function() {
 		this.prepareLoad($L("Select from Playlist"), true, false, true);
 		
-		for (var index = 0; index < this.playlist.length; index++)
-			this.episodeList.push(this.playlist[index]);
+		if (this.playlist.length === 0) {
+			this.$.error.setContent($L("Your playlist is empty. Swipe any episode to the right in order to add it to the playlist."));
+			this.$.error.setStyle("display: block;");
+			this.$.episodeSpinner.hide();
+		} else {
+			for (var index = 0; index < this.playlist.length; index++)
+				this.episodeList.push(this.playlist[index]);
+			
+			this.afterLoad(false);
+		}
 		
-		this.afterLoad(false);
 		this.doSpecialListSelected();
 	},
 	
@@ -170,6 +177,12 @@ enyo.kind({
 				if (this.selectedIndex == index) this.$.episodePublished.addClass("highlight");
 				if (old) this.$.episodePublished.addClass("marked");
 				if (playlist) this.$.episodePublished.addClass("playlist");
+				if (playlist) {
+					this.$.episodePublished.addClass("playlist");
+					
+					var number = Utilities.getIndexInList(this.playlist, episode) + 1;
+					this.$.episodePublished.setContent("#" + number + " - " + this.$.episodePublished.getContent());
+				}
 			}
 		}
 		
@@ -258,7 +271,7 @@ enyo.kind({
 		}
 		
 		// Update UI
-		this.$.showPlaylistButton.setDisabled(this.showPlaylist || this.playlist.length === 0);
+		this.$.showPlaylistButton.setDisabled(this.showPlaylist);
 		if (this.showPlaylist) this.setShowPlaylist();
 		
 		this.$.episodeListVR.render();
@@ -280,12 +293,11 @@ enyo.kind({
 		}
 		
 		if (this.showPlaylist) this.setShowPlaylist();
+		this.store();
 	},
 	
-	addToDownloaded: function(episode, response) {
-		this.downloadedEpisodes.push({ticket: response.ticket, url: response.url, file: response.target,
-			title: episode.title, description: episode.description, pubDate: episode.pubDate,
-			podcastTitle: episode.podcastTitle, isDownloaded: true, marked: episode.marked});
+	addToDownloaded: function(episode) {
+		this.downloadedEpisodes.push(episode);
 		
 		this.$.showDownloadedButton.setDisabled(this.showDownloads || this.downloadedEpisodes.length === 0);
 		if (this.showDownloads) this.setShowDownloads();
@@ -294,13 +306,8 @@ enyo.kind({
 	},
 	
 	removeFromDownloaded: function(episode) {
-		var remove = -1;
-		
-		for (var index = 0; index < this.downloadedEpisodes.length; index++)
-			if (this.downloadedEpisodes[index].url == episode.url)
-				remove = index;
-				
-		if (remove >= 0) {
+		if (Utilities.isInList(this.downloadedEpisodes, episode)) {
+			var remove = Utilities.getIndexInList(this.downloadedEpisodes, episode);
 			this.downloadedEpisodes.splice(remove, 1);
 			
 			this.$.showDownloadedButton.setDisabled(this.showDownloads || this.downloadedEpisodes.length === 0);
@@ -321,7 +328,7 @@ enyo.kind({
 	
 	prepareLoad: function (paneTitle, showPodcastTitles, showDownloads, showPlaylist) {
 		this.$.selectedPodcastName.setContent(paneTitle);
-		this.$.showPlaylistButton.setDisabled(showPlaylist || this.playlist.length === 0);
+		this.$.showPlaylistButton.setDisabled(showPlaylist);
 		this.$.showDownloadedButton.setDisabled(showDownloads || this.downloadedEpisodes.length === 0);
 		this.$.episodeSpinner.show();
 		this.$.error.setStyle("display: none;");
