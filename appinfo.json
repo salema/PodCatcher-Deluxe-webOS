@@ -1,11 +1,11 @@
 {
-	"id": "net.alliknow.podcatcher",
-	"version": "3.5.8",
+	"id": "net.alliknow.videocatcher",
+	"version": "4.1.1",
 	"vendor": "Kevin Hausmann",
 	"type": "web",
 	"main": "index.html",
-	"title": "PodCatcher Deluxe",
+	"title": "Video PodCatcher Deluxe",
 	"icon": "icons/icon48.png",
 	"uiRevision": "2",
-	"keywords": ["audio", "sound", "podcast", "podcatcher", "feed", "rss", "mp3", "media"]
+	"keywords": ["audio", "video", "sound", "podcast", "podcatcher", "feed", "rss", "media"]
 }

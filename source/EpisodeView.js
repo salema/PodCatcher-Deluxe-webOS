@@ -43,7 +43,7 @@ enyo.kind({
 			{name: "episodeName", content: $L("Listen"), className: "nowrap", flex: 1},
 			{kind: "Spinner", name: "stalledSpinner", align: "right"}
 		]},
-		{kind: "Sound"},
+		{kind: "Video", showControls: false, style: "width: 100%; border: 1px solid black;"},
 		{kind: "Button", name: "downloadButton", caption: $L("Download"), onclick: "startStopDelete"},
 		{name: "error", style: "display: none", className: "error"},
 		{kind: "Scroller", name: "episodeScroller", flex: 1, style: "margin: 5px 12px", components: [
@@ -61,7 +61,6 @@ enyo.kind({
 		
 		this.plays = false;
 		this.downloads = false;
-		this.player = this.$.sound.audio;
 		this.sliderInterval = setInterval(enyo.bind(this, this.updatePlaySlider), 250);
 		
 		this.$.preferencesService.call({keys: ["resumeEpisode", "resumeTime"]},	{method: "getPreferences", onSuccess: "resume"});
@@ -74,6 +73,9 @@ enyo.kind({
 	},
 	
 	resume: function(sender, response) {
+		// will do this here, since it might fail if done too early
+		this.player = this.$.video.node;
+		
 		if (response.resumeEpisode != undefined) {
 			var episode = new Episode();
 			episode.readFromJSON(response.resumeEpisode);
@@ -94,6 +96,8 @@ enyo.kind({
 	},
 	
 	setEpisode: function(episode, autoplay) {
+		this.player = this.$.video.node;
+		
 		// Don't do anything if downloading
 		if (this.downloads) this.showError($L("Download active, please wait or cancel."));
 		else if (this.plays && episode.url != this.episode.url) 
