@@ -23,5 +23,6 @@
 	"Resume":"Continuar",
 	"Resume at": "Continuar a",
 	"of": "de",
-	"Playback failed": "Reproducción fracasado"
+	"Playback failed": "Reproducción fracasado",
+	"Playback active, please pause before switching.": "Reproducción activa."
 }

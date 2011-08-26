@@ -23,5 +23,6 @@
 	"Resume":"Riprendere",
 	"Resume at": "Riprendere a",
 	"of": "di",
-	"Playback failed": "???"
+	"Playback failed": "???",
+	"Playback active, please pause before switching.":"???"
 }

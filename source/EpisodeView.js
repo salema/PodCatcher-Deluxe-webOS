@@ -33,9 +33,11 @@ enyo.kind({
 			{kind: "Spinner", name: "stalledSpinner", align: "right"}
 		]},
 		{kind: "Sound"},
+		{name: "error", style: "display: none", className: "error"},
 		{kind: "Scroller", name: "episodeScroller", flex: 1, style: "margin: 5px 12px", components: [
 			{kind: "HtmlContent", name: "episodeDescription", onLinkClick: "doOpenInBrowser", flex: 1}
 		]},
+		{kind: "ProgressSlider", name: "playSlider", style: "margin: 10px;", onChange: "seek", maximum: 0},
 		{kind: "Toolbar", className: "toolbar", components: [
 			{kind: "GrabButton", style: "position: static"},
 			{kind: "ToolButton", name: "playButton", caption: $L("Play"), onclick: "togglePlay", disabled: true, flex: 1}
@@ -46,24 +48,35 @@ enyo.kind({
 		this.inherited(arguments);
 		
 		this.plays = false;
+		this.sliderInterval = setInterval(enyo.bind(this, this.updatePlaySlider), 250);
+	},
+	
+	destroy: function() {
+		clearInterval(this.sliderInterval);
+		
+		this.inherited(arguments);
 	},
 	
 	setEpisode: function(episode) {
 		// Don't do anything if same episode is set again
-		if (episode.url == this.$.sound.getSrc()) return;
-		if (this.plays) this.togglePlay();
-		
-		this.episode = episode;
-		
-		// Update UI
-		this.$.playButton.setCaption($L("Play"));
-		this.$.playButton.setDisabled(false);
-		this.$.stalledSpinner.hide();
-		this.$.episodeName.setContent($L("Listen to") + " \"" + episode.title + "\"");
-		this.$.episodeDescription.setContent(episode.description);
-		this.$.episodeScroller.scrollTo(0, 0);
-		// Set sound source
-		this.$.sound.setSrc(episode.url);
+		if (episode.url == this.$.sound.getSrc()) this.$.error.setStyle("display: none;");
+		else if (this.plays) this.showError($L("Playback active, please pause before switching."));
+		else {
+			this.episode = episode;
+			
+			// Update UI
+			this.$.error.setStyle("display: none;");
+			this.$.playButton.setCaption($L("Play"));
+			this.$.playButton.setDisabled(false);
+			this.$.stalledSpinner.hide();
+			this.$.episodeName.setContent($L("Listen to") + " \"" + episode.title + "\"");
+			this.$.episodeDescription.setContent(episode.description);
+			this.$.episodeScroller.scrollTo(0, 0);
+			this.$.playSlider.setPosition(0);
+			this.$.playSlider.setBarPosition(0);
+			// Set sound source
+			this.$.sound.setSrc(episode.url);
+		}
 	},
 
 	togglePlay: function() {
@@ -83,6 +96,13 @@ enyo.kind({
 		this.doTogglePlay();
 	},
 	
+	seek: function(sender, event) {
+		if (this.$.sound.audio.readyState === 0 || this.$.playButton.getDisabled()) return;
+		
+		this.$.sound.audio.currentTime = event;
+		this.updatePlaytime();
+	},
+	
 	updatePlaytime: function() {
 		// Update stalled spinner
 		if (this.$.sound.audio.readyState != 4) this.$.stalledSpinner.show();
@@ -94,6 +114,14 @@ enyo.kind({
 		else this.$.playButton.setCaption($L("Pause at") + " " + this.createTimeString());
 		
 		if (this.$.sound.audio.error > 0) this.stopPlayback($L("Playback failed"));
+	},
+	
+	updatePlaySlider: function () {
+		this.$.playSlider.setMaximum(this.$.sound.audio.duration);
+		this.$.playSlider.setBarMaximum(this.$.sound.audio.duration);
+		this.$.playSlider.setPosition(this.$.sound.audio.currentTime);
+		if (this.$.sound.audio.buffered.length > 0)
+			this.$.playSlider.setBarPosition(this.$.sound.audio.buffered.end(this.$.sound.audio.buffered.length - 1));
 	},
 	
 	stopPlayback: function(buttonText) {
@@ -134,5 +162,10 @@ enyo.kind({
 		else if (seconds < 10) seconds = "0" + seconds;
 		
 		return  minutes + ":" + seconds; 
+	},
+	
+	showError: function(text) {
+		this.$.error.setContent(text);
+		this.$.error.setStyle("display: block; width: 100%; text-align: center; padding-bottom: 5px; border-bottom: 1px solid gray;");
 	}
 });

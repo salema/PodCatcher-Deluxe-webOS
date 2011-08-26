@@ -23,5 +23,6 @@
 	"Resume":"Weiterspielen",
 	"Resume at": "Weiterspielen bei",
 	"of": "von",
-	"Playback failed": "Wiedergabe fehlgeschlagen"
+	"Playback failed": "Wiedergabe fehlgeschlagen",
+	"Playback active, please pause before switching.": "Wiedergabe aktiv, bitte erst anhalten."
 }
