@@ -2,4 +2,4 @@ Check Formatter in EpisodeList
 Check Dashboard enabled
 Set framework_config.json to non logging
 Check appinfo.json
-Make palm-package exclude mock folder: --exclude="UPCOMING" --exclude="PAID VERSION FEATURES" --exclude="PRE RELEASE CHECKLIST" --exclude="mock" --exclude="it.json"
+Make palm-package exclude mock folder: --exclude="UPCOMING" --exclude="PAID VERSION FEATURES" --exclude="PRE RELEASE CHECKLIST" --exclude="mock"
