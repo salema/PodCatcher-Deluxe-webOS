@@ -68,6 +68,14 @@ Utilities.startsWithValidProtocol = function(url) {
 };
 
 /**
+ * Create an unique, no-hassle filename for a downloaded file
+ */
+Utilities.createUniqueFilename = function(url) {
+	var splits = url.split(".");
+	return new Date().getTime() + "." + splits[splits.length - 1];
+};
+
+/**
  * Check whether a given item ins in list via equals
  */
 Utilities.isInList = function(list, item) {

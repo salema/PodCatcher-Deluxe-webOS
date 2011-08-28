@@ -123,8 +123,8 @@ enyo.kind({
 		if (!this.downloads) {
 			if (!this.episode.isDownloaded) {
 				this.downloads = true;
-				this.$.downloadButton.setCaption($L("Cancel"));		
-				this.$.episodeDownload.call({target: this.episode.url});
+				this.$.downloadButton.setCaption($L("Cancel"));
+				this.$.episodeDownload.call({target: this.episode.url, targetFilename: Utilities.createUniqueFilename(this.episode.url)});
 			} // Cannot delete file since it is playing
 			else if (this.episode.isDownloaded && this.plays) {
 				this.showError($L("Please stop playback before deleting."));
