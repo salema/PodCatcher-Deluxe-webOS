@@ -27,8 +27,8 @@ enyo.kind({
 	components: [
 		{kind: "PalmService", name: "launchBrowserCall", service: "palm://com.palm.applicationManager/", method: "launch"},
 		{kind: "AppMenu", components: [
-			{kind: "AppMenuItem", caption: $L("About"), onclick: "openAbout"},
-			{kind: "AppMenuItem", caption: $L("Help"), onclick: "openHelp"}
+			{kind: "AppMenuItem", caption: $L("Help"), onclick: "openHelp"},
+			{kind: "AppMenuItem", caption: $L("About"), onclick: "openAbout"}
 		]},
 		{kind: "Dashboard", name: "dashboard", smallIcon: "icons/icon48.png", onTap: "togglePlay"},
 		{kind: "SlidingPane", flex: 1, components: [
