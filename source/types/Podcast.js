@@ -46,7 +46,7 @@ Podcast.prototype.readFromJSON = function(data) {
 Podcast.prototype.isValidXML = function(xmlDocument) {
 	var xmlTree = XmlHelper.parse(xmlDocument);
 		
-	return XmlHelper.has(xmlTree, XmlHelper.TITLE) && XmlHelper.has(xmlTree, XmlHelper.DESCRIPTION);
+	return XmlHelper.has(xmlTree, XmlHelper.TITLE);
 };
 
 Podcast.prototype.findImage = function(xmlTree) {

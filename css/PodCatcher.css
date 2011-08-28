@@ -21,6 +21,9 @@
 .toolbar {
 	height: 60px;
 }
+.fullWidth {
+	width: 100%;
+}
 .nowrap {
 	text-overflow: ellipsis;
 	overflow: hidden;

@@ -38,7 +38,7 @@ enyo.kind({
 					onSelectEpisode: "episodeSelected", onSpecialListSelected: "specialListSelected"},
 			{kind: "Net.Alliknow.PodCatcher.EpisodeView", name: "episodeViewPane", flex: 1, peekWidth: 0, onTogglePlay: "updateDashboard",
 					onPlaybackEnded: "episodePlaybackEnded", onResume: "updateDashboard", onMarkEpisode: "episodeMarked", onOpenInBrowser: "openInBrowser",
-					onDownloaded: "episodeDownloaded", onDelete: "deleteDownloadedEpisode"}
+					onDownloaded: "episodeDownloaded", onDelete: "deleteDownloadedEpisode", onResize: "videoResize"}
 		]}
 	],
 	
@@ -67,6 +67,10 @@ enyo.kind({
 		
 		if (!this.$.episodeViewPane.downloads && !this.$.episodeViewPane.plays)
 			this.updateDashboard(this, episode);
+	},
+	
+	videoResize: function(sender, width) {
+		this.$.episodeViewPane.videoResize(width.substring(0, width.length - 2));
 	},
 	
 	episodeDownloaded: function(sender, episode) {

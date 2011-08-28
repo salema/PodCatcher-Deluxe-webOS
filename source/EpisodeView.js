@@ -40,10 +40,10 @@ enyo.kind({
 		{kind: "PalmService", name: "launchBrowserCall", service: "palm://com.palm.applicationManager/", method: "launch"},
 		{kind: "Header", layoutKind: "HFlexLayout", className: "header", components: [
 			{kind: "Image", name: "markButton", src: Episode.UNMARKED_ICON, onclick: "toggleMarked", style: "margin-right: 10px;"},
-			{name: "episodeName", content: $L("Listen"), className: "nowrap", flex: 1},
+			{name: "episodeName", content: $L("Watch"), className: "nowrap", flex: 1},
 			{kind: "Spinner", name: "stalledSpinner", align: "right"}
 		]},
-		{kind: "Video", showControls: false, style: "width: 100%; border: 1px solid black;"},
+		{kind: "Video", showControls: false, className: "fullWidth", style: "display: none;"},
 		{kind: "Button", name: "downloadButton", caption: $L("Download"), onclick: "startStopDelete"},
 		{name: "error", style: "display: none", className: "error"},
 		{kind: "Scroller", name: "episodeScroller", flex: 1, style: "margin: 5px 12px", components: [
@@ -61,21 +61,20 @@ enyo.kind({
 		
 		this.plays = false;
 		this.downloads = false;
-		this.sliderInterval = setInterval(enyo.bind(this, this.updatePlaySlider), 250);
+		this.sliderInterval = setInterval(enyo.bind(this, this.updatePlaySlider), 500);
+		this.videoInterval = setInterval(enyo.bind(this, this.updateVideoMode), 500);
 		
 		this.$.preferencesService.call({keys: ["resumeEpisode", "resumeTime"]},	{method: "getPreferences", onSuccess: "resume"});
 	},
 	
 	destroy: function() {
 		clearInterval(this.sliderInterval);
+		clearInterval(this.videoInterval);
 		
 		this.inherited(arguments);
 	},
 	
 	resume: function(sender, response) {
-		// will do this here, since it might fail if done too early
-		this.player = this.$.video.node;
-		
 		if (response.resumeEpisode != undefined) {
 			var episode = new Episode();
 			episode.readFromJSON(response.resumeEpisode);
@@ -235,12 +234,26 @@ enyo.kind({
 		if (this.player.error > 0) this.playbackFailed();
 	},
 		
-	updatePlaySlider: function () {
+	updatePlaySlider: function() {
 		this.$.playSlider.setMaximum(this.player.duration);
 		this.$.playSlider.setBarMaximum(this.player.duration);
 		this.$.playSlider.setPosition(this.player.currentTime);
 		if (this.player.buffered.length > 0)
 			this.$.playSlider.setBarPosition(this.player.buffered.end(this.player.buffered.length - 1));
+	},
+	
+	updateVideoMode: function() {
+		if (this.isVideoContentAvailable()) {
+			this.$.video.setStyle("display: block;");
+			
+			if (this.episode != undefined) this.$.episodeName.setContent($L("Watching") + " \"" + this.episode.title + "\"");
+			else this.$.episodeName.setContent($L("Watch"));
+		} else {
+			this.$.video.setStyle("display: none;");
+			
+			if (this.episode != undefined) this.$.episodeName.setContent($L("Listen to") + " \"" + this.episode.title + "\"");
+			else this.$.episodeName.setContent($L("Listen"));
+		}
 	},
 	
 	playbackEnded: function() {
@@ -264,6 +277,18 @@ enyo.kind({
 		this.doPlaybackEnded(this.episode);
 	},
 	
+	videoResize: function(width) {
+		if (width > 1000 && this.isVideoContentAvailable()) {
+			this.$.downloadButton.setStyle("display: none;");
+			this.$.episodeDescription.setStyle("display: none;");
+		} else {
+			this.$.downloadButton.setStyle("display: block;");
+			this.$.episodeDescription.setStyle("display: block;");
+		}
+		
+		this.$.episodeScroller.scrollTo(0, 0);
+	},
+	
 	isAtStartOfPlayback: function() {
 		return this.player.currentTime === 0;
 	},
@@ -277,18 +302,28 @@ enyo.kind({
 		return this.player.currentTime === this.player.duration;
 	},
 	
+	isVideoContentAvailable: function() {
+		return this.player && this.player.videoWidth > 0;
+	},
+	
 	updateUIOnSetEpisode: function(episode) {
 		this.$.error.setStyle("display: none;");
 		this.$.playButton.setCaption($L("Play"));
 		this.$.playButton.setDisabled(false);
+		
 		if (episode.isDownloaded) this.$.downloadButton.setCaption($L("Delete from device"));
 		else this.$.downloadButton.setCaption($L("Download"));
+		
 		this.$.stalledSpinner.hide();
-		this.$.episodeName.setContent($L("Listen to") + " \"" + episode.title + "\"");
+		
+		if (this.isVideoContentAvailable()) this.$.episodeName.setContent($L("Watching") + " \"" + episode.title + "\"");
+		else this.$.episodeName.setContent($L("Listen to") + " \"" + episode.title + "\"");
+		
 		this.$.episodeDescription.setContent(episode.description);
 		this.$.episodeScroller.scrollTo(0, 0);
 		this.$.playSlider.setPosition(0);
 		this.$.playSlider.setBarPosition(0);
+		
 		if (episode.marked) this.$.markButton.setSrc(Episode.MARKED_ICON);
 		else this.$.markButton.setSrc(Episode.UNMARKED_ICON);
 	},
