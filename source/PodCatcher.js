@@ -27,8 +27,8 @@ enyo.kind({
 		{kind: "AppMenu", components: [
 		    {kind: "AppMenuItem", caption: "VideoCatcher Deluxe", onclick: "openVideoDeluxe"},
 			{kind: "AppMenuItem", caption: "PodCatcher Deluxe", onclick: "openDeluxe"},
-			{kind: "AppMenuItem", caption: $L("About"), onclick: "openAbout"},
-			{kind: "AppMenuItem", caption: $L("Help"), onclick: "openHelp"}
+			{kind: "AppMenuItem", caption: $L("Help"), onclick: "openHelp"},
+			{kind: "AppMenuItem", caption: $L("About"), onclick: "openAbout"}
 		]},
 		{kind: "Dashboard", name: "dashboard", smallIcon: "icons/icon48.png", onTap: "togglePlay"},
 		{kind: "SlidingPane", flex: 1, components: [
