@@ -25,6 +25,7 @@ enyo.kind({
 	components: [
 		{kind: "PalmService", name: "launchBrowserCall", service: "palm://com.palm.applicationManager/", method: "launch"},
 		{kind: "AppMenu", components: [
+		    {kind: "AppMenuItem", caption: "VideoCatcher Deluxe", onclick: "openVideoDeluxe"},
 			{kind: "AppMenuItem", caption: "PodCatcher Deluxe", onclick: "openDeluxe"},
 			{kind: "AppMenuItem", caption: $L("About"), onclick: "openAbout"},
 			{kind: "AppMenuItem", caption: $L("Help"), onclick: "openHelp"}
@@ -37,6 +38,10 @@ enyo.kind({
 					onPlaybackEnded: "updateDashboard", onOpenInBrowser: "openInBrowser"}
 		]}
 	],
+	
+	openVideoDeluxe: function(inSender) {
+		this.openInBrowser("http://developer.palm.com/appredirect/?packageid=net.alliknow.videocatcher");
+	},
 	
 	openDeluxe: function(inSender) {
 		this.openInBrowser("http://developer.palm.com/appredirect/?packageid=net.alliknow.podcatcher");
