@@ -27,14 +27,14 @@ Episode.prototype.read = function(xmlTree) {
 	this.url = XmlHelper.getFirst(xmlTree, XmlHelper.ENCLOSURE).getAttribute(XmlHelper.URL);
 	this.pubDate = XmlHelper.getFirstValue(xmlTree, XmlHelper.PUBDATE);
 	
-	if (XmlHelper.getFirst(xmlTree, XmlHelper.DESCRIPTION).firstChild != undefined)
-		this.description = XmlHelper.getFirstValue(xmlTree, XmlHelper.DESCRIPTION);
+	if (XmlHelper.has(xmlTree, XmlHelper.DESCRIPTION) &&
+		XmlHelper.getFirst(xmlTree, XmlHelper.DESCRIPTION).firstChild != undefined)
+			this.description = XmlHelper.getFirstValue(xmlTree, XmlHelper.DESCRIPTION);
 	else this.description = "<i>" + $L("No description available.") + "</i>";
 };
 
 Episode.prototype.isValid = function(xmlTree) {
 	return XmlHelper.has(xmlTree, XmlHelper.TITLE) &&
 		XmlHelper.has(xmlTree, XmlHelper.ENCLOSURE) &&
-		XmlHelper.has(xmlTree, XmlHelper.PUBDATE) &&
-		XmlHelper.has(xmlTree, XmlHelper.DESCRIPTION);
+		XmlHelper.has(xmlTree, XmlHelper.PUBDATE);
 };
