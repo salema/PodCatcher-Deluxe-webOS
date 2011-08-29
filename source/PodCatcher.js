@@ -43,11 +43,11 @@ enyo.kind({
 	],
 	
 	openAbout: function() {
-		this.openInBrowser(this.HOME_PAGE);
+		this.openInBrowser(this, this.HOME_PAGE);
 	},
 	
 	openHelp: function() {
-		this.openInBrowser(this.HELP_PAGE);
+		this.openInBrowser(this, this.HELP_PAGE);
 	},
 	
 	podcastSelected: function(sender, podcast) {
@@ -105,7 +105,7 @@ enyo.kind({
 		this.$.appMenu.close();
 	},
 	
-	openInBrowser: function(url) {
+	openInBrowser: function(sender, url) {
 		this.$.launchBrowserCall.call({"id": "com.palm.app.browser", "params": {"target": url}});
 	},
 	
