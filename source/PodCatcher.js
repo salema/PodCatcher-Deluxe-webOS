@@ -22,6 +22,7 @@
 enyo.kind({
 	name: "Net.Alliknow.PodCatcher",
 	kind: "VFlexBox",
+	VIDEOCATCHER: "http://developer.palm.com/appredirect/?packageid=net.alliknow.videocatcher",
 	HOME_PAGE: "http://salema.github.com/Yet-Another-Simple-Pod-Catcher",
 	HELP_PAGE: "http://salema.github.com/Yet-Another-Simple-Pod-Catcher/help.html",
 	components: [
@@ -44,15 +45,15 @@ enyo.kind({
 	],
 	
 	openVideoDeluxe: function(inSender) {
-		this.openInBrowser("http://developer.palm.com/appredirect/?packageid=net.alliknow.videocatcher");
+		this.openInBrowser(this, this.VIDEOCATCHER);
 	},
 	
 	openAbout: function() {
-		this.openInBrowser(this.HOME_PAGE);
+		this.openInBrowser(this, this.HOME_PAGE);
 	},
 	
 	openHelp: function() {
-		this.openInBrowser(this.HELP_PAGE);
+		this.openInBrowser(this, this.HELP_PAGE);
 	},
 	
 	podcastSelected: function(sender, podcast) {
@@ -112,7 +113,7 @@ enyo.kind({
 		this.$.appMenu.close();
 	},
 	
-	openInBrowser: function(url) {
+	openInBrowser: function(sender, url) {
 		this.$.launchBrowserCall.call({"id": "com.palm.app.browser", "params": {"target": url}});
 	},
 	
