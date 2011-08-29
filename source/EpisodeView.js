@@ -43,6 +43,7 @@ enyo.kind({
 			{name: "episodeName", content: $L("Listen"), className: "nowrap", flex: 1},
 			{kind: "Spinner", name: "stalledSpinner", align: "right"}
 		]},
+		{style: "color: gray;", content: $L("This episode has video content. You might want to give <a href=\"http://developer.palm.com/appredirect/?packageid=net.alliknow.podcatcher\">Video PodCatcher Deluxe</a> a try.")},
 		{kind: "Sound"},
 		{kind: "Button", name: "downloadButton", caption: $L("Download"), onclick: "startStopDelete"},
 		{name: "error", style: "display: none", className: "error"},
@@ -52,7 +53,8 @@ enyo.kind({
 		{kind: "ProgressSlider", name: "playSlider", style: "margin: 10px;", onChange: "seek", maximum: 0},
 		{kind: "Toolbar", className: "toolbar", components: [
 			{kind: "GrabButton", style: "position: static"},
-			{kind: "ToolButton", name: "playButton", caption: $L("Play"), onclick: "togglePlay", disabled: true, flex: 1}
+			{kind: "ToolButton", name: "playButton", caption: $L("Play"), onclick: "togglePlay", disabled: true, flex: 1},
+			{kind: "ToolButton", name: "nextButton", caption: $L("Next"), onclick: "next", disabled: true}
 		]}
 	],
 

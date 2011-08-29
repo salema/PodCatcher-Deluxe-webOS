@@ -29,11 +29,13 @@
 	"Resume at": "Continuar a",
 	"of": "de",
 	"Playback failed": "Error de reproducción",
+	"Next": "Próximo",
 	"Delete from device": "Eliminar del dispositivo",
 	"Cancel": "Cancelar",
 	"Cancel at": "Porcentaje a cancelar:",
 	"Download active, please wait or cancel.": "Descarga activa, por favor espere o cancele.",
 	"Please stop playback before deleting.": "Por favor, detener la reproducción antes de borrarla.",
 	"Download failed": "Descarga fallida",
-	"Playback active, please pause before switching.": "Reproducción activa."
+	"Playback active, please pause before switching.": "Reproducción activa.",
+	"This episode has video content. You might want to give <a href=\"http://developer.palm.com/appredirect/?packageid=net.alliknow.podcatcher\">Video PodCatcher Deluxe</a> a try.": "Este episodio tiene un contenido de vídeo. Es posible que desee dar <a href=\"http://developer.palm.com/appredirect/?packageid=net.alliknow.podcatcher\">Video PodCatcher Deluxe</a> intentarlo."
 }
