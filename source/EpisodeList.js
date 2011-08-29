@@ -25,6 +25,7 @@ enyo.kind({
 	LIMIT: 100,
 	events: {
 		onSelectEpisode: "",
+		onPlaylistChanged: "",
 		onSpecialListSelected: ""
 	},
 	components: [
@@ -66,7 +67,7 @@ enyo.kind({
 		this.showDownloads = false;
 		this.showPlaylist = false;
 		
-		this.formatter = new enyo.g11n.DateFmt({date: "long", time: "short", weekday: true});
+		//this.formatter = new enyo.g11n.DateFmt({date: "long", time: "short", weekday: true});
 		
 		this.$.preferencesService.call({keys: ["episodePlaylist", "markedEpisodes", "downloadedEpisodes"]},
 				{method: "getPreferences", onSuccess: "restore"});
@@ -81,7 +82,7 @@ enyo.kind({
 				this.playlist.push(episode);
 			}
 			
-			//this.$.showPlaylistButton.setDisabled(this.playlist.length === 0);
+			this.doPlaylistChanged(this.playlist.length);
 		}
 		
 		if (response.markedEpisodes != undefined)
@@ -282,6 +283,7 @@ enyo.kind({
 		if (this.showPlaylist) this.setShowPlaylist();
 		
 		this.$.episodeListVR.render();
+		this.doPlaylistChanged(this.playlist.length);
 		this.store();		
 	},
 	
@@ -305,6 +307,7 @@ enyo.kind({
 		this.store();
 		
 		if (this.showPlaylist) this.setShowPlaylist();
+		this.doPlaylistChanged(this.playlist.length);
 		this.$.episodeListVR.render();
 	},
 	

@@ -24,6 +24,7 @@ enyo.kind({
 	events: {
 		onTogglePlay: "",
 		onPlaybackEnded: "",
+		onNext: "",
 		onResume: "",
 		onMarkEpisode: "",
 		onDownloaded: "",
@@ -52,7 +53,8 @@ enyo.kind({
 		{kind: "ProgressSlider", name: "playSlider", style: "margin: 10px;", onChange: "seek", maximum: 0},
 		{kind: "Toolbar", className: "toolbar", components: [
 			{kind: "GrabButton", style: "position: static"},
-			{kind: "ToolButton", name: "playButton", caption: $L("Play"), onclick: "togglePlay", disabled: true, flex: 1}
+			{kind: "ToolButton", name: "playButton", caption: $L("Play"), onclick: "togglePlay", disabled: true, flex: 1},
+			{kind: "ToolButton", name: "nextButton", caption: $L("Next"), onclick: "doNext", style: "display: none;"}
 		]}
 	],
 
@@ -126,6 +128,7 @@ enyo.kind({
 		if (!this.downloads) {
 			if (!this.episode.isDownloaded) {
 				this.downloads = true;
+				this.$.nextButton.setDisabled(true);
 				this.$.downloadButton.setCaption($L("Cancel"));
 				this.$.episodeDownload.call({target: this.episode.url, targetFilename: Utilities.createUniqueFilename(this.episode.url)});
 			} // Cannot delete file since it is playing
@@ -154,6 +157,7 @@ enyo.kind({
 		
 		if (response.completed) {
 			this.downloads = false;
+			this.$.nextButton.setDisabled(false);
 			this.$.error.setStyle("display: none;");
 			this.$.downloadButton.setCaption($L("Delete from device"));
 			
@@ -166,12 +170,14 @@ enyo.kind({
 	
 	cancelSuccess: function(sender, response) {
 		this.downloads = false;
+		this.$.nextButton.setDisabled(false);
 		this.$.error.setStyle("display: none;");
 		this.$.downloadButton.setCaption($L("Download"));
 	},
    
 	downloadFail: function(sender, response) {
 		this.downloads = false;
+		this.$.nextButton.setDisabled(false);
 		this.$.downloadButton.setCaption($L("Download failed"));
 		this.$.error.setStyle("display: none;");
 		this.genericFail(sender, response);
@@ -254,6 +260,11 @@ enyo.kind({
 			if (this.episode != undefined) this.$.episodeName.setContent($L("Listen to") + " \"" + this.episode.title + "\"");
 			else this.$.episodeName.setContent($L("Listen"));
 		}
+	},
+	
+	playlistChanged: function(newLength) {
+		if (newLength > 0) this.$.nextButton.setStyle("display: block;");
+		else this.$.nextButton.setStyle("display: none;");
 	},
 	
 	playbackEnded: function() {

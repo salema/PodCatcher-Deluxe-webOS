@@ -38,6 +38,12 @@
 .playlist {
 	font-style: italic;
 }
+.info {
+	color: gray;
+	padding: 10px;
+	width: 100%;
+	text-align: center;
+}
 .error {
 	color: red;
 	font-size: smaller;
