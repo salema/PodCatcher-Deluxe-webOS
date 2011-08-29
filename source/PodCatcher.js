@@ -40,19 +40,19 @@ enyo.kind({
 	],
 	
 	openVideoDeluxe: function(inSender) {
-		this.openInBrowser("http://developer.palm.com/appredirect/?packageid=net.alliknow.videocatcher");
+		this.openInBrowser(this, "http://developer.palm.com/appredirect/?packageid=net.alliknow.videocatcher");
 	},
 	
 	openDeluxe: function(inSender) {
-		this.openInBrowser("http://developer.palm.com/appredirect/?packageid=net.alliknow.podcatcher");
+		this.openInBrowser(this, "http://developer.palm.com/appredirect/?packageid=net.alliknow.podcatcher");
 	},
 	
 	openAbout: function() {
-		this.openInBrowser(PodCatcher.HOME_PAGE);
+		this.openInBrowser(this, PodCatcher.HOME_PAGE);
 	},
 	
 	openHelp: function() {
-		this.openInBrowser(PodCatcher.HELP_PAGE);
+		this.openInBrowser(this, PodCatcher.HELP_PAGE);
 	},
 	
 	podcastSelected: function(inSender, podcast) {
@@ -79,8 +79,8 @@ enyo.kind({
 		this.$.appMenu.close();
 	},
 	
-	openInBrowser: function(inUrl) {
-		this.$.launchBrowserCall.call({"id": "com.palm.app.browser", "params": {"target": inUrl}});
+	openInBrowser: function(sender, url) {
+		this.$.launchBrowserCall.call({"id": "com.palm.app.browser", "params": {"target": url}});
 	},
 	
 	updateDashboard: function() {

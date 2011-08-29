@@ -32,7 +32,7 @@ Episode.prototype.read = function(xmlTree) {
 			this.description = XmlHelper.getFirstValue(xmlTree, XmlHelper.DESCRIPTION);
 	else this.description = "<i>" + $L("No description available.") + "</i>";
 	
-	this.description = this.description + "<hr style=\"color: gray; width: 100%\"><span style=\"color: gray;\">" +
+	this.description = this.description + "<hr style=\"color: gray; width: 100%\"><span style=\"color: gray; font-size: smaller;\">" +
 		$L("Try <a href=\"http://developer.palm.com/appredirect/?packageid=net.alliknow.podcatcher\">PodCatcher Deluxe</a> " +
 		"and <a href=\"http://developer.palm.com/appredirect/?packageid=net.alliknow.videocatcher\">Video PodCatcher Deluxe</a>: " +
 		"Downloads, Playlists, Filters and much more!") + "</span>";
