@@ -24,5 +24,6 @@
 	"Resume at": "Continuar a",
 	"of": "de",
 	"Playback failed": "Error de reproducción",
-	"Playback active, please pause before switching.": "Reproducción activa."
+	"Playback active, please pause before switching.": "Reproducción activa.",
+	"Try <a href=\"http://developer.palm.com/appredirect/?packageid=net.alliknow.podcatcher\">PodCatcher Deluxe</a> and <a href=\"http://developer.palm.com/appredirect/?packageid=net.alliknow.videocatcher\">Video PodCatcher Deluxe</a>: Downloads, Playlists, Filters and much more!": "Trate <a href=\"http://developer.palm.com/appredirect/?packageid=net.alliknow.podcatcher\">PodCatcher Deluxe</a> y <a href=\"http://developer.palm.com/appredirect/?packageid=net.alliknow.videocatcher\">Video PodCatcher Deluxe</a>: Descargas, Listas, filtros y mucho más!"
 }

@@ -24,5 +24,6 @@
 	"Resume at": "Weiterspielen bei",
 	"of": "von",
 	"Playback failed": "Wiedergabe fehlgeschlagen",
-	"Playback active, please pause before switching.": "Wiedergabe aktiv, bitte erst anhalten."
+	"Playback active, please pause before switching.": "Wiedergabe aktiv, bitte erst anhalten.",
+	"Try <a href=\"http://developer.palm.com/appredirect/?packageid=net.alliknow.podcatcher\">PodCatcher Deluxe</a> and <a href=\"http://developer.palm.com/appredirect/?packageid=net.alliknow.videocatcher\">Video PodCatcher Deluxe</a>: Downloads, Playlists, Filters and much more!": "Testen Sie <a href=\"http://developer.palm.com/appredirect/?packageid=net.alliknow.podcatcher\">PodCatcher Deluxe</a> und <a href=\"http://developer.palm.com/appredirect/?packageid=net.alliknow.videocatcher\">Video PodCatcher Deluxe</a>: Downloads, Playlisten, Filter und vieles mehr!"
 }
