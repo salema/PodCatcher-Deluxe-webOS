@@ -37,5 +37,5 @@
 	"Please stop playback before deleting.": "Bitte vor dem Löschen die Wiedergabe unterbrechen.",
 	"Download failed": "Download fehlgeschlagen",
 	"Playback active, please pause before switching.": "Wiedergabe aktiv, bitte erst anhalten.",
-	"This episode has video content. You might want to give <a href=\"http://developer.palm.com/appredirect/?packageid=net.alliknow.podcatcher\">Video PodCatcher Deluxe</a> a try.": "Diese Episode beinhaltet Video. Testen Sie <a href=\"http://developer.palm.com/appredirect/?packageid=net.alliknow.podcatcher\">Video PodCatcher Deluxe</a>."
+	"This episode has video content. You might want to give <a href=\"http://developer.palm.com/appredirect/?packageid=net.alliknow.videocatcher\">Video PodCatcher Deluxe</a> a try.": "Diese Episode beinhaltet Video. Testen Sie <a href=\"http://developer.palm.com/appredirect/?packageid=net.alliknow.videocatcher\">Video PodCatcher Deluxe</a>."
 }

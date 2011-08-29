@@ -36,9 +36,9 @@ enyo.kind({
 			{kind: "Net.Alliknow.PodCatcher.PodcastList", name: "podcastListPane", width: "230px", 
 					onSelectPodcast: "podcastSelected", onSelectAll: "allPodcastsSelected"},
 			{kind: "Net.Alliknow.PodCatcher.EpisodeList", name: "episodeListPane", width: "360px", peekWidth: 100,
-					onSelectEpisode: "episodeSelected", onSpecialListSelected: "specialListSelected"},
-			{kind: "Net.Alliknow.PodCatcher.EpisodeView", name: "episodeViewPane", flex: 1, peekWidth: 250, onTogglePlay: "updateDashboard",
-					onPlaybackEnded: "episodePlaybackEnded", onResume: "updateDashboard", onMarkEpisode: "episodeMarked", onOpenInBrowser: "openInBrowser",
+					onSelectEpisode: "episodeSelected", onPlaylistChanged: "playlistChanged", onSpecialListSelected: "specialListSelected"},
+			{kind: "Net.Alliknow.PodCatcher.EpisodeView", name: "episodeViewPane", flex: 1, peekWidth: 250, onTogglePlay: "updateDashboard", onNext: "playNext",
+					onPlaybackEnded: "playNext", onResume: "updateDashboard", onMarkEpisode: "episodeMarked", onOpenInBrowser: "openInBrowser",
 					onDownloaded: "episodeDownloaded", onDelete: "deleteDownloadedEpisode"}
 		]}
 	],
@@ -74,6 +74,10 @@ enyo.kind({
 			this.updateDashboard(this, episode);
 	},
 	
+	playlistChanged: function(sender, newLength) {
+		this.$.episodeViewPane.playlistChanged(newLength);
+	},
+	
 	episodeDownloaded: function(sender, episode) {
 		this.$.episodeListPane.addToDownloaded(episode);
 	},
@@ -93,7 +97,9 @@ enyo.kind({
 		this.updateDashboard();
 	},
 	
-	episodePlaybackEnded: function(sender, episode) {
+	playNext: function(sender, episode) {
+		if (this.$.episodeViewPane.plays) this.$.episodeViewPane.togglePlay();
+		
 		this.$.episodeListPane.nextInPlaylist(episode);
 		this.updateDashboard();
 	},
@@ -121,6 +127,6 @@ enyo.kind({
 			else if (this.$.episodeViewPane.isInMiddleOfPlayback()) playText = $L("Tap to resume");
 		
 		var episode = this.$.episodeViewPane.episode;
-		this.$.dashboard.setLayers([{icon: "icons/icon48.png", title: episode.title, text: episode.podcastTitle + " - " + playText}]);
+		//this.$.dashboard.setLayers([{icon: "icons/icon48.png", title: episode.title, text: episode.podcastTitle + " - " + playText}]);
 	}
 });

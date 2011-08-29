@@ -24,6 +24,7 @@ enyo.kind({
 	events: {
 		onTogglePlay: "",
 		onPlaybackEnded: "",
+		onNext: "",
 		onResume: "",
 		onMarkEpisode: "",
 		onDownloaded: "",
@@ -43,8 +44,8 @@ enyo.kind({
 			{name: "episodeName", content: $L("Listen"), className: "nowrap", flex: 1},
 			{kind: "Spinner", name: "stalledSpinner", align: "right"}
 		]},
-		{style: "color: gray;", content: $L("This episode has video content. You might want to give <a href=\"http://developer.palm.com/appredirect/?packageid=net.alliknow.podcatcher\">Video PodCatcher Deluxe</a> a try.")},
-		{kind: "Sound"},
+		{name: "videoInfo", className: "info", content: $L("This episode has video content. You might want to give <a href=\"http://developer.palm.com/appredirect/?packageid=net.alliknow.videocatcher\">Video PodCatcher Deluxe</a> a try.")},
+		{kind: "Video", showControls: false, style: "display: none;"},
 		{kind: "Button", name: "downloadButton", caption: $L("Download"), onclick: "startStopDelete"},
 		{name: "error", style: "display: none", className: "error"},
 		{kind: "Scroller", name: "episodeScroller", flex: 1, style: "margin: 5px 12px", components: [
@@ -54,7 +55,7 @@ enyo.kind({
 		{kind: "Toolbar", className: "toolbar", components: [
 			{kind: "GrabButton", style: "position: static"},
 			{kind: "ToolButton", name: "playButton", caption: $L("Play"), onclick: "togglePlay", disabled: true, flex: 1},
-			{kind: "ToolButton", name: "nextButton", caption: $L("Next"), onclick: "next", disabled: true}
+			{kind: "ToolButton", name: "nextButton", caption: $L("Next"), onclick: "doNext", style: "display: none;"}
 		]}
 	],
 
@@ -63,14 +64,15 @@ enyo.kind({
 		
 		this.plays = false;
 		this.downloads = false;
-		this.player = this.$.sound.audio;
 		this.sliderInterval = setInterval(enyo.bind(this, this.updatePlaySlider), 250);
+		this.videoInterval = setInterval(enyo.bind(this, this.updateVideoMode), 1000);
 		
 		this.$.preferencesService.call({keys: ["resumeEpisode", "resumeTime"]},	{method: "getPreferences", onSuccess: "resume"});
 	},
 	
 	destroy: function() {
 		clearInterval(this.sliderInterval);
+		clearInterval(this.videoInterval);
 		
 		this.inherited(arguments);
 	},
@@ -96,6 +98,8 @@ enyo.kind({
 	},
 	
 	setEpisode: function(episode, autoplay) {
+		this.player = this.$.video.node;
+		
 		// Don't do anything if downloading
 		if (this.downloads) this.showError($L("Download active, please wait or cancel."));
 		else if (this.plays && episode.url != this.episode.url) 
@@ -125,6 +129,7 @@ enyo.kind({
 		if (!this.downloads) {
 			if (!this.episode.isDownloaded) {
 				this.downloads = true;
+				this.$.nextButton.setDisabled(true);
 				this.$.downloadButton.setCaption($L("Cancel"));
 				this.$.episodeDownload.call({target: this.episode.url, targetFilename: Utilities.createUniqueFilename(this.episode.url)});
 			} // Cannot delete file since it is playing
@@ -153,6 +158,7 @@ enyo.kind({
 		
 		if (response.completed) {
 			this.downloads = false;
+			this.$.nextButton.setDisabled(false);
 			this.$.error.setStyle("display: none;");
 			this.$.downloadButton.setCaption($L("Delete from device"));
 			
@@ -165,12 +171,14 @@ enyo.kind({
 	
 	cancelSuccess: function(sender, response) {
 		this.downloads = false;
+		this.$.nextButton.setDisabled(false);
 		this.$.error.setStyle("display: none;");
 		this.$.downloadButton.setCaption($L("Download"));
 	},
    
 	downloadFail: function(sender, response) {
 		this.downloads = false;
+		this.$.nextButton.setDisabled(false);
 		this.$.downloadButton.setCaption($L("Download failed"));
 		this.$.error.setStyle("display: none;");
 		this.genericFail(sender, response);
@@ -241,6 +249,16 @@ enyo.kind({
 			this.$.playSlider.setBarPosition(this.player.buffered.end(this.player.buffered.length - 1));
 	},
 	
+	updateVideoMode: function() {
+		if (this.isVideoContentAvailable()) this.$.videoInfo.setStyle("display: block;");
+		else this.$.videoInfo.setStyle("display: none;");
+	},
+	
+	playlistChanged: function(newLength) {
+		if (newLength > 0) this.$.nextButton.setStyle("display: block;");
+		else this.$.nextButton.setStyle("display: none;");
+	},
+	
 	playbackEnded: function() {
 		if (! this.episode.marked) this.toggleMarked();	
 		this.stopPlayback($L("Playback complete"));
@@ -275,7 +293,12 @@ enyo.kind({
 		return this.player.currentTime === this.player.duration;
 	},
 	
+	isVideoContentAvailable: function() {
+		return this.player && this.player.videoWidth > 0;
+	},
+	
 	updateUIOnSetEpisode: function(episode) {
+		this.$.videoInfo.setStyle("display: none;");
 		this.$.error.setStyle("display: none;");
 		this.$.playButton.setCaption($L("Play"));
 		this.$.playButton.setDisabled(false);
