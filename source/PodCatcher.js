@@ -35,19 +35,19 @@ enyo.kind({
 			{kind: "Net.Alliknow.PodCatcher.PodcastList", name: "podcastListPane", width: "230px", 
 					onSelectPodcast: "podcastSelected", onSelectAll: "allPodcastsSelected"},
 			{kind: "Net.Alliknow.PodCatcher.EpisodeList", name: "episodeListPane", width: "360px", peekWidth: 0,
-					onSelectEpisode: "episodeSelected", onSpecialListSelected: "specialListSelected"},
-			{kind: "Net.Alliknow.PodCatcher.EpisodeView", name: "episodeViewPane", flex: 1, peekWidth: 0, onTogglePlay: "updateDashboard",
-					onPlaybackEnded: "episodePlaybackEnded", onResume: "updateDashboard", onMarkEpisode: "episodeMarked", onOpenInBrowser: "openInBrowser",
+					onSelectEpisode: "episodeSelected", onPlaylistChanged: "playlistChanged", onSpecialListSelected: "specialListSelected"},
+			{kind: "Net.Alliknow.PodCatcher.EpisodeView", name: "episodeViewPane", flex: 1, peekWidth: 0, onTogglePlay: "updateDashboard", onNext: "playNext",
+					onPlaybackEnded: "playNext", onResume: "updateDashboard", onMarkEpisode: "episodeMarked", onOpenInBrowser: "openInBrowser",
 					onDownloaded: "episodeDownloaded", onDelete: "deleteDownloadedEpisode", onResize: "videoResize"}
 		]}
 	],
 	
 	openAbout: function() {
-		this.openInBrowser(this.HOME_PAGE);
+		this.openInBrowser(this, this.HOME_PAGE);
 	},
 	
 	openHelp: function() {
-		this.openInBrowser(this.HELP_PAGE);
+		this.openInBrowser(this, this.HELP_PAGE);
 	},
 	
 	podcastSelected: function(sender, podcast) {
@@ -73,6 +73,10 @@ enyo.kind({
 		this.$.episodeViewPane.videoResize(width.substring(0, width.length - 2));
 	},
 	
+	playlistChanged: function(sender, newLength) {
+		this.$.episodeViewPane.playlistChanged(newLength);
+	},
+	
 	episodeDownloaded: function(sender, episode) {
 		this.$.episodeListPane.addToDownloaded(episode);
 	},
@@ -92,7 +96,9 @@ enyo.kind({
 		this.updateDashboard();
 	},
 	
-	episodePlaybackEnded: function(sender, episode) {
+	playNext: function(sender, episode) {
+		if (this.$.episodeViewPane.plays) this.$.episodeViewPane.togglePlay();
+		
 		this.$.episodeListPane.nextInPlaylist(episode);
 		this.updateDashboard();
 	},
@@ -105,7 +111,7 @@ enyo.kind({
 		this.$.appMenu.close();
 	},
 	
-	openInBrowser: function(url) {
+	openInBrowser: function(sender, url) {
 		this.$.launchBrowserCall.call({"id": "com.palm.app.browser", "params": {"target": url}});
 	},
 	
@@ -120,6 +126,6 @@ enyo.kind({
 			else if (this.$.episodeViewPane.isInMiddleOfPlayback()) playText = $L("Resume");
 		
 		var episode = this.$.episodeViewPane.episode;
-		this.$.dashboard.setLayers([{icon: "icons/icon48.png", title: episode.title, text: episode.podcastTitle + " - " + playText}]);
+		//this.$.dashboard.setLayers([{icon: "icons/icon48.png", title: episode.title, text: episode.podcastTitle + " - " + playText}]);
 	}
 });
