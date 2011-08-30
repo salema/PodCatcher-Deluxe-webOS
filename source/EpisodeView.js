@@ -216,10 +216,10 @@ enyo.kind({
 		}		
 	},
 	
-	seek: function(sender, event) {
+	seek: function(sender, seekTo) {
 		if (this.player.readyState === 0 || this.$.playButton.getDisabled()) return;
 		
-		this.player.currentTime = event;
+		this.player.currentTime = seekTo;
 		this.updatePlaytime();
 	},
 	
