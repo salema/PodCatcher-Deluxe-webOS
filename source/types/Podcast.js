@@ -32,14 +32,14 @@ Podcast.prototype.readFromXML = function(xmlDocument) {
 	var xmlTree = XmlHelper.parse(xmlDocument);
 		
 	this.title = XmlHelper.getFirstValue(xmlTree, XmlHelper.TITLE);
-	this.description = XmlHelper.getFirstValue(xmlTree, XmlHelper.DESCRIPTION);
+	//this.description = XmlHelper.getFirstValue(xmlTree, XmlHelper.DESCRIPTION);
 	this.image = this.findImage(xmlTree);
 };
 
 //Read episode information from JSON data
 Podcast.prototype.readFromJSON = function(data) {
 	this.title = data.title;
-	this.description = data.description;
+	//this.description = data.description;
 	this.image = data.image;
 };
 
