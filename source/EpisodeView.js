@@ -80,32 +80,32 @@ enyo.kind({
 	},
 
 	togglePlay: function() {
-		if (!this.plays) {
+		this.plays = !this.plays;
+		this.doTogglePlay();
+		
+		if (this.plays) {
 			this.$.sound.play();
 			this.updatePlaytime();
 			this.interval = setInterval(enyo.bind(this, this.updatePlaytime), 1000);
 		} else {
 			this.$.sound.audio.pause();
-			if (this.isAtStartOfPlayback()) this.$.playButton.setCaption($L("Resume"));
+			if (this.isAtStartOfPlayback()) this.$.playButton.setCaption($L("Play"));
 			else this.$.playButton.setCaption($L("Resume at") + " " + this.createTimeString());
-			// TODO what happens to the spinner?
+			this.$.stalledSpinner.hide();
 			clearInterval(this.interval);
 		}
-		
-		this.plays = !this.plays;
-		this.doTogglePlay();
 	},
 	
-	seek: function(sender, event) {
+	seek: function(sender, seekTo) {
 		if (this.$.sound.audio.readyState === 0 || this.$.playButton.getDisabled()) return;
 		
-		this.$.sound.audio.currentTime = event;
+		this.$.sound.audio.currentTime = seekTo;
 		this.updatePlaytime();
 	},
 	
 	updatePlaytime: function() {
 		// Update stalled spinner
-		if (this.$.sound.audio.readyState != 4) this.$.stalledSpinner.show();
+		if (this.plays && (this.$.sound.audio.readyState != 4 || this.$.sound.audio.seeking)) this.$.stalledSpinner.show();
 		else this.$.stalledSpinner.hide();
 		
 		// Update play button

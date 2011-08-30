@@ -22,6 +22,10 @@
 enyo.kind({
 	name: "Net.Alliknow.PodCatcher",
 	kind: "VFlexBox",
+	VIDEOCATCHER: "http://developer.palm.com/appredirect/?packageid=net.alliknow.videocatcher",
+	PODCATCHER: "http://developer.palm.com/appredirect/?packageid=net.alliknow.podcatcher",
+	HELP_PAGE: "http://salema.github.com/Yet-Another-Simple-Pod-Catcher/help.html",
+	HOME_PAGE: "http://salema.github.com/Yet-Another-Simple-Pod-Catcher",
 	components: [
 		{kind: "PalmService", name: "launchBrowserCall", service: "palm://com.palm.applicationManager/", method: "launch"},
 		{kind: "AppMenu", components: [
@@ -40,19 +44,19 @@ enyo.kind({
 	],
 	
 	openVideoDeluxe: function(inSender) {
-		this.openInBrowser(this, "http://developer.palm.com/appredirect/?packageid=net.alliknow.videocatcher");
+		this.openInBrowser(this, this.VIDEOCATCHER);
 	},
 	
 	openDeluxe: function(inSender) {
-		this.openInBrowser(this, "http://developer.palm.com/appredirect/?packageid=net.alliknow.podcatcher");
+		this.openInBrowser(this, this.PODCATCHER);
 	},
 	
 	openAbout: function() {
-		this.openInBrowser(this, PodCatcher.HOME_PAGE);
+		this.openInBrowser(this, this.HOME_PAGE);
 	},
 	
 	openHelp: function() {
-		this.openInBrowser(this, PodCatcher.HELP_PAGE);
+		this.openInBrowser(this, this.HELP_PAGE);
 	},
 	
 	podcastSelected: function(inSender, podcast) {
@@ -88,19 +92,14 @@ enyo.kind({
 	},
 	
 	updateDashboard: function() {
-		var playText = $L("Tap to pause");
+		var playText = $L("Pause");
 		
-		if (!this.$.episodeViewPane.plays && this.$.episodeViewPane.isAtStartOfPlayback()) playText = $L("Tap to play");
+		if (!this.$.episodeViewPane.plays && this.$.episodeViewPane.isAtStartOfPlayback()) playText = $L("Play");
 		else if (!this.$.episodeViewPane.plays && this.$.episodeViewPane.isAtEndOfPlayback()) playText = $L("Playback complete");
-		else if (this.$.episodeViewPane.plays && this.$.episodeViewPane.isInMiddleOfPlayback()) playText = $L("Tap to pause"); 
-		else if (! this.$.episodeViewPane.plays && this.$.episodeViewPane.isInMiddleOfPlayback()) playText = $L("Tap to resume");
+		else if (this.$.episodeViewPane.plays && this.$.episodeViewPane.isInMiddleOfPlayback()) playText = $L("Pause"); 
+		else if (! this.$.episodeViewPane.plays && this.$.episodeViewPane.isInMiddleOfPlayback()) playText = $L("Resume");
 		
 		var episode = this.$.episodeViewPane.episode;
 		this.$.dashboard.setLayers([{icon: "icons/icon48.png", title: episode.title, text: playText}]);
 	}
 });
-
-function PodCatcher() {}
-
-PodCatcher.HOME_PAGE = "http://salema.github.com/Yet-Another-Simple-Pod-Catcher";
-PodCatcher.HELP_PAGE = "http://salema.github.com/Yet-Another-Simple-Pod-Catcher/help.html";
