@@ -33,9 +33,11 @@ XmlHelper.getFirst = function(xmlTree, tagName) {
 };
 
 XmlHelper.getFirstValue = function(xmlTree, tagName) {
-	var firstChild = this.getFirst(xmlTree, tagName).firstChild;
+	var firstChild = undefined;
 	
-	if (firstChild != undefined) return firstChild.data;
+	if (this.has(xmlTree, tagName)) firstChild = this.getFirst(xmlTree, tagName).firstChild;
+	
+	if (firstChild) return firstChild.data;
 	else return undefined;
 };
 
