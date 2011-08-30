@@ -43,3 +43,11 @@ Episode.prototype.isValid = function(xmlTree) {
 		XmlHelper.has(xmlTree, XmlHelper.ENCLOSURE) &&
 		XmlHelper.has(xmlTree, XmlHelper.PUBDATE);
 };
+
+Episode.prototype.equals = function(episode) {
+	return episode instanceof Episode && this.url == episode.url;
+};
+
+Episode.prototype.compare = function(episodeA, episodeB) {
+	return Date.parse(episodeB.pubDate) - Date.parse(episodeA.pubDate);
+};

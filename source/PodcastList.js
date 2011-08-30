@@ -24,7 +24,8 @@ enyo.kind({
 	kind: "SlidingView",
 	layoutKind: "VFlexLayout",
 	events: {
-		onSelectPodcast: ""
+		onSelectPodcast: "",
+		onSelectAll: ""
 	},
 	components: [
 		{kind: "SystemService", name: "preferencesService", subscribe : false},
@@ -40,7 +41,8 @@ enyo.kind({
 		]},
 		{kind: "Image", name: "podcastImage", className: "podcastImage", src: Podcast.DEFAULT_IMAGE},
 		{kind: "Toolbar", pack: "justify", className: "toolbar", components: [
-			{kind: "ToolButton", caption: $L("Add"), onclick: "showAddPodcastPopup", flex: 1}
+			{kind: "ToolButton", caption: $L("Add"), onclick: "showAddPodcastPopup", flex: 1},
+			{kind: "ToolButton", name: "selectAllButton", caption: $L("All"), onclick: "selectAllPodcasts", flex: 1, disabled: true}
 		]}
 	],
 
@@ -49,6 +51,7 @@ enyo.kind({
 		
 		this.selectedIndex = -1;
 		this.podcastList = [];
+		this.selectAll = false;
 		
 		this.$.preferencesService.call({keys: ["storedPodcastList"]}, {method: "getPreferences", onSuccess: "restorePodcastList"});
 	},
@@ -60,8 +63,14 @@ enyo.kind({
 		if (list == undefined || list.length == 0) this.showAddPodcastPopup();
 		// podcast list restored
 		else {
-			this.podcastList = list;
+			for (var index = 0; index < list.length; index++) {
+				var podcast = new Podcast(list[index].url);
+				podcast.readFromJSON(list[index]);
+				
+				this.podcastList.push(podcast);
+			}
 			
+			this.$.selectAllButton.setDisabled(! (this.podcastList.length > 1));
 			this.$.podcastListVR.render();
 		}
 	},
@@ -76,20 +85,18 @@ enyo.kind({
 		
 		if (podcast) {
 			this.$.podcastTitle.setContent(podcast.title);
-			if (this.selectedIndex == inIndex) this.$.podcastTitle.addClass("highlight");
+			if (this.selectedIndex == inIndex || this.selectAll) this.$.podcastTitle.addClass("highlight");
 			return true;
 		}
 	},
 	
 	selectPodcastClick: function(inSender, inEvent) {
-		// No action if current podcast is tapped on again
-		if (this.$.podcastListVR.fetchRowIndex() != this.selectedIndex) {
-			this.selectedIndex = this.$.podcastListVR.fetchRowIndex();
-			this.selectPodcast();
-		}
+		this.selectedIndex = this.$.podcastListVR.fetchRowIndex();
+		this.selectPodcast();
 	},
 	
 	selectPodcast: function() {
+		this.selectAll = false;
 		var podcast = this.podcastList[this.selectedIndex];
 		
 		if (podcast) {
@@ -100,6 +107,16 @@ enyo.kind({
 			this.doSelectPodcast(podcast);
 		}
 		
+		this.$.selectAllButton.setDisabled(this.podcastList.length === 0);
+		this.$.podcastListVR.render();
+	},
+	
+	selectAllPodcasts: function(sender, event) {
+		this.selectAll = true;
+		this.doSelectAll(this.podcastList);
+		
+		this.$.podcastImage.setSrc(Podcast.DEFAULT_IMAGE);
+		this.$.selectAllButton.setDisabled(true);
 		this.$.podcastListVR.render();
 	},
 

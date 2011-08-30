@@ -22,6 +22,7 @@ enyo.kind({
 	name: "Net.Alliknow.PodCatcher.EpisodeList",
 	kind: "SlidingView",
 	layoutKind: "VFlexLayout",
+	LIMIT: 100,
 	events: {
 		onSelectEpisode: ""
 	},
@@ -55,33 +56,41 @@ enyo.kind({
 	},
 	
 	setPodcast: function(podcast) {
-		this.$.selectedPodcastName.setContent($L("Select from") + " \"" + podcast.title + "\"");
-		this.$.episodeSpinner.show();
-		this.$.error.setStyle("display: none;");
-		
-		this.selectedIndex = -1;
-		this.episodeList = [];
-		this.$.episodeListVR.render();
+		this.prepareLoad($L("Select from") + " \"" + podcast.title + "\"", false);
+		this.podcastList.push(podcast);
 		
 		this.$.grabPodcast.setUrl(encodeURI(podcast.url));
 		this.$.grabPodcast.call();
 	},
+	
+	setPodcastList: function(podcastList) {
+		this.prepareLoad($L("Select from all"), true);
 		
-	getEpisode: function(inSender, inIndex) {
-		var episode = this.episodeList[inIndex];
+		for (var index = 0; index < podcastList.length; index++) {
+			this.podcastList.push(podcastList[index]);
+			this.$.grabPodcast.setUrl(encodeURI(podcastList[index].url));
+			this.$.grabPodcast.call();
+		}
+	},
+		
+	getEpisode: function(inSender, index) {
+		var episode = this.episodeList[index];
 
 		if (episode) {
 			this.$.episodeTitle.setContent(episode.title);
-			if (this.selectedIndex == inIndex) this.$.episodeTitle.addClass("highlight");
+			if (this.selectedIndex == index) this.$.episodeTitle.addClass("highlight");
 			
 			var pubDate = new Date(episode.pubDate);
 			if (this.formatter != undefined) this.$.episodePublished.setContent(this.formatter.format(pubDate));
 			else this.$.episodePublished.setContent(episode.pubDate);
 			
-			if (this.selectedIndex == inIndex) this.$.episodePublished.addClass("highlight");
+			// Put podcast title if wanted
+			if (this.showPodcastTitle) this.$.episodePublished.setContent(episode.podcastTitle + " - " + this.$.episodePublished.getContent());
 			
-			return true;
+			if (this.selectedIndex == index) this.$.episodePublished.addClass("highlight");
 		}
+		
+		return index < this.episodeList.length && index < this.LIMIT;
 	},
 	
 	selectEpisode: function(inSender, inIndex) {
@@ -93,8 +102,10 @@ enyo.kind({
 		this.$.episodeListVR.render();
 	},
 	
-	grabPodcastSuccess: function(inSender, inResponse, inRequest) {
-		var xmlTree = XmlHelper.parse(inResponse);
+	grabPodcastSuccess: function(sender, response, request) {
+		this.loadCounter++;
+		
+		var xmlTree = XmlHelper.parse(response);
 		var items = XmlHelper.get(xmlTree, XmlHelper.ITEM);
 		
 		for (var index = 0; index < items.length; index++) {
@@ -102,20 +113,51 @@ enyo.kind({
 			if (! episode.isValid(items[index])) continue;
 			
 			episode.read(items[index]);
+			episode.podcastTitle = Utilities.getItemAttributeValueInList(this.podcastList, new Podcast(request.url), "title");
 			this.episodeList.push(episode);
 		}
 		
-		if (this.episodeList.length == 0) this.grabPodcastFailed();
-		
-		this.$.episodeListScroller.scrollTo(0, 0);
-		this.$.episodeListVR.render();
-		this.$.episodeSpinner.hide();
+		this.checkLoadFinished();
 	},
 	
 	grabPodcastFailed: function() {
+		this.loadCounter++;
+		this.checkLoadFinished();
+	},
+	
+	checkLoadFinished: function() {
+		if (this.loadCounter == this.podcastList.length) {
+			if (this.episodeList.length === 0) this.loadFailed();
+			else this.afterLoad(this.podcastList.length > 1);
+		}
+	},
+	
+	loadFailed: function() {
 		this.warn("Failed to load podcast feed");
 		this.$.error.setContent($L("The podcast feed failed to load. Please make sure you are online."));
-		this.$.error.setStyle("display: block;");
+		this.$.error.setStyle("display: block; color: red;");
+		this.$.episodeSpinner.hide();
+	},
+	
+	prepareLoad: function (paneTitle, showPodcastTitles) {
+		this.$.selectedPodcastName.setContent(paneTitle);
+		this.$.episodeSpinner.show();
+		this.$.error.setStyle("display: none;");
+		
+		this.showPodcastTitle = showPodcastTitles;
+		this.selectedIndex = -1;
+		this.episodeList = [];
+		this.loadCounter = 0;
+		this.podcastList = [];
+		
+		this.$.episodeListVR.render();	
+	},
+	
+	afterLoad: function (sort) {
+		if (sort) this.episodeList.sort(new Episode().compare);
+		
+		this.$.episodeListScroller.scrollTo(0, 0);
+		this.$.episodeListVR.render();
 		this.$.episodeSpinner.hide();
 	}
 }); 

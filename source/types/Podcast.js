@@ -36,6 +36,13 @@ Podcast.prototype.read = function(xmlDocument) {
 	this.image = this.findImage(xmlTree);
 };
 
+//Read episode information from JSON data
+Podcast.prototype.readFromJSON = function(data) {
+	this.title = data.title;
+	this.description = data.description;
+	this.image = data.image;
+};
+
 Podcast.prototype.isValid = function(xmlDocument) {
 	var xmlTree = XmlHelper.parse(xmlDocument);
 		
@@ -56,6 +63,10 @@ Podcast.prototype.findImage = function(xmlTree) {
 	// Image is in thumbnail tag
 	else if (XmlHelper.get(xmlTree, XmlHelper.THUMBNAIL).length > 0)
 		return XmlHelper.getFirst(xmlTree, XmlHelper.THUMBNAIL).getAttribute(XmlHelper.URL);
+};
+
+Podcast.prototype.equals = function(podcast) {
+	return podcast instanceof Podcast && this.url == podcast.url;
 };
 
 Podcast.DEFAULT_IMAGE = "icons/icon128.png";
