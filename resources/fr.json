@@ -14,7 +14,7 @@
 	"Select from Playlist": "Sélectionner depuis le Playlist",
 	"Select from Downloads": "Sélectionner depuis les téléchargements",
 	"The podcast feed failed to load. Please make sure you are online.": "Le téléchargement du podcast a échoué. Assurez-vous que vous êtes en ligne.",
-	"Your playlist is empty. Swipe any episode to the right in order to add it to the playlist.": "Votre playlist est vide. Glissez un épisode vers la droite afin de l'ajouter à la playlist.",
+	"Your playlist is empty. Swipe any episode to the right in order to add it to the playlist.": "Votre liste de lecture est vide. Glissez un épisode vers la droite afin de l'ajouter à la liste.",
 	"Listen": "Écouter",
 	"Listen to": "Vous écoutez",
 	"Watch": "Regardez",
@@ -28,12 +28,12 @@
 	"Resume at": "Reprendre à",
 	"of": "de",
 	"Playback failed": "Lecture a échoué",
-	"Next": "Prochaine",
+	"Next": "Prochain",
 	"Delete from device": "Supprimer de l'appareil",
 	"Cancel": "Annuler",
 	"Cancel at": "Annuler à",
 	"Download active, please wait or cancel.": "Télécharger en cours, veuillez attendre ou annuler.",
 	"Please stop playback before deleting.": "Veuillez stopper la lecture avant la suppression.",
 	"Download failed": "Le téléchargement a échoué",
-	"Playback active, please pause before switching.": "Lecture active."
+	"Playback active, please pause before switching.": "Lecture active, presser pause avant de changer d'activité."
 }
