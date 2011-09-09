@@ -45,6 +45,8 @@ Utilities.formatDownloadStatus = function(data) {
 	var received = Math.round(data.amountReceived / (1024*1024));
 	var total = Math.round(data.amountTotal / (1024*1024));
 	
+	if (percent == 100 && !data.completed) percent = undefined;
+	
 	return this.formatNumber(percent) + "% (" + this.formatNumber(received) +
 			" " + $L("of") + " " + this.formatNumber(total) + "MB)";
 };
