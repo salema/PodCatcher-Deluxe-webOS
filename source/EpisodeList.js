@@ -157,6 +157,7 @@ enyo.kind({
 		if (episode) {
 			var old = this.markedEpisodes.indexOf(episode.url) >= 0;
 			var playlist = Utilities.isInList(this.playlist, episode);
+			var downloaded = Utilities.isInList(this.downloadedEpisodes, episode);
 			
 			if (!this.showAll && old) {
 				this.$.episodeTitle.parent.setStyle("display: none;");
@@ -166,6 +167,7 @@ enyo.kind({
 				if (this.selectedIndex == index) this.$.episodeTitle.addClass("highlight");
 				if (old) this.$.episodeTitle.addClass("marked");
 				if (playlist) this.$.episodeTitle.addClass("playlist");
+				if (downloaded) this.$.episodeTitle.parent.addClass("downloaded");
 				
 				// Put date
 				var pubDate = new Date(episode.pubDate);
@@ -317,6 +319,7 @@ enyo.kind({
 		this.$.showDownloadedButton.setDisabled(this.showDownloads || this.downloadedEpisodes.length === 0);
 		if (this.showDownloads) this.setShowDownloads();
 		
+		this.$.episodeListVR.render();
 		this.store();
 	},
 	
@@ -328,6 +331,7 @@ enyo.kind({
 			this.$.showDownloadedButton.setDisabled(this.showDownloads || this.downloadedEpisodes.length === 0);
 			if (this.showDownloads) this.setShowDownloads();
 			
+			this.$.episodeListVR.render();
 			this.store();
 		}
 	},
