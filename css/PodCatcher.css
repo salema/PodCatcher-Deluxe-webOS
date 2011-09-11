@@ -30,10 +30,13 @@
 	font-weight: bold;
 }
 .marked {
-	color: gray;
+	color: #5A5A5A;
 }
 .playlist {
 	font-style: italic;
+}
+.downloaded {
+	background: #C8C8C8;
 }
 .info {
 	color: gray;
