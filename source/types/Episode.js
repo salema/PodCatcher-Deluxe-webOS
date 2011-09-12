@@ -55,16 +55,11 @@ Episode.prototype.isValidXML = function(xmlTree) {
 		XmlHelper.has(xmlTree, XmlHelper.PUBDATE);
 };
 
-Episode.prototype.setDownloaded = function(downloaded, ticket, file) {
+Episode.prototype.setDownloaded = function(downloaded, file) {
 	this.isDownloaded = downloaded;
 	
-	if (downloaded) {
-		this.ticket = ticket;
-		this.file = file;
-	} else {
-		this.ticket = undefined;
-		this.file = undefined;
-	};
+	if (downloaded) this.file = file;
+	else this.file = undefined;
 };
 
 Episode.prototype.equals = function(episode) {

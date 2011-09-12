@@ -337,10 +337,10 @@ enyo.kind({
 	},
 	
 	updateEpisodeMetadata: function(episode) {
-		if (Utilities.isInList(this.downloadedEpisodes, episode)) episode.setDownloaded(true,
-				Utilities.getItemAttributeValueInList(this.downloadedEpisodes, episode, "ticket"),
-				Utilities.getItemAttributeValueInList(this.downloadedEpisodes, episode, "file"));
-		else episode.setDownloaded(false);
+		if (Utilities.isInList(this.downloadedEpisodes, episode)) {
+			episode.setDownloaded(true, Utilities.getItemAttributeValueInList(this.downloadedEpisodes, episode, "file"));
+			episode.ticket = Utilities.getItemAttributeValueInList(this.downloadedEpisodes, episode, "ticket");
+		} else episode.setDownloaded(false);
 		
 		episode.marked = this.markedEpisodes.indexOf(episode.url) >= 0;
 	},
