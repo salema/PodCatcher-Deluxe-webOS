@@ -83,7 +83,8 @@ Utilities.startsWithValidProtocol = function(url) {
  * Create an unique, no-hassle filename for a downloaded file
  */
 Utilities.createUniqueFilename = function(url) {
-	var splits = url.split(".");
+	var urlToFile = url.split("?")[0];
+	var splits = urlToFile.split(".");
 	return new Date().getTime() + "." + splits[splits.length - 1];
 };
 
