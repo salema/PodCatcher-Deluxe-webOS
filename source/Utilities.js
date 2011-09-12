@@ -21,6 +21,18 @@
 function Utilities() {}
 
 /**
+ * Prepare a call to the AJAX service given
+ */
+Utilities.prepareFeedService = function(service, url, user, pass) {
+	service.setUrl(encodeURI(url));
+	
+	if (user && pass && user.length > 0) {
+		service.setUsername(user);
+		service.setPassword(pass);
+	}
+},
+
+/**
  * Convert a time given in seconds with many digits to HH:MM:SS
  */
 Utilities.formatTime = function(time) {

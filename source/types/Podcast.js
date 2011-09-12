@@ -41,6 +41,8 @@ Podcast.prototype.readFromJSON = function(data) {
 	this.title = data.title;
 	//this.description = data.description;
 	this.image = data.image;
+	this.user = data.user;
+	this.pass = data.pass;
 };
 
 Podcast.prototype.isValidXML = function(xmlDocument) {

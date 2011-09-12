@@ -109,7 +109,7 @@ enyo.kind({
 		this.prepareLoad($L($L("Select from") + " \"" + podcast.title + "\""), false, false, false);
 		this.podcastList.push(podcast);
 		
-		this.$.grabPodcast.setUrl(encodeURI(podcast.url));
+		Utilities.prepareFeedService(this.$.grabPodcast, podcast.url, podcast.user, podcast.pass);
 		this.$.grabPodcast.call();
 	},
 	
@@ -118,7 +118,8 @@ enyo.kind({
 		
 		for (var index = 0; index < podcastList.length; index++) {
 			this.podcastList.push(podcastList[index]);
-			this.$.grabPodcast.setUrl(encodeURI(podcastList[index].url));
+			Utilities.prepareFeedService(this.$.grabPodcast, podcastList[index].url,
+					podcastList[index].user, podcastList[index].pass);
 			this.$.grabPodcast.call();
 		}
 	},
