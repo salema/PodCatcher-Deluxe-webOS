@@ -253,7 +253,7 @@ enyo.kind({
 	checkLoadFinished: function() {
 		if (this.loadCounter == this.podcastList.length) {
 			if (this.episodeList.length === 0) this.loadFailed();
-			else this.afterLoad(this.podcastList.length > 1);
+			else this.afterLoad(true);
 		}
 	},
 	
