@@ -30,6 +30,7 @@ enyo.kind({
 	width: "70%",
 	components: [
 		{kind: "WebService", name: "grabPodcastService", onSuccess: "grabPodcastSuccess", onFailure: "grabPodcastFailed"},
+		{kind: "Net.Alliknow.PodCatcher.LoginPopup", name: "loginPopup", onLogin: "addPodcast"},
 		{kind: "VFlexBox", components: [
 			{kind: "HFlexBox", align: "center", components: [
 				{kind: "Input", name: "urlInput", hint: $L("Insert Podcast URL here"), inputType: "url", flex: 1,
@@ -51,6 +52,7 @@ enyo.kind({
 		this.$.urlInput.setDisabled(false);
 		this.$.addButton.setDisabled(false);
 		
+
 		// call for clipboard contents (maybe a podcast feed url?!)
 		enyo.dom.getClipboard(enyo.bind(this, this.gotClipboard));
 	},
@@ -61,6 +63,7 @@ enyo.kind({
 
 	addPodcast: function() {
 		// update UI
+		this.$.loginPopup.close();
 		this.$.error.setStyle("display: none");
 		this.$.loadSpinner.show();
 		this.$.urlInput.setDisabled(true);
@@ -71,7 +74,8 @@ enyo.kind({
 			this.$.urlInput.setValue("http://" + this.$.urlInput.getValue());
 		
 		// Try to grab podcast
-		this.$.grabPodcastService.setUrl(encodeURI(this.$.urlInput.getValue()));
+		Utilities.prepareFeedService(this.$.grabPodcastService, this.$.urlInput.getValue(),
+				this.$.loginPopup.getUser(), this.$.loginPopup.getPass());
 		this.$.grabPodcastService.call();
 	},
 	
@@ -80,14 +84,20 @@ enyo.kind({
 		
 		if (podcast.isValidXML(response)) {
 			podcast.readFromXML(response);
+			podcast.user = this.$.loginPopup.getUser();
+			podcast.pass = this.$.loginPopup.getPass();
 			
 			this.doAddPodcast(podcast);
 			this.close();
 		} else this.grabPodcastFailed();
 	},
 	
-	grabPodcastFailed: function(sender, response) {
-		this.warn(response);
+	grabPodcastFailed: function(sender, response, request) {
+		if (request && request.xhr.status === 401) this.$.loginPopup.openAtCenter();
+		else this.showFailed();
+	},
+	
+	showFailed: function() {
 		this.$.error.setContent($L("Your podcast failed to load. Please check the URL and make sure you are online. Tap anywhere outside this window to cancel."));
 		this.$.error.setStyle("display: block");
 		
