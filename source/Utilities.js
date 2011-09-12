@@ -59,6 +59,8 @@ Utilities.formatDownloadStatus = function(data) {
 	
 	if (percent == 100 && !data.completed) percent = undefined;
 	
+	if (percent == 100 && !data.completed) percent = undefined;
+	
 	return this.formatNumber(percent) + "% (" + this.formatNumber(received) +
 			" " + $L("of") + " " + this.formatNumber(total) + "MB)";
 };
@@ -85,7 +87,8 @@ Utilities.startsWithValidProtocol = function(url) {
  * Create an unique, no-hassle filename for a downloaded file
  */
 Utilities.createUniqueFilename = function(url) {
-	var splits = url.split(".");
+	var urlToFile = url.split("?")[0];
+	var splits = urlToFile.split(".");
 	return new Date().getTime() + "." + splits[splits.length - 1];
 };
 

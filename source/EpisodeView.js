@@ -49,7 +49,7 @@ enyo.kind({
 		{kind: "Scroller", name: "episodeScroller", flex: 1, style: "margin: 5px 12px", components: [
 			{kind: "HtmlContent", name: "episodeDescription", onLinkClick: "doOpenInBrowser", flex: 1}
 		]},
-		{kind: "ProgressSlider", name: "playSlider", style: "margin: 10px;", onChange: "seek", maximum: 0},
+		{kind: "ProgressSlider", name: "playSlider", style: "margin: 10px;", onChanging: "seeking", onChange: "seek", maximum: 0},
 		{kind: "Toolbar", className: "toolbar", components: [
 			{kind: "GrabButton", style: "position: static"},
 			{kind: "ToolButton", name: "playButton", caption: $L("Play"), onclick: "togglePlay", disabled: true, flex: 1},
@@ -197,11 +197,29 @@ enyo.kind({
 		}		
 	},
 	
+	seeking: function(sender, currentlyAt) {
+		if (this.player.readyState === 0 || this.$.playButton.getDisabled()) return;
+		
+		if (this.plays) clearInterval(this.playtimeInterval);
+		
+		if (this.plays) 
+			this.$.playButton.setCaption($L("Pause at") + " " + Utilities.formatTime(currentlyAt) + " " +
+				$L("of") + " " + Utilities.formatTime(this.player.duration));
+		else this.$.playButton.setCaption($L("Resume at") + " " + Utilities.formatTime(currentlyAt) + " " +
+				$L("of") + " " + Utilities.formatTime(this.player.duration));
+	},
+	
 	seek: function(sender, seekTo) {
 		if (this.player.readyState === 0 || this.$.playButton.getDisabled()) return;
 		
 		this.player.currentTime = seekTo;
+		
 		this.updatePlaytime();
+		if (this.plays) {
+			// just in case this has not been cleared by seeking before (we do not want multiple intervals!)
+			clearInterval(this.playtimeInterval);
+			this.playtimeInterval = setInterval(enyo.bind(this, this.updatePlaytime), 1000);
+		}
 	},
 	
 	updatePlaytime: function() {
@@ -225,7 +243,14 @@ enyo.kind({
 	updatePlaySlider: function () {
 		this.$.playSlider.setMaximum(this.player.duration);
 		this.$.playSlider.setBarMaximum(this.player.duration);
-		this.$.playSlider.setPosition(this.player.currentTime);
+		
+		// Change position only if not seeking, i.e. delta is small
+		// Also, there are special conditions for the start of the episode and seeking
+		// non-playing state
+		var delta = this.player.currentTime - this.$.playSlider.getPosition();
+		if ((this.player.currentTime > 0 && this.player.currentTime <= 1) || 
+			(delta > 0 && delta <= 1)) this.$.playSlider.setPosition(this.player.currentTime);
+		
 		if (this.player.buffered.length > 0)
 			this.$.playSlider.setBarPosition(this.player.buffered.end(this.player.buffered.length - 1));
 	},
