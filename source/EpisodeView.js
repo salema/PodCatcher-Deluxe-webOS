@@ -148,20 +148,8 @@ enyo.kind({
 	},
 	
 	createTimeString: function() {
-		return this.formatTime(this.$.sound.audio.currentTime) + " " +  $L("of") + " " +
-			this.formatTime(this.$.sound.audio.duration);
-	},
-	
-	// Convert a time given in seconds with many digits to MM:SS
-	formatTime: function(time) {
-		var minutes = Math.floor(Math.floor(time) / 60);
-		var seconds = Math.floor(time) % 60;
-		
-		if (isNaN(minutes) || !isFinite(minutes)) minutes = "--";
-		if (isNaN(seconds) || !isFinite(seconds)) seconds = "--"; 
-		else if (seconds < 10) seconds = "0" + seconds;
-		
-		return  minutes + ":" + seconds; 
+		return Utilities.formatTime(this.$.sound.audio.currentTime) + " " +  $L("of") + " " +
+				Utilities.formatTime(this.$.sound.audio.duration);
 	},
 	
 	showError: function(text) {
