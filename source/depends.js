@@ -5,5 +5,6 @@ enyo.depends(
 	"EpisodeList.js",
 	"EpisodeView.js",
 	"AddPodcastPopup.js",
+	"LoginPopup.js",
 	"Utilities.js"
 );
