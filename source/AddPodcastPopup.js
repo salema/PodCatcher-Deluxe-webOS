@@ -38,7 +38,7 @@ enyo.kind({
 				{kind: "Spinner", name: "loadSpinner"},
 				{kind: "Button", name: "addButton", content: $L("Add Podcast"), onclick: "addPodcast"}
 			]},
-			{name: "error", style: "display: none;", className: "error"}
+			{name: "error", showing: false, className: "error"}
 		]}
 	],
 	
@@ -47,7 +47,7 @@ enyo.kind({
 		
 		// update UI
 		this.$.urlInput.setValue("");
-		this.$.error.setStyle("display: none");
+		this.$.error.hide();
 		this.$.loadSpinner.hide();
 		this.$.urlInput.setDisabled(false);
 		this.$.addButton.setDisabled(false);
@@ -64,7 +64,7 @@ enyo.kind({
 	addPodcast: function() {
 		// update UI
 		this.$.loginPopup.close();
-		this.$.error.setStyle("display: none");
+		this.$.error.hide();
 		this.$.loadSpinner.show();
 		this.$.urlInput.setDisabled(true);
 		this.$.addButton.setDisabled(true);
@@ -99,7 +99,7 @@ enyo.kind({
 	
 	showFailed: function() {
 		this.$.error.setContent($L("Your podcast failed to load. Please check the URL and make sure you are online. Tap anywhere outside this window to cancel."));
-		this.$.error.setStyle("display: block");
+		this.$.error.show();
 		
 		this.$.urlInput.setDisabled(false);
 		this.$.addButton.setDisabled(false);
