@@ -77,7 +77,7 @@ Utilities.formatNumber = function(number, makeTwoDigits) {
  * Check whether given string starts with a valid web protocol identifier
  */
 Utilities.startsWithValidProtocol = function(url) {
-	return url !== undefined && url.length > 8 && 
+	return url !== undefined && url.length >= 7 && 
 		(url.substring(0, 7) == "http://" || url.substring(0, 8) == "https://");
 };
 
