@@ -40,7 +40,7 @@ enyo.kind({
 			{name: "episodeName", content: $L("Listen"), className: "nowrap", flex: 1},
 			{kind: "Spinner", name: "stalledSpinner", align: "right"}
 		]},
-		{kind: "HtmlContent", name: "videoInfo", className: "info", onLinkClick: "doOpenInBrowser", style: "display: none;", content: $L("This episode has video content. You might want to give <a href=\"http://developer.palm.com/appredirect/?packageid=net.alliknow.videocatcher\">Video PodCatcher Deluxe</a> a try.")},
+		{kind: "HtmlContent", name: "videoInfo", className: "info", onLinkClick: "doOpenInBrowser", showing: false, content: $L("This episode has video content. You might want to give <a href=\"http://developer.palm.com/appredirect/?packageid=net.alliknow.videocatcher\">Video PodCatcher Deluxe</a> a try.")},
 		{kind: "Video", showControls: false, showing: false},
 		{kind: "Button", name: "downloadButton", caption: $L("Download"), onclick: "startStopDelete"},
 		{kind: "Net.Alliknow.PodCatcher.DownloadManager", name: "downloadManager", style: "display: block;", onStatusUpdate: "downloadStatusUpdate", 
@@ -304,7 +304,7 @@ enyo.kind({
 	},
 	
 	updateUIOnSetEpisode: function(episode) {
-		this.$.videoInfo.setStyle("display: none;");
+		this.$.videoInfo.hide();
 		this.$.error.hide();
 		this.$.playButton.setCaption($L("Play"));
 		this.$.playButton.setDisabled(false);
