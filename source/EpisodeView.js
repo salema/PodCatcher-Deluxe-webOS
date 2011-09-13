@@ -33,7 +33,7 @@ enyo.kind({
 			{kind: "Spinner", name: "stalledSpinner", align: "right"}
 		]},
 		{kind: "Sound"},
-		{name: "error", style: "display: none", className: "error"},
+		{name: "error", showing: false, className: "error"},
 		{kind: "Scroller", name: "episodeScroller", flex: 1, style: "margin: 5px 12px", components: [
 			{kind: "HtmlContent", name: "episodeDescription", onLinkClick: "doOpenInBrowser", flex: 1}
 		]},
@@ -59,13 +59,13 @@ enyo.kind({
 	
 	setEpisode: function(episode) {
 		// Don't do anything if same episode is set again
-		if (episode.url == this.$.sound.getSrc()) this.$.error.setStyle("display: none;");
+		if (episode.url == this.$.sound.getSrc()) this.$.error.hide();
 		else if (this.plays) this.showError($L("Playback active, please pause before switching."));
 		else {
 			this.episode = episode;
 			
 			// Update UI
-			this.$.error.setStyle("display: none;");
+			this.$.error.hide();
 			this.$.playButton.setCaption($L("Play"));
 			this.$.playButton.setDisabled(false);
 			this.$.stalledSpinner.hide();
@@ -179,6 +179,7 @@ enyo.kind({
 	
 	showError: function(text) {
 		this.$.error.setContent(text);
-		this.$.error.setStyle("display: block; width: 100%; text-align: center; padding-bottom: 5px; border-bottom: 1px solid gray;");
+		this.$.error.show();
+		this.$.error.setStyle("width: 100%; text-align: center; padding-bottom: 5px; border-bottom: 1px solid gray;");
 	}
 });

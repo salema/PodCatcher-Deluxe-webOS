@@ -32,7 +32,7 @@ enyo.kind({
 			{content: $L("Select"), name: "selectedPodcastName", className: "nowrap", flex: 1},
 			{kind: "Spinner", name: "episodeSpinner", align: "right"}
 		]},
-		{name: "error", style: "display: none", className: "error"},
+		{name: "error", showing: false, className: "error"},
 		{kind: "Scroller", name: "episodeListScroller", flex: 1, components: [
 			{kind: "VirtualRepeater", name: "episodeListVR", onSetupRow: "getEpisode", onclick: "selectEpisode", components: [
 				{kind: "Item", layout: "HFlexBox", components: [
@@ -136,14 +136,15 @@ enyo.kind({
 	loadFailed: function() {
 		this.warn("Failed to load podcast feed");
 		this.$.error.setContent($L("The podcast feed failed to load. Please make sure you are online."));
-		this.$.error.setStyle("display: block; color: red;");
+		this.$.error.setStyle("color: red;");
+		this.$.error.show();
 		this.$.episodeSpinner.hide();
 	},
 	
 	prepareLoad: function (paneTitle, showPodcastTitles) {
 		this.$.selectedPodcastName.setContent(paneTitle);
 		this.$.episodeSpinner.show();
-		this.$.error.setStyle("display: none;");
+		this.$.error.hide();
 		
 		this.showPodcastTitle = showPodcastTitles;
 		this.selectedIndex = -1;
