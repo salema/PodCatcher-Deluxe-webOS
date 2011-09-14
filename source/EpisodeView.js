@@ -33,11 +33,11 @@ enyo.kind({
 			{kind: "Spinner", name: "stalledSpinner", align: "right"}
 		]},
 		{kind: "Sound"},
-		{name: "error", style: "display: none", className: "error"},
+		{name: "error", showing: false, className: "error"},
 		{kind: "Scroller", name: "episodeScroller", flex: 1, style: "margin: 5px 12px", components: [
 			{kind: "HtmlContent", name: "episodeDescription", onLinkClick: "doOpenInBrowser", flex: 1}
 		]},
-		{kind: "ProgressSlider", name: "playSlider", style: "margin: 10px;", onChange: "seek", maximum: 0},
+		{kind: "ProgressSlider", name: "playSlider", style: "margin: 10px;", onChanging: "seeking", onChange: "seek", maximum: 0},
 		{kind: "Toolbar", className: "toolbar", components: [
 			{kind: "GrabButton", style: "position: static"},
 			{kind: "ToolButton", name: "playButton", caption: $L("Play"), onclick: "togglePlay", disabled: true, flex: 1}
@@ -59,13 +59,13 @@ enyo.kind({
 	
 	setEpisode: function(episode) {
 		// Don't do anything if same episode is set again
-		if (episode.url == this.$.sound.getSrc()) this.$.error.setStyle("display: none;");
+		if (episode.url == this.$.sound.getSrc()) this.$.error.hide();
 		else if (this.plays) this.showError($L("Playback active, please pause before switching."));
 		else {
 			this.episode = episode;
 			
 			// Update UI
-			this.$.error.setStyle("display: none;");
+			this.$.error.hide();
 			this.$.playButton.setCaption($L("Play"));
 			this.$.playButton.setDisabled(false);
 			this.$.stalledSpinner.hide();
@@ -96,6 +96,18 @@ enyo.kind({
 		}
 	},
 	
+	seeking: function(sender, currentlyAt) {
+		if (this.player.readyState === 0 || this.$.playButton.getDisabled()) return;
+		
+		if (this.plays) clearInterval(this.playtimeInterval);
+		
+		if (this.plays) 
+			this.$.playButton.setCaption($L("Pause at") + " " + Utilities.formatTime(currentlyAt) + " " +
+				$L("of") + " " + Utilities.formatTime(this.player.duration));
+		else this.$.playButton.setCaption($L("Resume at") + " " + Utilities.formatTime(currentlyAt) + " " +
+				$L("of") + " " + Utilities.formatTime(this.player.duration));
+	},
+	
 	seek: function(sender, seekTo) {
 		if (this.$.sound.audio.readyState === 0 || this.$.playButton.getDisabled()) return;
 		
@@ -103,6 +115,11 @@ enyo.kind({
 		this.$.playSlider.setPosition(seekTo);
 
 		this.updatePlaytime();
+		if (this.plays) {
+			// just in case this has not been cleared by seeking before (we do not want multiple intervals!)
+			clearInterval(this.playtimeInterval);
+			this.playtimeInterval = setInterval(enyo.bind(this, this.updatePlaytime), 1000);
+		}
 	},
 	
 	updatePlaytime: function() {
@@ -160,6 +177,7 @@ enyo.kind({
 	
 	showError: function(text) {
 		this.$.error.setContent(text);
-		this.$.error.setStyle("display: block; width: 100%; text-align: center; padding-bottom: 5px; border-bottom: 1px solid gray;");
+		this.$.error.show();
+		this.$.error.setStyle("width: 100%; text-align: center; padding-bottom: 5px; border-bottom: 1px solid gray;");
 	}
 });

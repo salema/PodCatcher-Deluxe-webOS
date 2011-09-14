@@ -22,7 +22,7 @@ enyo.kind({
 	name: "Net.Alliknow.PodCatcher.AddPodcastPopup",
 	kind: "ModalDialog",
 	caption: $L("Add a new Podcast"),
-	scrim: false,
+	scrim: true,
 	dismissWithClick: true,
 	events: {
 		onAddPodcast: ""
@@ -31,6 +31,7 @@ enyo.kind({
 	components: [
 		{kind: "WebService", name: "grabPodcastService", onSuccess: "grabPodcastSuccess", onFailure: "grabPodcastFailed"},
 		{kind: "Net.Alliknow.PodCatcher.LoginPopup", name: "loginPopup", onLogin: "addPodcast"},
+		{kind: "Net.Alliknow.PodCatcher.SuggestPopup", name: "suggestPopup", onAddSuggestion: "addSuggestion"},
 		{kind: "VFlexBox", components: [
 			{kind: "HFlexBox", align: "center", components: [
 				{kind: "Input", name: "urlInput", hint: $L("Insert Podcast URL here"), inputType: "url", flex: 1, 
@@ -38,8 +39,8 @@ enyo.kind({
 				{kind: "Spinner", name: "loadSpinner"},
 				{kind: "Button", name: "addButton", content: $L("Add Podcast"), onclick: "addPodcast"}
 			]},
-			{name: "error", style: "display: none;", className: "error"},
-			{kind: "Button", content: $L("I don't know. Show me some suggestions..."), style: "margin-top: 8px;", onclick: ""}
+			{name: "error", showing: false, className: "error"},
+			{kind: "Button", content: $L("Show suggestions..."), style: "margin-top: 10px;", onclick: "showSuggestions"}
 		]},
 	],
 	
@@ -47,7 +48,7 @@ enyo.kind({
 		this.inherited(arguments);
 		
 		this.$.urlInput.setValue("");
-		this.$.error.setStyle("display: none");
+		this.$.error.hide();
 		this.$.loadSpinner.hide();
 		this.$.urlInput.setDisabled(false);
 		this.$.addButton.setDisabled(false);
@@ -58,11 +59,16 @@ enyo.kind({
 	gotClipboard: function(inText) {
 		if (Utilities.startsWithValidProtocol(inText)) this.$.urlInput.setValue(inText);
 	},
+	
+	showSuggestions: function() {
+		this.close();
+		this.$.suggestPopup.openAtCenter();
+	},
 
 	addPodcast: function() {
 		// update UI
 		this.$.loginPopup.close();
-		this.$.error.setStyle("display: none");
+		this.$.error.hide();
 		this.$.loadSpinner.show();
 		this.$.urlInput.setDisabled(true);
 		this.$.addButton.setDisabled(true);
@@ -77,8 +83,14 @@ enyo.kind({
 		this.$.grabPodcastService.call();
 	},
 	
+	addSuggestion: function(sender, url) {
+		// Try to grab podcast
+		Utilities.prepareFeedService(this.$.grabPodcastService, url);
+		this.$.grabPodcastService.call();
+	},
+	
 	grabPodcastSuccess: function(inSender, inResponse, inRequest) {
-		var podcast = new Podcast(this.$.urlInput.getValue());
+		var podcast = new Podcast(inRequest.url);
 		
 		if (podcast.isValid(inResponse)) {
 			podcast.read(inResponse);
@@ -97,7 +109,7 @@ enyo.kind({
 	
 	showFailed: function() {
 		this.$.error.setContent($L("Your podcast failed to load. Please check the URL and make sure you are online. Tap anywhere outside this window to cancel."));
-		this.$.error.setStyle("display: block");
+		this.$.error.show();
 		
 		this.$.urlInput.setDisabled(false);
 		this.$.addButton.setDisabled(false);
