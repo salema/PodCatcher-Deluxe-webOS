@@ -36,7 +36,7 @@ enyo.kind({
 			{content: $L("Select"), name: "selectedPodcastName", className: "nowrap", flex: 1},
 			{kind: "Spinner", name: "episodeSpinner", align: "right"}
 		]},
-		{name: "error", style: "display: none", className: "error"},
+		{name: "error", showing: false, className: "error"},
 		{kind: "Scroller", name: "episodeListScroller", flex: 1, components: [
 			{kind: "VirtualRepeater", name: "episodeListVR", onSetupRow: "getEpisode", onclick: "selectEpisode", components: [
 				{kind: "SwipeableItem", layout: "HFlexBox", onConfirm: "togglePlaylist", allowLeft: false, confirmRequired: false, components: [
@@ -139,7 +139,8 @@ enyo.kind({
 		
 		if (this.playlist.length === 0) {
 			this.$.error.setContent($L("Your playlist is empty. Swipe any episode to the right in order to add it to the playlist."));
-			this.$.error.setStyle("display: block; color: gray;");
+			this.$.error.setStyle("color: gray;");
+			this.$.error.show();
 			this.$.episodeSpinner.hide();
 		} else {
 			for (var index = 0; index < this.playlist.length; index++)
@@ -161,7 +162,7 @@ enyo.kind({
 			var downloaded = Utilities.isInList(this.downloadedEpisodes, episode);
 			
 			if (!this.showAll && old) {
-				this.$.episodeTitle.parent.setStyle("display: none;");
+				this.$.episodeTitle.parent.hide();
 			} else {
 				// Put title
 				this.$.episodeTitle.setContent(episode.title);
@@ -261,7 +262,8 @@ enyo.kind({
 	loadFailed: function() {
 		this.warn("Failed to load podcast feed");
 		this.$.error.setContent($L("The podcast feed failed to load. Please make sure you are online."));
-		this.$.error.setStyle("display: block; color: red;");
+		this.$.error.setStyle("color: red;");
+		this.$.error.show();
 		this.$.episodeSpinner.hide();
 	},
 	
@@ -351,7 +353,7 @@ enyo.kind({
 		this.$.showPlaylistButton.setDisabled(showPlaylist);
 		this.$.showDownloadedButton.setDisabled(showDownloads || this.downloadedEpisodes.length === 0);
 		this.$.episodeSpinner.show();
-		this.$.error.setStyle("display: none;");
+		this.$.error.hide();
 		
 		this.showPodcastTitle = showPodcastTitles;
 		this.selectedIndex = -1;

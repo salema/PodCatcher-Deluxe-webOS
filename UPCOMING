@@ -1,7 +1,3 @@
 Podcast image in dashboard
-Support for password protected feeds
 Suggestions
-Better seeking (display time)
-Fix 100% downloaded before starting actual download
-Shade grey downloaded episodes in list
-Concurrent downloads
+Mark all old/new as AppMenu items

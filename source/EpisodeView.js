@@ -40,12 +40,12 @@ enyo.kind({
 			{name: "episodeName", content: $L("Listen"), className: "nowrap", flex: 1},
 			{kind: "Spinner", name: "stalledSpinner", align: "right"}
 		]},
-		{kind: "HtmlContent", name: "videoInfo", className: "info", onLinkClick: "doOpenInBrowser", style: "display: none;", content: $L("This episode has video content. You might want to give <a href=\"http://developer.palm.com/appredirect/?packageid=net.alliknow.videocatcher\">Video PodCatcher Deluxe</a> a try.")},
-		{kind: "Video", showControls: false, style: "display: none;"},
+		{kind: "HtmlContent", name: "videoInfo", className: "info", onLinkClick: "doOpenInBrowser", showing: false, content: $L("This episode has video content. You might want to give <a href=\"http://developer.palm.com/appredirect/?packageid=net.alliknow.videocatcher\">Video PodCatcher Deluxe</a> a try.")},
+		{kind: "Video", showControls: false, showing: false},
 		{kind: "Button", name: "downloadButton", caption: $L("Download"), onclick: "startStopDelete"},
 		{kind: "Net.Alliknow.PodCatcher.DownloadManager", name: "downloadManager", style: "display: block;", onStatusUpdate: "downloadStatusUpdate", 
 			onDownloadComplete: "downloadComplete", onCancelSuccess: "cancelSuccess", onDownloadFailed: "downloadFailed"},
-		{name: "error", style: "display: none", className: "error"},
+		{name: "error", showing: false, className: "error"},
 		{kind: "Scroller", name: "episodeScroller", flex: 1, style: "margin: 5px 12px", components: [
 			{kind: "HtmlContent", name: "episodeDescription", onLinkClick: "doOpenInBrowser", flex: 1}
 		]},
@@ -53,7 +53,7 @@ enyo.kind({
 		{kind: "Toolbar", className: "toolbar", components: [
 			{kind: "GrabButton", style: "position: static"},
 			{kind: "ToolButton", name: "playButton", caption: $L("Play"), onclick: "togglePlay", disabled: true, flex: 1},
-			{kind: "ToolButton", name: "nextButton", caption: $L("Next"), onclick: "doNext", style: "display: none;"}
+			{kind: "ToolButton", name: "nextButton", caption: $L("Next"), onclick: "doNext", showing: false}
 		]}
 	],
 
@@ -100,7 +100,7 @@ enyo.kind({
 		if (this.plays && episode.url != this.episode.url) 
 			this.showError($L("Playback active, please pause before switching."));
 		else if (this.plays) 
-			this.$.error.setStyle("display: none;");
+			this.$.error.hide();
 		else {
 			this.episode = episode;
 			this.resumeOnce = -1;
@@ -111,7 +111,7 @@ enyo.kind({
 			if (episode.isDownloaded) this.player.src = episode.file;
 			else this.player.src = episode.url;
 			
-			//this.log(this.player.src);
+			this.log(this.player.src);
 			
 			if (autoplay) this.togglePlay();
 		}
@@ -129,7 +129,7 @@ enyo.kind({
 			} // Delete downloaded file
 			else if (this.episode.isDownloaded) {
 				this.player.src = this.episode.url;
-				this.$.error.setStyle("display: none;");
+				this.$.error.hide();
 				this.$.downloadButton.setCaption($L("Download"));
 						
 				this.$.downloadManager.deleteDownload(this.episode);
@@ -146,7 +146,7 @@ enyo.kind({
 	
 	downloadComplete: function(sender, episode) {
 		if (this.episode.equals(episode)) {
-			this.$.error.setStyle("display: none;");
+			this.$.error.hide();
 			this.$.downloadButton.setCaption($L("Delete from device"));
 			
 			if (!this.plays) this.player.src = episode.file;
@@ -157,14 +157,14 @@ enyo.kind({
 	
 	cancelSuccess: function(sender, episode) {
 		if (this.episode.equals(episode)) {
-			this.$.error.setStyle("display: none;");
+			this.$.error.hide();
 			this.$.downloadButton.setCaption($L("Download"));
 		}
 	},
    
 	downloadFailed: function(sender, episode) {
 		if (this.episode.equals(episode)) {
-			this.$.error.setStyle("display: none;");
+			this.$.error.hide();
 			this.$.downloadButton.setCaption($L("Download failed"));
 		}
 	},
@@ -254,13 +254,13 @@ enyo.kind({
 	},
 	
 	updateVideoMode: function() {
-		if (this.isVideoContentAvailable()) this.$.videoInfo.setStyle("display: block;");
-		else this.$.videoInfo.setStyle("display: none;");
+		if (this.isVideoContentAvailable()) this.$.videoInfo.show();
+		else this.$.videoInfo.hide();
 	},
 	
 	playlistChanged: function(newLength) {
-		if (newLength > 0) this.$.nextButton.setStyle("display: block;");
-		else this.$.nextButton.setStyle("display: none;");
+		if (newLength > 0) this.$.nextButton.show();
+		else this.$.nextButton.hide();
 	},
 	
 	playbackEnded: function() {
@@ -302,7 +302,7 @@ enyo.kind({
 	},
 	
 	updateUIOnSetEpisode: function(episode) {
-		this.$.videoInfo.setStyle("display: none;");
+		this.$.videoInfo.hide();
 		this.$.error.hide();
 		this.$.playButton.setCaption($L("Play"));
 		this.$.playButton.setDisabled(false);
