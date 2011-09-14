@@ -119,8 +119,7 @@ enyo.kind({
 	},
 	
 	updateSuggestions: function() {
-		this.featured = this.filter(this.allFeatured)[0];
-		if (!this.featured) this.featured = this.allFeatured[0];
+		this.featured = this.pickFeatured();
 		
 		this.$.featuredTitle.setContent(this.featured.title);
 		this.$.featuredDetails.setContent(this.createMetadataString(this.featured));
@@ -129,6 +128,21 @@ enyo.kind({
 		this.currentSuggestions = this.filter(this.allSuggestions);
 		this.$.suggestListVR.render();
 		this.$.suggestScroller.scrollTo(0, 0);
+	},
+	
+	pickFeatured: function() {
+		var candidates = this.filter(this.allFeatured);
+		
+		// If there is no featured podcast for this filter combination
+		// find a podcast in the correct language at least
+		if (candidates.length === 0) 
+			for (var index = 0; index < this.allFeatured.length; index++)
+				if (this.accept(this.$.languagePicker, this.allFeatured[index], "language")) 
+					candidates.push(this.allFeatured[index]);
+			
+		if (candidates.length > 0) return candidates[Math.floor(candidates.length * Math.random())];
+		// last fallback
+		else return this.allFeatured[0];
 	},
 	
 	filter: function(list) {
