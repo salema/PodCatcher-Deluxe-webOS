@@ -48,7 +48,7 @@ enyo.kind({
 		this.inherited(arguments);
 		
 		this.plays = false;
-		this.sliderInterval = setInterval(enyo.bind(this, this.updatePlaySlider), 250);
+		this.sliderInterval = setInterval(enyo.bind(this, this.updatePlaySlider), 500);
 	},
 	
 	destroy: function() {
@@ -100,6 +100,8 @@ enyo.kind({
 		if (this.$.sound.audio.readyState === 0 || this.$.playButton.getDisabled()) return;
 		
 		this.$.sound.audio.currentTime = seekTo;
+		this.$.playSlider.setPosition(seekTo);
+
 		this.updatePlaytime();
 	},
 	
@@ -119,7 +121,11 @@ enyo.kind({
 	updatePlaySlider: function () {
 		this.$.playSlider.setMaximum(this.$.sound.audio.duration);
 		this.$.playSlider.setBarMaximum(this.$.sound.audio.duration);
-		this.$.playSlider.setPosition(this.$.sound.audio.currentTime);
+		
+		// Change position only if not seeking, i.e. delta is small
+		var delta = this.$.sound.audio.currentTime - this.$.playSlider.getPosition();
+		if (delta > 0 && delta <= 1) this.$.playSlider.setPosition(this.$.sound.audio.currentTime);
+		
 		if (this.$.sound.audio.buffered.length > 0)
 			this.$.playSlider.setBarPosition(this.$.sound.audio.buffered.end(this.$.sound.audio.buffered.length - 1));
 	},
