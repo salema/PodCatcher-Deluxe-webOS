@@ -61,7 +61,7 @@ enyo.kind({
 		this.inherited(arguments);
 		
 		this.plays = false;
-		this.sliderInterval = setInterval(enyo.bind(this, this.updatePlaySlider), 250);
+		this.sliderInterval = setInterval(enyo.bind(this, this.updatePlaySlider), 500);
 		this.videoInterval = setInterval(enyo.bind(this, this.updateVideoMode), 1000);
 		
 		this.$.preferencesService.call({keys: ["resumeEpisode", "resumeTime"]},	{method: "getPreferences", onSuccess: "resume"});
@@ -213,6 +213,7 @@ enyo.kind({
 		if (this.player.readyState === 0 || this.$.playButton.getDisabled()) return;
 		
 		this.player.currentTime = seekTo;
+		this.$.playSlider.setPosition(seekTo);
 		
 		this.updatePlaytime();
 		if (this.plays) {
@@ -245,11 +246,8 @@ enyo.kind({
 		this.$.playSlider.setBarMaximum(this.player.duration);
 		
 		// Change position only if not seeking, i.e. delta is small
-		// Also, there are special conditions for the start of the episode and seeking
-		// non-playing state
 		var delta = this.player.currentTime - this.$.playSlider.getPosition();
-		if ((this.player.currentTime > 0 && this.player.currentTime <= 1) || 
-			(delta > 0 && delta <= 1)) this.$.playSlider.setPosition(this.player.currentTime);
+		if (delta > 0 && delta <= 1) this.$.playSlider.setPosition(this.player.currentTime);
 		
 		if (this.player.buffered.length > 0)
 			this.$.playSlider.setBarPosition(this.player.buffered.end(this.player.buffered.length - 1));
