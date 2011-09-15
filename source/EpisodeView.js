@@ -48,7 +48,7 @@ enyo.kind({
 		this.inherited(arguments);
 		
 		this.plays = false;
-		this.sliderInterval = setInterval(enyo.bind(this, this.updatePlaySlider), 250);
+		this.sliderInterval = setInterval(enyo.bind(this, this.updatePlaySlider), 500);
 	},
 	
 	destroy: function() {
@@ -112,7 +112,8 @@ enyo.kind({
 		if (this.$.sound.audio.readyState === 0 || this.$.playButton.getDisabled()) return;
 		
 		this.$.sound.audio.currentTime = seekTo;
-		
+		this.$.playSlider.setPosition(seekTo);
+
 		this.updatePlaytime();
 		if (this.plays) {
 			// just in case this has not been cleared by seeking before (we do not want multiple intervals!)
@@ -139,11 +140,8 @@ enyo.kind({
 		this.$.playSlider.setBarMaximum(this.$.sound.audio.duration);
 		
 		// Change position only if not seeking, i.e. delta is small
-		// Also, there are special conditions for the start of the episode and seeking
-		// non-playing state
 		var delta = this.$.sound.audio.currentTime - this.$.playSlider.getPosition();
-		if ((this.$.sound.audio.currentTime > 0 && this.$.sound.audio.currentTime <= 1) || 
-			(delta > 0 && delta <= 1)) this.$.playSlider.setPosition(this.$.sound.audio.currentTime);
+		if (delta > 0 && delta <= 1) this.$.playSlider.setPosition(this.$.sound.audio.currentTime);
 		
 		if (this.$.sound.audio.buffered.length > 0)
 			this.$.playSlider.setBarPosition(this.$.sound.audio.buffered.end(this.$.sound.audio.buffered.length - 1));
