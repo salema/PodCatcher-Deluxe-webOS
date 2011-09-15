@@ -64,6 +64,16 @@ enyo.kind({
 		this.$.episodeViewPane.reloadMarkedStatus();
 	},
 	
+	markAll: function() {
+		this.$.episodeListPane.markAll(true);
+		this.$.episodeViewPane.reloadMarkedStatus();
+	},
+	
+	unmarkAll: function() {
+		this.$.episodeListPane.markAll(false);
+		this.$.episodeViewPane.reloadMarkedStatus();
+	},
+	
 	podcastSelected: function(sender, podcast) {
 		this.$.episodeListPane.setPodcast(podcast);
 	},
