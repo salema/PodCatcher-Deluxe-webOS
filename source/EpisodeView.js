@@ -48,7 +48,7 @@ enyo.kind({
 		{kind: "Scroller", name: "episodeScroller", flex: 1, style: "margin: 5px 12px", components: [
 			{kind: "HtmlContent", name: "episodeDescription", onLinkClick: "doOpenInBrowser", flex: 1}
 		]},
-		{kind: "ProgressSlider", name: "playSlider", style: "margin: 10px;", onChanging: "seeking", onChange: "seek", maximum: 0},
+		{kind: "ProgressSlider", name: "playSlider", style: "margin: 10px;", onChanging: "seeking", onChange: "seek", tapPosition: false},
 		{kind: "Toolbar", className: "toolbar", components: [
 			{kind: "GrabButton", style: "position: static"},
 			{kind: "ToolButton", name: "playButton", caption: $L("Play"), onclick: "togglePlay", disabled: true, flex: 1},
@@ -187,18 +187,16 @@ enyo.kind({
 			this.resumeOnce = -1;
 			
 			this.player.play();
-			this.updatePlaytime();
 			this.playtimeInterval = setInterval(enyo.bind(this, this.updatePlaytime), 1000);
 		} else {
 			this.player.pause();
-			this.updatePlaytime();
 			clearInterval(this.playtimeInterval);
-		}		
+		}
+		
+		this.updatePlaytime();
 	},
 	
 	seeking: function(sender, currentlyAt) {
-		if (this.player.readyState === 0 || this.$.playButton.getDisabled()) return;
-		
 		if (this.plays) clearInterval(this.playtimeInterval);
 		
 		if (this.plays) 
@@ -209,10 +207,9 @@ enyo.kind({
 	},
 	
 	seek: function(sender, seekTo) {
-		if (this.player.readyState === 0 || this.$.playButton.getDisabled()) return;
-		
 		this.player.currentTime = seekTo;
-		this.$.playSlider.setPosition(seekTo);
+		// If seeking after playback ended
+		this.$.playButton.setDisabled(false);
 		
 		this.updatePlaytime();
 		if (this.plays) {
@@ -244,9 +241,7 @@ enyo.kind({
 		this.$.playSlider.setMaximum(this.player.duration);
 		this.$.playSlider.setBarMaximum(this.player.duration);
 		
-		// Change position only if not seeking, i.e. delta is small
-		var delta = this.player.currentTime - this.$.playSlider.getPosition();
-		if (delta > 0 && delta <= 1) this.$.playSlider.setPosition(this.player.currentTime);
+		this.$.playSlider.setPosition(this.player.currentTime);
 		
 		if (this.player.buffered.length > 0)
 			this.$.playSlider.setBarPosition(this.player.buffered.end(this.player.buffered.length - 1));
@@ -284,6 +279,7 @@ enyo.kind({
 	stopPlayback: function(buttonText) {
 		clearInterval(this.playtimeInterval);
 		this.plays = false;
+		this.player.pause();
 				
 		this.$.playButton.setCaption(buttonText);
 		this.$.playButton.setDisabled(true);
