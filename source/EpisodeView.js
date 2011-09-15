@@ -37,7 +37,7 @@ enyo.kind({
 		{kind: "Scroller", name: "episodeScroller", flex: 1, style: "margin: 5px 12px", components: [
 			{kind: "HtmlContent", name: "episodeDescription", onLinkClick: "doOpenInBrowser", flex: 1}
 		]},
-		{kind: "ProgressSlider", name: "playSlider", style: "margin: 10px;", onChanging: "seeking", onChange: "seek", maximum: 0},
+		{kind: "ProgressSlider", name: "playSlider", style: "margin: 10px;", onChanging: "seeking", onChange: "seek", tapPosition: false},
 		{kind: "Toolbar", className: "toolbar", components: [
 			{kind: "GrabButton", style: "position: static"},
 			{kind: "ToolButton", name: "playButton", caption: $L("Play"), onclick: "togglePlay", disabled: true, flex: 1}
@@ -68,12 +68,12 @@ enyo.kind({
 			this.$.error.hide();
 			this.$.playButton.setCaption($L("Play"));
 			this.$.playButton.setDisabled(false);
-			this.$.stalledSpinner.hide();
 			this.$.episodeName.setContent($L("Listen to") + " \"" + episode.title + "\"");
 			this.$.episodeDescription.setContent(episode.description);
 			this.$.episodeScroller.scrollTo(0, 0);
 			this.$.playSlider.setPosition(0);
 			this.$.playSlider.setBarPosition(0);
+			
 			// Set sound source
 			this.$.sound.setSrc(episode.url);
 		}
@@ -85,40 +85,40 @@ enyo.kind({
 		
 		if (this.plays) {
 			this.$.sound.play();
+			
 			this.updatePlaytime();
 			this.interval = setInterval(enyo.bind(this, this.updatePlaytime), 1000);
 		} else {
 			this.$.sound.audio.pause();
+			
+			clearInterval(this.interval);
 			if (this.isAtStartOfPlayback()) this.$.playButton.setCaption($L("Play"));
 			else this.$.playButton.setCaption($L("Resume at") + " " + this.createTimeString());
+			
 			this.$.stalledSpinner.hide();
-			clearInterval(this.interval);
 		}
 	},
 	
 	seeking: function(sender, currentlyAt) {
-		if (this.player.readyState === 0 || this.$.playButton.getDisabled()) return;
-		
-		if (this.plays) clearInterval(this.playtimeInterval);
+		if (this.plays) clearInterval(this.interval);
 		
 		if (this.plays) 
 			this.$.playButton.setCaption($L("Pause at") + " " + Utilities.formatTime(currentlyAt) + " " +
-				$L("of") + " " + Utilities.formatTime(this.player.duration));
+				$L("of") + " " + Utilities.formatTime(this.$.sound.audio.duration));
 		else this.$.playButton.setCaption($L("Resume at") + " " + Utilities.formatTime(currentlyAt) + " " +
-				$L("of") + " " + Utilities.formatTime(this.player.duration));
+				$L("of") + " " + Utilities.formatTime(this.$.sound.audio.duration));
 	},
 	
 	seek: function(sender, seekTo) {
-		if (this.$.sound.audio.readyState === 0 || this.$.playButton.getDisabled()) return;
-		
 		this.$.sound.audio.currentTime = seekTo;
-		this.$.playSlider.setPosition(seekTo);
-
+		// If seeking after playback ended
+		this.$.playButton.setDisabled(false);
+		
 		this.updatePlaytime();
 		if (this.plays) {
 			// just in case this has not been cleared by seeking before (we do not want multiple intervals!)
-			clearInterval(this.playtimeInterval);
-			this.playtimeInterval = setInterval(enyo.bind(this, this.updatePlaytime), 1000);
+			clearInterval(this.interval);
+			this.interval = setInterval(enyo.bind(this, this.updatePlaytime), 1000);
 		}
 	},
 	
@@ -128,9 +128,14 @@ enyo.kind({
 		else this.$.stalledSpinner.hide();
 		
 		// Update play button
-		if (this.isAtStartOfPlayback()) this.$.playButton.setCaption($L("Pause"));
-		else if (this.isAtEndOfPlayback()) this.stopPlayback($L("Playback complete"));
-		else this.$.playButton.setCaption($L("Pause at") + " " + this.createTimeString());
+		if (this.plays) {
+			if (this.isAtStartOfPlayback()) this.$.playButton.setCaption($L("Pause"));
+			else if (this.isAtEndOfPlayback()) this.stopPlayback($L("Playback complete"));
+			else this.$.playButton.setCaption($L("Pause at") + " " + this.createTimeString());
+		} else {
+			if (this.isAtStartOfPlayback()) this.$.playButton.setCaption($L("Play"));
+			else this.$.playButton.setCaption($L("Resume at") + " " + this.createTimeString());
+		}
 		
 		if (this.$.sound.audio.error > 0) this.stopPlayback($L("Playback failed"));
 	},
@@ -139,9 +144,7 @@ enyo.kind({
 		this.$.playSlider.setMaximum(this.$.sound.audio.duration);
 		this.$.playSlider.setBarMaximum(this.$.sound.audio.duration);
 		
-		// Change position only if not seeking, i.e. delta is small
-		var delta = this.$.sound.audio.currentTime - this.$.playSlider.getPosition();
-		if (delta > 0 && delta <= 1) this.$.playSlider.setPosition(this.$.sound.audio.currentTime);
+		this.$.playSlider.setPosition(this.$.sound.audio.currentTime);
 		
 		if (this.$.sound.audio.buffered.length > 0)
 			this.$.playSlider.setBarPosition(this.$.sound.audio.buffered.end(this.$.sound.audio.buffered.length - 1));
@@ -149,7 +152,9 @@ enyo.kind({
 	
 	stopPlayback: function(buttonText) {
 		clearInterval(this.interval);
+		
 		this.plays = false;
+		this.$.sound.audio.pause();
 		this.doPlaybackEnded();
 		
 		this.$.playButton.setCaption(buttonText);
@@ -158,7 +163,7 @@ enyo.kind({
 	},
 	
 	isAtStartOfPlayback: function() {
-		return this.$.sound.audio.currentTime == 0;
+		return this.$.sound.audio.currentTime === 0;
 	},
 	
 	isInMiddleOfPlayback: function() {
