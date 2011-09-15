@@ -207,6 +207,25 @@ enyo.kind({
 	},
 	
 	markEpisode: function(episode) {
+		this.updateListOfMarkedEpisodes(episode);
+		
+		this.store();
+		this.$.episodeListVR.render();
+	},
+	
+	markAll: function(mark) {
+		for (var index = 0; index < this.episodeList.length; index++) {
+			var episode = this.episodeList[index];
+			
+			episode.marked = mark;
+			this.updateListOfMarkedEpisodes(episode);
+		}
+		
+		this.store();
+		this.$.episodeListVR.render();
+	},
+	
+	updateListOfMarkedEpisodes: function(episode) {
 		// Add to list
 		if (episode.marked && this.markedEpisodes.indexOf(episode.url) < 0) 
 			this.markedEpisodes.push(episode.url);
@@ -215,9 +234,6 @@ enyo.kind({
 			var index = this.markedEpisodes.indexOf(episode.url);
 			if (index >= 0) this.markedEpisodes.splice(index, 1);
 		}
-		
-		this.store();
-		this.$.episodeListVR.render();
 	},
 	
 	toggleShowAll: function(sender, event) {
