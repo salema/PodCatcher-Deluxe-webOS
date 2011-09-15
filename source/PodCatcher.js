@@ -22,14 +22,12 @@
 enyo.kind({
 	name: "Net.Alliknow.PodCatcher",
 	kind: "VFlexBox",
-	VIDEOCATCHER: "http://developer.palm.com/appredirect/?packageid=net.alliknow.videocatcher",
 	HOME_PAGE: "http://salema.github.com/Yet-Another-Simple-Pod-Catcher",
 	HELP_PAGE: "http://salema.github.com/Yet-Another-Simple-Pod-Catcher/help.html",
 	components: [
 		{kind: "PalmService", name: "launchBrowserCall", service: "palm://com.palm.applicationManager/", method: "launch"},
 		{kind: "AppMenu", components: [
-		    {kind: "AppMenuItem", caption: "VideoCatcher Deluxe", onclick: "openVideoDeluxe"},
-			{kind: "AppMenuItem", caption: $L("Help"), onclick: "openHelp"},
+		    {kind: "AppMenuItem", caption: $L("Help"), onclick: "openHelp"},
 			{kind: "AppMenuItem", caption: $L("About"), onclick: "openAbout"}
 		]},
 		{kind: "Dashboard", name: "dashboard", smallIcon: "icons/icon48.png", onTap: "togglePlay"},
@@ -43,10 +41,6 @@ enyo.kind({
 					onDownloaded: "episodeDownloaded", onDelete: "deleteDownloadedEpisode"}
 		]}
 	],
-	
-	openVideoDeluxe: function(inSender) {
-		this.openInBrowser(this, this.VIDEOCATCHER);
-	},
 	
 	openAbout: function() {
 		this.openInBrowser(this, this.HOME_PAGE);
