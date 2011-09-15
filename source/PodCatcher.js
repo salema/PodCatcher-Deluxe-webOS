@@ -27,7 +27,11 @@ enyo.kind({
 	components: [
 		{kind: "PalmService", name: "launchBrowserCall", service: "palm://com.palm.applicationManager/", method: "launch"},
 		{kind: "AppMenu", components: [
-			{kind: "AppMenuItem", caption: $L("Help"), onclick: "openHelp"},
+			{kind: "AppMenuItem", caption: $L("Episodes"), components: [
+				{kind: "AppMenuItem", caption: $L("Mark all"), icon: "icons/star-off.png", onclick: "markAll"},
+				{kind: "AppMenuItem", caption: $L("Unmark all"), icon: "icons/star-on.png", onclick: "unmarkAll"}
+       		]},
+		    {kind: "AppMenuItem", caption: $L("Help"), onclick: "openHelp"},
 			{kind: "AppMenuItem", caption: $L("About"), onclick: "openAbout"}
 		]},
 		{kind: "Dashboard", name: "dashboard", smallIcon: "icons/icon48.png", onTap: "togglePlay"},
@@ -48,6 +52,16 @@ enyo.kind({
 	
 	openHelp: function() {
 		this.openInBrowser(this, this.HELP_PAGE);
+	},
+	
+	markAll: function() {
+		this.$.episodeListPane.markAll(true);
+		this.$.episodeViewPane.reloadMarkedStatus();
+	},
+	
+	unmarkAll: function() {
+		this.$.episodeListPane.markAll(false);
+		this.$.episodeViewPane.reloadMarkedStatus();
 	},
 	
 	podcastSelected: function(sender, podcast) {
