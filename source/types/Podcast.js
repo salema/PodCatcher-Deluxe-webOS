@@ -49,7 +49,7 @@ Podcast.prototype.isValidXML = function(xmlDocument) {
 	var xmlTree = XmlHelper.parse(xmlDocument);
 		
 	return XmlHelper.has(xmlTree, XmlHelper.TITLE) && XmlHelper.getFirstValue(xmlTree, XmlHelper.TITLE) &&
-		XmlHelper.getFirstValue(xmlTree, XmlHelper.TITLE).length > 0;
+		XmlHelper.getFirstValue(xmlTree, XmlHelper.TITLE).length > 0 && XmlHelper.has(xmlTree, XmlHelper.ITEM);
 };
 
 Podcast.prototype.findImage = function(xmlTree) {
