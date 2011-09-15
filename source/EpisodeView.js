@@ -168,11 +168,14 @@ enyo.kind({
 		}
 	},
 	
-	toggleMarked: function() {
-		this.episode.marked = !this.episode.marked;
-		
+	reloadMarkedStatus: function() {
 		if (this.episode.marked) this.$.markButton.setSrc(Episode.MARKED_ICON);
 		else this.$.markButton.setSrc(Episode.UNMARKED_ICON);
+	},
+	
+	toggleMarked: function() {
+		this.episode.marked = !this.episode.marked;
+		this.reloadMarkedStatus();
 		
 		this.doMarkEpisode(this.episode);
 	},
