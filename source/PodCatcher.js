@@ -26,6 +26,7 @@ enyo.kind({
 	PODCATCHER: "http://developer.palm.com/appredirect/?packageid=net.alliknow.podcatcher",
 	HELP_PAGE: "http://salema.github.com/Yet-Another-Simple-Pod-Catcher/help.html",
 	HOME_PAGE: "http://salema.github.com/Yet-Another-Simple-Pod-Catcher",
+	AUTO_UPDATE_INTERVAL: 30 * 60 * 1000,
 	components: [
 		{kind: "PalmService", name: "launchBrowserCall", service: "palm://com.palm.applicationManager/", method: "launch"},
 		{kind: "AppMenu", components: [
@@ -45,6 +46,22 @@ enyo.kind({
 					onPlaybackEnded: "updateDashboard", onOpenInBrowser: "openInBrowser"}
 		]}
 	],
+	
+	create: function() {
+		this.inherited(arguments);
+		
+		this.autoUpdateInterval = setInterval(enyo.bind(this, this.autoUpdate), this.AUTO_UPDATE_INTERVAL);
+	},
+	
+	destroy: function() {
+		clearInterval(this.autoUpdateInterval);
+		
+		this.inherited(arguments);
+	},
+	
+	autoUpdate: function() {
+		this.$.podcastListPane.autoUpdate();
+	},
 	
 	openVideoDeluxe: function(inSender) {
 		this.openInBrowser(this, this.VIDEOCATCHER);

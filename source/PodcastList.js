@@ -29,6 +29,7 @@ enyo.kind({
 	},
 	components: [
 		{kind: "SystemService", name: "preferencesService", subscribe : false},
+		{kind: "WebService", name: "autoUpdatePodcast", onSuccess: "autoUpdatePodcastSuccess", onFailure: "autoUpdatePodcastFailed"},
 		{kind: "WebService", name: "grabPodcast", onSuccess: "grabPodcastSuccess", onFailure: "grabPodcastFailed"},
 		{kind: "WebService", name: "grabPodcastImage", onSuccess: "grabPodcastImageSuccess"},
 		{kind: "Net.Alliknow.PodCatcher.AddPodcastPopup", name: "addPodcastPopup", onAddPodcast: "addPodcast"},
@@ -38,9 +39,9 @@ enyo.kind({
 		]},
 		{kind: "Scroller", name: "podcastListScroller", flex: 1, components: [
 			{kind: "VirtualRepeater", name: "podcastListVR", onSetupRow: "getPodcast", onclick: "selectPodcastClick", components: [
-				{kind: "SwipeableItem", layout: "HFlexBox", onConfirm: "deletePodcast", style: "padding: 5px 0px 2px 10px;", components: [
+				{kind: "SwipeableItem", layout: "HFlexBox", onConfirm: "deletePodcast", components: [
 					{name: "podcastTitle", className: "nowrap"},
-					{name: "podcastEpisodeNumber", className: "nowrap", style: "font-size: smaller"}
+					{name: "podcastEpisodeNumber", className: "nowrap", style: "font-size: smaller;"}
 				]}
 			]}
 		]},
@@ -56,9 +57,9 @@ enyo.kind({
 		
 		this.selectedIndex = -1;
 		this.loadCounter = 0;
+		this.autoUpdateLoadCounter = 0;
 		this.podcastList = [];
 		this.selectAll = false;
-		this.autoUpdateInProgress = false;
 		
 		this.$.preferencesService.call({keys: ["storedPodcastList"]}, {method: "getPreferences", onSuccess: "restorePodcastList"});
 	},
@@ -78,6 +79,7 @@ enyo.kind({
 			}
 			
 			this.$.selectAllButton.setDisabled(this.selectAll || this.podcastList.length === 0);
+			this.$.podcastListVR.render();
 			this.autoUpdate();
 		}
 	},
@@ -93,7 +95,8 @@ enyo.kind({
 		if (podcast) {
 			this.$.podcastTitle.setContent(podcast.title);
 			
-			if (!podcast.episodeList || podcast.episodeList.length === 0)
+			if (!podcast.episodeList) this.$.podcastEpisodeNumber.setContent("");
+			else if (podcast.episodeList.length === 0)
 				this.$.podcastEpisodeNumber.setContent($L("No episodes"));
 			else if (podcast.episodeList.length == 1)
 				this.$.podcastEpisodeNumber.setContent(podcast.episodeList.length + " " + $L("episode"));
@@ -109,8 +112,6 @@ enyo.kind({
 	},
 	
 	selectPodcastClick: function(inSender, inEvent) {
-		if (this.autoUpdateInProgress) return;
-		
 		this.selectedIndex = this.$.podcastListVR.fetchRowIndex();
 		this.selectPodcast();
 	},
@@ -130,27 +131,28 @@ enyo.kind({
 	},
 	
 	selectAllPodcasts: function(sender, event) {
-		if (this.autoUpdateInProgress) return;
-		
 		this.prepareLoad(true);
-		this.loadAllPodcasts();
-	},
-	
-	autoUpdate: function() {
-		this.autoUpdateInProgress = true;
-		this.$.podcastSpinner.show();
 		
-		this.loadAllPodcasts();
-	},
-	
-	loadAllPodcasts: function() {
 		for (var index = 0; index < this.podcastList.length; index++) {
 			Utilities.prepareFeedService(this.$.grabPodcast, this.podcastList[index].url,
 					this.podcastList[index].user, this.podcastList[index].pass);
+			
 			this.$.grabPodcast.call();
 		}
 	},
-
+	
+	autoUpdate: function() {
+		this.$.podcastSpinner.show();
+		this.autoUpdateLoadCounter = 0;
+		
+		for (var index = 0; index < this.podcastList.length; index++) {
+			Utilities.prepareFeedService(this.$.autoUpdatePodcast, this.podcastList[index].url,
+					this.podcastList[index].user, this.podcastList[index].pass);
+			
+			this.$.autoUpdatePodcast.call();
+		}
+	},
+	
 	showAddPodcastPopup: function(inSender, inIndex) {
 		this.$.addPodcastPopup.openAtCenter();
 	},
@@ -199,23 +201,32 @@ enyo.kind({
 			if (this.podcastList[index].url == podcast.url) return index;	
 	},
 	
+	autoUpdatePodcastSuccess: function(sender, response, request) {
+		this.autoUpdateLoadCounter++;
+		
+		var podcast = Utilities.getItemInList(this.podcastList, new Podcast(request.url));
+		podcast.readEpisodes(response);
+		
+		this.checkAutoUpdateComplete();
+	},
+	
+	autoUpdatePodcastFailed: function(sender, response, request) {
+		this.autoUpdateLoadCounter++;
+		this.checkAutoUpdateComplete();
+	},
+	
+	checkAutoUpdateComplete: function() {
+		if (this.autoUpdateLoadCounter == this.podcastList.length) {
+			this.$.podcastSpinner.hide();
+			this.$.podcastListVR.render();
+		}
+	},
+	
 	grabPodcastSuccess: function(sender, response, request) {
 		this.loadCounter++;
 		
 		var podcast = Utilities.getItemInList(this.podcastList, new Podcast(request.url));
-		var xmlTree = XmlHelper.parse(response);
-		var items = XmlHelper.get(xmlTree, XmlHelper.ITEM);
-		
-		podcast.episodeList = [];
-		
-		for (var index = 0; index < items.length; index++) {
-			var episode = new Episode();
-			if (! episode.isValid(items[index])) continue;
-			
-			episode.read(items[index]);
-			episode.podcastTitle = podcast.title;
-			podcast.episodeList.push(episode);
-		}
+		podcast.readEpisodes(response);
 		
 		this.checkLoadFinished(podcast);
 	},
@@ -230,13 +241,9 @@ enyo.kind({
 	
 	checkLoadFinished: function(currentPodcast) {
 		// All feed finished loading?
-		if (!(this.selectAll || this.autoUpdateInProgress) || this.loadCounter == this.podcastList.length) {
-			if (this.selectAll && !this.autoUpdateInProgress) this.doSelectAll(this.podcastList);
-			else if (!this.autoUpdateInProgress) this.doSelectPodcast(currentPodcast);
-			else {
-				this.$.podcastSpinner.hide();
-				this.autoUpdateInProgress = false;
-			}
+		if (!this.selectAll || this.loadCounter == this.podcastList.length) {
+			if (this.selectAll) this.doSelectAll(this.podcastList);
+			else this.doSelectPodcast(currentPodcast);
 			
 			this.$.podcastListVR.render();
 		}
