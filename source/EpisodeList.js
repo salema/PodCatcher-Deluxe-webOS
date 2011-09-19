@@ -51,7 +51,7 @@ enyo.kind({
 		this.episodeList = [];
 		this.selectedIndex = -1;
 		
-		//this.formatter = new enyo.g11n.DateFmt({date: "long", time: "short", weekday: true});
+		this.formatter = new enyo.g11n.DateFmt({date: "long", time: "short", weekday: true});
 	},
 	
 	setPodcast: function(podcast) {
@@ -86,7 +86,7 @@ enyo.kind({
 			if (this.selectedIndex == index) this.$.episodeTitle.addClass("highlight");
 			
 			var pubDate = new Date(episode.pubDate);
-			if (this.formatter != undefined) this.$.episodePublished.setContent(this.formatter.format(pubDate));
+			if (this.formatter) this.$.episodePublished.setContent(this.formatter.format(pubDate));
 			else this.$.episodePublished.setContent(episode.pubDate);
 			
 			// Put podcast title if wanted
