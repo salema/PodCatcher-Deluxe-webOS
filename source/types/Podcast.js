@@ -54,9 +54,9 @@ Podcast.prototype.readEpisodes = function(xmlDocument) {
 	
 	for (var index = 0; index < items.length; index++) {
 		var episode = new Episode();
-		if (! episode.isValid(items[index])) continue;
+		if (! episode.isValidXML(items[index])) continue;
 		
-		episode.read(items[index]);
+		episode.readFromXML(items[index]);
 		episode.podcastTitle = this.title;
 		this.episodeList.push(episode);
 	}
