@@ -48,8 +48,10 @@ enyo.kind({
 	},
 	
 	download: function(episode) {
-		this.addToActive(episode);
-		this.$.episodeDownload.call({target: episode.url, targetFilename: Utilities.createUniqueFilename(episode.url)});
+		if (! this.isDownloading(episode)) {
+			this.addToActive(episode);
+			this.$.episodeDownload.call({target: episode.url, targetFilename: Utilities.createUniqueFilename(episode.url)});
+		}
 	},
 	
 	downloadSuccess: function(sender, response) {
