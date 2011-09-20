@@ -30,7 +30,6 @@ enyo.kind({
 	},
 	components: [
 		{kind: "SystemService", name: "preferencesService", subscribe : false},
-		{kind: "WebService", name: "grabPodcast", onSuccess: "grabPodcastSuccess", onFailure: "grabPodcastFailed"},
 		{kind: "Header", layoutKind: "HFlexLayout", className: "header", components: [
 			{kind: "Image", name: "showAllButton", src: Episode.UNMARKED_ICON, onclick: "toggleShowAll", style: "margin-right: 10px;"},
 			{content: $L("Select"), name: "selectedPodcastName", className: "nowrap", flex: 1},
@@ -56,7 +55,6 @@ enyo.kind({
 		this.inherited(arguments);
 		
 		this.episodeList = [];
-		this.podcastList = [];
 		this.playlist = [];
 		this.markedEpisodes = [];
 		this.downloadedEpisodes = [];
@@ -106,26 +104,32 @@ enyo.kind({
 	},
 	
 	setPodcast: function(podcast) {
-		this.prepareLoad($L($L("Select from") + " \"" + podcast.title + "\""), false, false, false);
-		this.podcastList.push(podcast);
+		this.updateUIOnLoad(false, false, false);
+		this.$.selectedPodcastName.setContent($L("Select from") + " \"" + podcast.title + "\"");
 		
-		Utilities.prepareFeedService(this.$.grabPodcast, podcast.url, podcast.user, podcast.pass);
-		this.$.grabPodcast.call();
+		this.episodeList = podcast.episodeList;
+		
+		this.afterLoad();
 	},
 	
 	setPodcastList: function(podcastList) {
-		this.prepareLoad($L("Select from all"), true, false, false);
+		this.updateUIOnLoad(true, false, false);
+		this.$.selectedPodcastName.setContent($L("Select from all"));
 		
 		for (var index = 0; index < podcastList.length; index++) {
-			this.podcastList.push(podcastList[index]);
-			Utilities.prepareFeedService(this.$.grabPodcast, podcastList[index].url,
-					podcastList[index].user, podcastList[index].pass);
-			this.$.grabPodcast.call();
+			var list = podcastList[index].episodeList;
+			
+			if (list)
+				for (var item = 0; item < list.length; item++)
+					this.episodeList.push(list[item]);
 		}
+		
+		this.afterLoad();
 	},
 	
 	setShowDownloads: function() {
-		this.prepareLoad($L("Select from Downloads"), true, true, false);
+		this.updateUIOnLoad(true, true, false);
+		this.$.selectedPodcastName.setContent($L("Select from Downloads"));
 		
 		for (var index = 0; index < this.downloadedEpisodes.length; index++) 
 			this.episodeList.push(this.downloadedEpisodes[index]);
@@ -135,7 +139,8 @@ enyo.kind({
 	},
 	
 	setShowPlaylist: function() {
-		this.prepareLoad($L("Select from Playlist"), true, false, true);
+		this.updateUIOnLoad(true, false, true);
+		this.$.selectedPodcastName.setContent($L("Select from Playlist"));
 		
 		if (this.playlist.length === 0) {
 			this.$.error.setContent($L("Your playlist is empty. Swipe any episode to the right in order to add it to the playlist."));
@@ -244,45 +249,7 @@ enyo.kind({
 		
 		this.$.episodeListVR.render();
 	},
-	
-	grabPodcastSuccess: function(sender, response, request) {
-		this.loadCounter++;
 		
-		var xmlTree = XmlHelper.parse(response);
-		var items = XmlHelper.get(xmlTree, XmlHelper.ITEM);
-		
-		for (var index = 0; index < items.length; index++) {
-			var episode = new Episode();
-			if (! episode.isValidXML(items[index])) continue;
-			
-			episode.readFromXML(items[index]);
-			episode.podcastTitle = Utilities.getItemAttributeValueInList(this.podcastList, new Podcast(request.url), "title");
-			this.episodeList.push(episode);
-		}
-		
-		this.checkLoadFinished();
-	},
-	
-	grabPodcastFailed: function() {
-		this.loadCounter++;
-		this.checkLoadFinished();
-	},
-	
-	checkLoadFinished: function() {
-		if (this.loadCounter == this.podcastList.length) {
-			if (this.episodeList.length === 0) this.loadFailed();
-			else this.afterLoad(true);
-		}
-	},
-	
-	loadFailed: function() {
-		this.warn("Failed to load podcast feed");
-		this.$.error.setContent($L("The podcast feed failed to load. Please make sure you are online."));
-		this.$.error.setStyle("color: red;");
-		this.$.error.show();
-		this.$.episodeSpinner.hide();
-	},
-	
 	togglePlaylist: function(sender, index) {
 		var episode = this.episodeList[index];
 		
@@ -364,29 +331,35 @@ enyo.kind({
 		episode.marked = this.markedEpisodes.indexOf(episode.url) >= 0;
 	},
 	
-	prepareLoad: function (paneTitle, showPodcastTitles, showDownloads, showPlaylist) {
-		this.$.selectedPodcastName.setContent(paneTitle);
-		this.$.showPlaylistButton.setDisabled(showPlaylist);
-		this.$.showDownloadedButton.setDisabled(showDownloads || this.downloadedEpisodes.length === 0);
+	prepareLoad: function(paneTitle, showPodcastTitles) {
 		this.$.episodeSpinner.show();
 		this.$.error.hide();
-		
-		this.showPodcastTitle = showPodcastTitles;
+				
 		this.selectedIndex = -1;
 		this.episodeList = [];
-		this.loadCounter = 0;
-		this.podcastList = [];
-		this.showDownloads = showDownloads;
-		this.showPlaylist = showPlaylist;
 		
 		this.$.episodeListVR.render();	
 	},
 	
-	afterLoad: function (sort) {
-		if (sort) this.episodeList.sort(new Episode().compare);
+	afterLoad: function() {
+		this.episodeList.sort(new Episode().compare);
 		
 		this.$.episodeListScroller.scrollTo(0, 0);
 		this.$.episodeListVR.render();
 		this.$.episodeSpinner.hide();
+		
+		if (this.episodeList.length === 0) this.loadFailed();
+	},
+	
+	loadFailed: function() {
+		this.$.error.setContent($L("The podcast feed failed to load. Please make sure you are online."));
+		this.$.error.setStyle("color: red;");
+		this.$.error.show();
+	},
+	
+	updateUIOnLoad: function(showPodcastTitles, showDownloads, showPlaylist) {
+		this.showPodcastTitle = showPodcastTitles;
+		this.$.showDownloadedButton.setDisabled(showDownloads || this.downloadedEpisodes.length === 0);
+		this.$.showPlaylistButton.setDisabled(showPlaylist);
 	}
 });
