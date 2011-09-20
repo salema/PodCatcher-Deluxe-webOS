@@ -107,7 +107,7 @@ enyo.kind({
 		this.$.episodeListVR.render();
 	},
 	
-	prepareLoad: function(paneTitle, showPodcastTitles) {
+	prepareLoad: function() {
 		this.$.episodeSpinner.show();
 		this.$.error.hide();
 				
