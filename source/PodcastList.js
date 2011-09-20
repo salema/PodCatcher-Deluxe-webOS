@@ -88,6 +88,44 @@ enyo.kind({
 		this.$.preferencesService.call({"storedPodcastList": this.podcastList},	{method: "setPreferences"});
 	},
 	
+	showAddPodcastPopup: function(inSender, inIndex) {
+		this.$.addPodcastPopup.openAtCenter();
+	},
+	
+	addPodcast: function(inSender, podcast) {
+		var index = Utilities.getIndexInList(this.podcastList, podcast);
+		
+		// podcast is already in list
+		if (index >= 0) {
+			this.selectedIndex = index;
+			this.selectPodcast();
+		} // podcast is new
+		else {
+			this.podcastList.push(podcast);
+			this.storePodcastList();
+			
+			this.selectedIndex = this.podcastList.length - 1;
+			this.selectPodcast();
+			
+			this.$.podcastListScroller.scrollToBottom();
+		}
+	},
+
+	deletePodcast: function(inSender, inIndex) {
+		this.podcastList.splice(inIndex, 1);
+		
+		// Swipe on selected
+		if (inIndex == this.selectedIndex) {
+			this.selectedIndex = -1;
+			this.$.podcastImage.setSrc(Podcast.DEFAULT_IMAGE);
+		}
+		// Via swipe and above in list
+		else if (inIndex < this.selectedIndex) this.selectedIndex--;
+		
+		this.storePodcastList();
+		this.$.podcastListVR.render();	
+	},
+	
 	// Method called for item creation from virtual repeater
 	getPodcast: function(sender, index) {
 		var podcast = this.podcastList[index];
@@ -122,34 +160,32 @@ enyo.kind({
 		var podcast = this.podcastList[this.selectedIndex];
 		
 		if (podcast) {
-			this.$.grabPodcastImage.setUrl(encodeURI(podcast.image));
-			this.$.grabPodcastImage.call();
-			
 			Utilities.prepareFeedService(this.$.grabPodcast, podcast.url, podcast.user, podcast.pass);
 			this.$.grabPodcast.call();
+			
+			this.$.grabPodcastImage.setUrl(encodeURI(podcast.image));
+			this.$.grabPodcastImage.call();
 		}
 	},
 	
 	selectAllPodcasts: function(sender, event) {
 		this.prepareLoad(true);
-		
-		for (var index = 0; index < this.podcastList.length; index++) {
-			Utilities.prepareFeedService(this.$.grabPodcast, this.podcastList[index].url,
-					this.podcastList[index].user, this.podcastList[index].pass);
-			
-			this.$.grabPodcast.call();
-		}
+		this.loadAll(this.$.grabPodcast);
 	},
 
 	autoUpdate: function() {
 		this.$.podcastSpinner.show();
 		this.autoUpdateLoadCounter = 0;
 		
+		this.loadAll(this.$.autoUpdatePodcast);
+	},
+	
+	loadAll: function(service) {
 		for (var index = 0; index < this.podcastList.length; index++) {
-			Utilities.prepareFeedService(this.$.autoUpdatePodcast, this.podcastList[index].url,
+			Utilities.prepareFeedService(service, this.podcastList[index].url,
 					this.podcastList[index].user, this.podcastList[index].pass);
 			
-			this.$.autoUpdatePodcast.call();
+			service.call();
 		}
 	},
 	
@@ -176,7 +212,7 @@ enyo.kind({
 
 	deletePodcast: function(sender, index) {
 		this.podcastList.splice(index, 1);
-		
+
 		// if select all is active
 		if (this.selectAll) {
 			this.selectAll = false;
@@ -201,12 +237,7 @@ enyo.kind({
 		this.$.podcastImage.setSrc(Podcast.DEFAULT_IMAGE);
 		this.$.podcastListVR.render();
 	},
-	
-	getPodcastIndexInList: function(podcast) {
-		for (var index = 0; index < this.podcastList.length; index++)
-			if (this.podcastList[index].url == podcast.url) return index;	
-	},
-	
+
 	autoUpdatePodcastSuccess: function(sender, response, request) {
 		this.autoUpdateLoadCounter++;
 		
@@ -222,6 +253,7 @@ enyo.kind({
 	},
 	
 	checkAutoUpdateComplete: function() {
+		// All feeds finished loading?
 		if (this.autoUpdateLoadCounter == this.podcastList.length) {
 			this.$.podcastSpinner.hide();
 			this.$.podcastListVR.render();
@@ -246,7 +278,7 @@ enyo.kind({
 	},
 	
 	checkLoadFinished: function(currentPodcast) {
-		// All feed finished loading?
+		// All feeds finished loading?
 		if (!this.selectAll || this.loadCounter == this.podcastList.length) {
 			if (this.selectAll) this.doSelectAll(this.podcastList);
 			else this.doSelectPodcast(currentPodcast);

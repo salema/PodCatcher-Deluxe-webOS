@@ -178,7 +178,7 @@ enyo.kind({
 				
 				// Put date
 				var pubDate = new Date(episode.pubDate);
-				if (this.formatter != undefined) this.$.episodePublished.setContent(this.formatter.format(pubDate));
+				if (this.formatter) this.$.episodePublished.setContent(this.formatter.format(pubDate));
 				else this.$.episodePublished.setContent(episode.pubDate);
 				
 				// Put podcast title if wanted
