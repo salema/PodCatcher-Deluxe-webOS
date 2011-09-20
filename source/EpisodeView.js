@@ -60,6 +60,7 @@ enyo.kind({
 		this.inherited(arguments);
 		
 		this.plays = false;
+		this.player = this.$.video.node;
 		this.sliderInterval = setInterval(enyo.bind(this, this.updatePlaySlider), 500);
 		this.videoInterval = setInterval(enyo.bind(this, this.updateVideoMode), 500);
 		
