@@ -36,13 +36,30 @@ Podcast.prototype.readFromXML = function(xmlDocument) {
 	this.image = this.findImage(xmlTree);
 };
 
-//Read episode information from JSON data
+// Read podcast information from JSON data
 Podcast.prototype.readFromJSON = function(data) {
 	this.title = data.title;
 	//this.description = data.description;
 	this.image = data.image;
 	this.user = data.user;
 	this.pass = data.pass;
+};
+
+// Read episodes from xml feed
+Podcast.prototype.readEpisodes = function(xmlDocument) {
+	var xmlTree = XmlHelper.parse(xmlDocument);
+	var items = XmlHelper.get(xmlTree, XmlHelper.ITEM);
+	
+	this.episodeList = [];
+	
+	for (var index = 0; index < items.length; index++) {
+		var episode = new Episode();
+		if (! episode.isValid(items[index])) continue;
+		
+		episode.read(items[index]);
+		episode.podcastTitle = this.title;
+		this.episodeList.push(episode);
+	}
 };
 
 Podcast.prototype.isValidXML = function(xmlDocument) {
