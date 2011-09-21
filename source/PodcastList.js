@@ -142,10 +142,11 @@ enyo.kind({
 				var newEpisodeCount = this.getNumberOfUnmarkedEpisode(podcast.episodeList);
 				var text = "";
 				
-				if (newEpisodeCount == 1) text = $L("One new episode");
+				if (newEpisodeCount === 0) text = $L("No new episodes");
+				else if (newEpisodeCount == 1) text = $L("One new episode");
 				else text = newEpisodeCount + " " + $L("new episodes");
 				
-				text += " (" + $L("of") + " " + podcast.episodeList.length + ")";
+				text += " (" + $L("Total") + ": " + podcast.episodeList.length + ")";
 				this.$.podcastEpisodeNumber.setContent(text);
 			}
 			
