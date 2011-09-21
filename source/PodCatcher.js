@@ -28,7 +28,7 @@ enyo.kind({
 	components: [
 		{kind: "SystemService", name: "preferencesService", subscribe : false},
 		{kind: "PalmService", name: "launchBrowserCall", service: "palm://com.palm.applicationManager/", method: "launch"},
-		{kind: "AppMenu", components: [
+		{kind: "AppMenu", onBeforeOpen: "updateMenu", components: [
 			{kind: "MenuCheckItem", caption: $L("Autodownload"), name: "autoDownloadCheck", onclick: "toggleAutoDownload", checked: false},
 			{kind: "AppMenuItem", caption: $L("Episodes"), components: [
 				{kind: "AppMenuItem", caption: $L("All old"), icon: "icons/star-off.png", onclick: "markAll"},
@@ -65,14 +65,16 @@ enyo.kind({
 	},
 	
 	restore: function(sender, response) {
-		if (response.enableAutoDownload != undefined) {
-			this.$.appMenu.components[0].checked = response.enableAutoDownload;
+		if (response.enableAutoDownload != undefined)
 			this.enableAutoDownload = response.enableAutoDownload;
-		}
 	},
 	
 	store: function() {
 		this.$.preferencesService.call({"enableAutoDownload": this.enableAutoDownload}, {method: "setPreferences"});
+	},
+	
+	updateMenu: function() {
+		this.$.autoDownloadCheck.setChecked(this.enableAutoDownload);
 	},
 	
 	autoUpdate: function() {
@@ -81,6 +83,7 @@ enyo.kind({
 	
 	toggleAutoDownload: function() {
 		this.enableAutoDownload = !this.enableAutoDownload;
+		
 		this.store();
 	},
 	
