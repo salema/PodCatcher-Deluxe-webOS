@@ -117,6 +117,12 @@ enyo.kind({
 		}
 	},
 	
+	downloadEpisode: function(episode) {
+		if (this.episode.equals(episode)) this.$.downloadButton.setCaption($L("Cancel"));
+		
+		this.$.downloadManager.download(episode);
+	},
+	
 	startStopDelete: function(sender, response) {
 		// Download episode 
 		if (!this.$.downloadManager.isDownloading(this.episode)) {

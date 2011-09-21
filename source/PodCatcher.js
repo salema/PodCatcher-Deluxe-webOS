@@ -26,11 +26,13 @@ enyo.kind({
 	HELP_PAGE: "http://salema.github.com/Yet-Another-Simple-Pod-Catcher/help.html",
 	AUTO_UPDATE_INTERVAL: 30 * 60 * 1000,
 	components: [
+		{kind: "SystemService", name: "preferencesService", subscribe : false},
 		{kind: "PalmService", name: "launchBrowserCall", service: "palm://com.palm.applicationManager/", method: "launch"},
 		{kind: "AppMenu", components: [
+			{kind: "MenuCheckItem", caption: $L("Autodownload"), name: "autoDownloadCheck", onclick: "toggleAutoDownload", checked: false},
 			{kind: "AppMenuItem", caption: $L("Episodes"), components: [
-				{kind: "AppMenuItem", caption: $L("Mark all"), icon: "icons/star-off.png", onclick: "markAll"},
-				{kind: "AppMenuItem", caption: $L("Unmark all"), icon: "icons/star-on.png", onclick: "unmarkAll"}
+				{kind: "AppMenuItem", caption: $L("All old"), icon: "icons/star-off.png", onclick: "markAll"},
+				{kind: "AppMenuItem", caption: $L("All new"), icon: "icons/star-on.png", onclick: "unmarkAll"}
        		]},
 		    {kind: "AppMenuItem", caption: $L("Help"), onclick: "openHelp"},
 			{kind: "AppMenuItem", caption: $L("About"), onclick: "openAbout"}
@@ -38,9 +40,10 @@ enyo.kind({
 		{kind: "Dashboard", name: "dashboard", smallIcon: "icons/icon48.png", onTap: "togglePlay"},
 		{kind: "SlidingPane", flex: 1, components: [
 			{kind: "Net.Alliknow.PodCatcher.PodcastList", name: "podcastListPane", width: "230px", onPrepareLoad: "prepareLoad",
-					onSelectPodcast: "podcastSelected", onSelectAll: "allPodcastsSelected"},
+					onSelectPodcast: "podcastSelected", onSelectAll: "allPodcastsSelected", onAutoUpdateComplete: "autoDownload"},
 			{kind: "Net.Alliknow.PodCatcher.EpisodeList", name: "episodeListPane", width: "360px", peekWidth: 0,
-					onSelectEpisode: "episodeSelected", onPlaylistChanged: "playlistChanged", onSpecialListSelected: "specialListSelected"},
+					onSelectEpisode: "episodeSelected", onPlaylistChanged: "playlistChanged", onSpecialListSelected: "specialListSelected",
+					onResumeComplete: "propagateMarkedEpisodesToPodcastList"},
 			{kind: "Net.Alliknow.PodCatcher.EpisodeView", name: "episodeViewPane", flex: 1, peekWidth: 0, onTogglePlay: "updateDashboard", onNext: "playNext",
 					onPlaybackEnded: "playNext", onResume: "updateDashboard", onMarkEpisode: "episodeMarked", onOpenInBrowser: "openInBrowser",
 					onDownloaded: "episodeDownloaded", onDelete: "deleteDownloadedEpisode", onResize: "videoResize"}
@@ -50,17 +53,56 @@ enyo.kind({
 	create: function() {
 		this.inherited(arguments);
 		
+		this.enableAutoDownload = false;
 		this.autoUpdateInterval = setInterval(enyo.bind(this, this.autoUpdate), this.AUTO_UPDATE_INTERVAL);
+		this.$.preferencesService.call({keys: ["enableAutoDownload"]}, {method: "getPreferences", onSuccess: "restore"});
 	},
 	
 	destroy: function() {
 		clearInterval(this.autoUpdateInterval);
-		
+				
 		this.inherited(arguments);
+	},
+	
+	restore: function(sender, response) {
+		if (response.enableAutoDownload != undefined) {
+			this.$.appMenu.components[0].checked = response.enableAutoDownload;
+			this.enableAutoDownload = response.enableAutoDownload;
+		}
+	},
+	
+	store: function() {
+		this.$.preferencesService.call({"enableAutoDownload": this.enableAutoDownload}, {method: "setPreferences"});
 	},
 	
 	autoUpdate: function() {
 		this.$.podcastListPane.autoUpdate();
+	},
+	
+	toggleAutoDownload: function() {
+		this.enableAutoDownload = !this.enableAutoDownload;
+		this.store();
+	},
+	
+	autoDownload: function(sender, podcastList) {
+		if (this.enableAutoDownload) {
+			for (var index = 0; index < podcastList.length; index++) {
+				// Get latest episode for each podcast
+				var episodeList = podcastList[index].episodeList;
+				if (!episodeList || episodeList.length === 0) continue;
+				else episodeList.sort(new Episode().compare);
+				
+				var candidate = episodeList[0];
+				
+				// Filter for marked and downloaded
+				if (this.$.episodeListPane.markedEpisodes.indexOf(candidate.url) >= 0 ||
+					Utilities.isInList(this.$.episodeListPane.downloadedEpisodes, candidate)) continue;
+				
+				// Enqueue remaining for download
+				this.$.episodeViewPane.downloadEpisode(candidate);
+				this.log("Queued episode for download: \"" + candidate.title + "\" at " + candidate.url);
+			}		
+		}
 	},
 	
 	openAbout: function() {
@@ -74,11 +116,15 @@ enyo.kind({
 	markAll: function() {
 		this.$.episodeListPane.markAll(true);
 		this.$.episodeViewPane.reloadMarkedStatus();
+		
+		this.$.podcastListPane.repaint();
 	},
 	
 	unmarkAll: function() {
 		this.$.episodeListPane.markAll(false);
 		this.$.episodeViewPane.reloadMarkedStatus();
+		
+		this.$.podcastListPane.repaint();
 	},
 	
 	markAll: function() {
@@ -132,6 +178,8 @@ enyo.kind({
 	
 	episodeMarked: function(sender, episode) {
 		this.$.episodeListPane.markEpisode(episode);
+		
+		this.$.podcastListPane.repaint();
 	},
 	
 	togglePlay: function() {
@@ -171,6 +219,10 @@ enyo.kind({
 			else if (this.$.episodeViewPane.isInMiddleOfPlayback()) playText = $L("Resume");
 		
 		var episode = this.$.episodeViewPane.episode;
-		this.$.dashboard.setLayers([{icon: "icons/icon48.png", title: episode.title, text: episode.podcastTitle + " - " + playText}]);
+		//this.$.dashboard.setLayers([{icon: "icons/icon48.png", title: episode.title, text: episode.podcastTitle + " - " + playText}]);
+	},
+	
+	propagateMarkedEpisodesToPodcastList: function() {
+		this.$.podcastListPane.markedEpisodes = this.$.episodeListPane.markedEpisodes;
 	}
 });

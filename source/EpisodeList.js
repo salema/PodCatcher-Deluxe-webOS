@@ -24,6 +24,7 @@ enyo.kind({
 	layoutKind: "VFlexLayout",
 	LIMIT: 100,
 	events: {
+		onResumeComplete: "",
 		onSelectEpisode: "",
 		onPlaylistChanged: "",
 		onSpecialListSelected: ""
@@ -65,7 +66,7 @@ enyo.kind({
 		this.showDownloads = false;
 		this.showPlaylist = false;
 		
-		this.formatter = new enyo.g11n.DateFmt({date: "long", time: "short", weekday: true});
+		//this.formatter = new enyo.g11n.DateFmt({date: "long", time: "short", weekday: true});
 		
 		this.$.preferencesService.call({keys: ["episodePlaylist", "markedEpisodes", "downloadedEpisodes"]},
 				{method: "getPreferences", onSuccess: "restore"});
@@ -96,6 +97,8 @@ enyo.kind({
 			
 			this.$.showDownloadedButton.setDisabled(this.downloadedEpisodes.length === 0);
 		}
+		
+		this.doResumeComplete();
 	},
 	
 	store: function() {
@@ -104,16 +107,14 @@ enyo.kind({
 	},
 	
 	setPodcast: function(podcast) {
-		this.updateUIOnLoad(false, false, false);
 		this.$.selectedPodcastName.setContent($L("Select from") + " \"" + podcast.title + "\"");
 		
 		this.episodeList = podcast.episodeList;
 		
-		this.afterLoad();
+		this.afterLoad(true, false, false, false);
 	},
 	
 	setPodcastList: function(podcastList) {
-		this.updateUIOnLoad(true, false, false);
 		this.$.selectedPodcastName.setContent($L("Select from all"));
 		
 		for (var index = 0; index < podcastList.length; index++) {
@@ -124,22 +125,22 @@ enyo.kind({
 					this.episodeList.push(list[item]);
 		}
 		
-		this.afterLoad();
+		this.afterLoad(true, true, false, false);
 	},
 	
 	setShowDownloads: function() {
-		this.updateUIOnLoad(true, true, false);
+		this.prepareLoad();
 		this.$.selectedPodcastName.setContent($L("Select from Downloads"));
 		
 		for (var index = 0; index < this.downloadedEpisodes.length; index++) 
 			this.episodeList.push(this.downloadedEpisodes[index]);
 		
-		this.afterLoad(true);
+		this.afterLoad(true, true, true, false);
 		this.doSpecialListSelected();
 	},
 	
 	setShowPlaylist: function() {
-		this.updateUIOnLoad(true, false, true);
+		this.prepareLoad();
 		this.$.selectedPodcastName.setContent($L("Select from Playlist"));
 		
 		if (this.playlist.length === 0) {
@@ -151,7 +152,7 @@ enyo.kind({
 			for (var index = 0; index < this.playlist.length; index++)
 				this.episodeList.push(this.playlist[index]);
 			
-			this.afterLoad(false);
+			this.afterLoad(false, true, false, true);
 		}
 		
 		this.doSpecialListSelected();
@@ -269,8 +270,8 @@ enyo.kind({
 		// Update UI
 		this.$.showPlaylistButton.setDisabled(this.showPlaylist);
 		if (this.showPlaylist) this.setShowPlaylist();
+		else this.$.episodeListVR.render();
 		
-		this.$.episodeListVR.render();
 		this.doPlaylistChanged(this.playlist.length);
 		this.store();		
 	},
@@ -331,7 +332,7 @@ enyo.kind({
 		episode.marked = this.markedEpisodes.indexOf(episode.url) >= 0;
 	},
 	
-	prepareLoad: function(paneTitle, showPodcastTitles) {
+	prepareLoad: function() {
 		this.$.episodeSpinner.show();
 		this.$.error.hide();
 				
@@ -341,9 +342,15 @@ enyo.kind({
 		this.$.episodeListVR.render();	
 	},
 	
-	afterLoad: function() {
-		this.episodeList.sort(new Episode().compare);
+	afterLoad: function(sort, showPodcastTitles, showDownloads, showPlaylist) {
+		this.showPodcastTitle = showPodcastTitles;
+		this.showDownloads = showDownloads;
+		this.showPlaylist = showPlaylist;
 		
+		if (sort) this.episodeList.sort(new Episode().compare);
+		
+		this.$.showDownloadedButton.setDisabled(showDownloads || this.downloadedEpisodes.length === 0);
+		this.$.showPlaylistButton.setDisabled(showPlaylist);
 		this.$.episodeListScroller.scrollTo(0, 0);
 		this.$.episodeListVR.render();
 		this.$.episodeSpinner.hide();
@@ -355,11 +362,5 @@ enyo.kind({
 		this.$.error.setContent($L("The podcast feed failed to load. Please make sure you are online."));
 		this.$.error.setStyle("color: red;");
 		this.$.error.show();
-	},
-	
-	updateUIOnLoad: function(showPodcastTitles, showDownloads, showPlaylist) {
-		this.showPodcastTitle = showPodcastTitles;
-		this.$.showDownloadedButton.setDisabled(showDownloads || this.downloadedEpisodes.length === 0);
-		this.$.showPlaylistButton.setDisabled(showPlaylist);
 	}
 });
