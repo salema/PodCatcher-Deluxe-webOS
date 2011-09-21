@@ -289,7 +289,7 @@ enyo.kind({
 		this.$.playButton.setDisabled(true);
 		this.$.stalledSpinner.hide();
 		
-		this.doPlaybackEnded(this.episode);
+		this.doPlaybackEnded();
 	},
 	
 	videoResize: function(width) {

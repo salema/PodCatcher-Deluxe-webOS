@@ -120,10 +120,10 @@ enyo.kind({
 		this.updateDashboard();
 	},
 	
-	playNext: function(sender, episode) {
+	playNext: function() {
 		if (this.$.episodeViewPane.plays) this.$.episodeViewPane.togglePlay();
 		
-		this.$.episodeListPane.nextInPlaylist(episode);
+		this.$.episodeListPane.nextInPlaylist(this.$.episodeViewPane.episode);
 		this.updateDashboard();
 	},
 	
