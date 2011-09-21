@@ -175,10 +175,10 @@ enyo.kind({
 		this.updateDashboard();
 	},
 	
-	playNext: function(sender, episode) {
+	playNext: function() {
 		if (this.$.episodeViewPane.plays) this.$.episodeViewPane.togglePlay();
 		
-		this.$.episodeListPane.nextInPlaylist(episode);
+		this.$.episodeListPane.nextInPlaylist(this.$.episodeViewPane.episode);
 		this.updateDashboard();
 	},
 	
@@ -205,7 +205,7 @@ enyo.kind({
 			else if (this.$.episodeViewPane.isInMiddleOfPlayback()) playText = $L("Resume");
 		
 		var episode = this.$.episodeViewPane.episode;
-		//this.$.dashboard.setLayers([{icon: "icons/icon48.png", title: episode.title, text: episode.podcastTitle + " - " + playText}]);
+		this.$.dashboard.setLayers([{icon: "icons/icon48.png", title: episode.title, text: episode.podcastTitle + " - " + playText}]);
 	},
 	
 	propagateMarkedEpisodesToPodcastList: function() {
