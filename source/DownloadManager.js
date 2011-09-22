@@ -56,37 +56,35 @@ enyo.kind({
 	
 	downloadSuccess: function(sender, response) {
 		var episode = this.getEpisodeForResponse(response);
+		
 		if (episode) {
 			// Set ticket on first call
 			if (!episode.ticket && response.ticket) episode.ticket = response.ticket;
 			episode.amountReceived = response.amountReceived;
 			episode.amountTotal = response.amountTotal;
 			
-			this.updateProgress();
-			this.doStatusUpdate(episode, Utilities.formatDownloadStatus(response));
-			
 			if (response.completed) {
-				this.log("Complete ticket: " + episode.ticket);
+				this.log("Completed download for ticket: " + episode.ticket);
 				episode.setDownloaded(true, response.target);
 				
 				this.doDownloadComplete(episode, response);
 				this.removeFromActive(episode);
-				this.updateProgress();
-			}
+			} else this.doStatusUpdate(episode, Utilities.formatDownloadStatus(response));
+			
+			this.updateProgress();	
 		}
 	},
 	
 	cancel: function(episode) {
 		var activeEpisode = Utilities.getItemInList(this.activeEpisodes, episode);
 		
-		this.log("Cancel ticket: " + activeEpisode.ticket);
 		this.$.cancel.call({ticket: activeEpisode.ticket});
 	},
 	
 	cancelSuccess: function(sender, response) {
 		var episode = this.getEpisodeForResponse(response);
 		
-		this.log("Cancel success: " + episode.ticket);
+		this.log("Cancel success for ticket: " + episode.ticket);
 		this.doCancelSuccess(episode);
 		this.removeFromActive(episode);
 		this.updateProgress();
@@ -100,7 +98,7 @@ enyo.kind({
 	},
 	
 	deleteDownload: function(episode) {
-		this.log("Delete ticket: " + episode.ticket);
+		this.log("Delete downloaded file for ticket: " + episode.ticket);
 		this.$.episodeDelete.call({ticket: episode.ticket});
 		episode.ticket = undefined;
 	},
@@ -120,7 +118,7 @@ enyo.kind({
 	},
 	
 	genericFail: function(sender, response) {
-		this.log("Service failure, results=" + enyo.json.stringify(response));
+		this.warn("Service failure, results=" + enyo.json.stringify(response));
 	},
 	
 	addToActive: function(episode) {
@@ -130,6 +128,8 @@ enyo.kind({
 	
 	removeFromActive: function(episode) {
 		Utilities.removeItemFromList(this.activeEpisodes, episode);
+		
+		episode.amountReceived = undefined;
 	},
 	
 	updateProgress: function() {
@@ -137,7 +137,8 @@ enyo.kind({
 			this.$.progressUI.hide();
 			this.$.bar.setPosition(0);
 		} else {
-			if (!this.alwaysHidden) this.$.progressUI.show();
+			if (! this.alwaysHidden) this.$.progressUI.show();
+			
 			this.$.downloadCount.setContent(this.activeEpisodes.length);
 			
 			var total = 0;
@@ -169,7 +170,7 @@ enyo.kind({
 				if (this.activeEpisodes[index].ticket == response.ticket) return this.activeEpisodes[index];
 		}
 		
-		this.log("No match for: " + JSON.stringify(response));
-		this.log("in " + JSON.stringify(this.activeEpisodes));
+		this.warn("No match for: " + JSON.stringify(response));
+		this.warn("in " + JSON.stringify(this.activeEpisodes));
 	}
 });
