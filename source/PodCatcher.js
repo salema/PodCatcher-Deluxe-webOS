@@ -130,16 +130,6 @@ enyo.kind({
 		this.$.podcastListPane.repaint();
 	},
 	
-	markAll: function() {
-		this.$.episodeListPane.markAll(true);
-		this.$.episodeViewPane.reloadMarkedStatus();
-	},
-	
-	unmarkAll: function() {
-		this.$.episodeListPane.markAll(false);
-		this.$.episodeViewPane.reloadMarkedStatus();
-	},
-	
 	prepareLoad: function(sender) {
 		this.$.episodeListPane.prepareLoad();
 	},
