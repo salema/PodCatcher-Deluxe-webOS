@@ -104,7 +104,7 @@ enyo.kind({
 		} // podcast is new
 		else {
 			this.podcastList.push(podcast);
-			this.storePodcastList();
+			this.store();
 			
 			this.selectedIndex = this.podcastList.length - 1;
 			this.selectPodcast();
@@ -112,19 +112,23 @@ enyo.kind({
 			this.$.podcastListScroller.scrollToBottom();
 		}
 	},
-
+	
 	deletePodcast: function(sender, index) {
 		this.podcastList.splice(index, 1);
-		
-		// Swipe on selected
-		if (index == this.selectedIndex) {
+
+		// if select all is active
+		if (this.selectAll) {
+			this.selectAll = false;
+			this.selectedIndex = -1;
+		} // Swipe on selected
+		else if (index == this.selectedIndex) {
 			this.selectedIndex = -1;
 			this.$.podcastImage.setSrc(Podcast.DEFAULT_IMAGE);
-		}
-		// Via swipe and above in list
+		} // Via swipe and above in list
 		else if (index < this.selectedIndex) this.selectedIndex--;
 		
-		this.storePodcastList();
+		this.store();
+		this.$.selectAllButton.setDisabled(this.podcastList.length === 0);
 		this.$.podcastListVR.render();	
 	},
 	
@@ -146,7 +150,7 @@ enyo.kind({
 				else if (newEpisodeCount == 1) text = $L("One new episode");
 				else text = newEpisodeCount + " " + $L("new episodes");
 				
-				text += " (" + $L("Total") + ": " + podcast.episodeList.length + ")";
+				text += " (" + podcast.episodeList.length + " " + $L("total") + ")";
 				this.$.podcastEpisodeNumber.setContent(text);
 			}
 			
@@ -197,46 +201,6 @@ enyo.kind({
 			
 			service.call();
 		}
-	},
-	
-	showAddPodcastPopup: function(sender, event) {
-		this.$.addPodcastPopup.openAtCenter();
-	},
-	
-	addPodcast: function(sender, podcast) {
-		// podcast is already in list
-		if (Utilities.isInList(this.podcastList, podcast)) {
-			this.selectedIndex = Utilities.getIndexInList(this.podcastList, podcast);
-			this.selectPodcast();
-		} // podcast is new
-		else {
-			this.podcastList.push(podcast);
-			this.store();
-			
-			this.selectedIndex = this.podcastList.length - 1;
-			this.selectPodcast();
-			
-			this.$.podcastListScroller.scrollToBottom();
-		}
-	},
-
-	deletePodcast: function(sender, index) {
-		this.podcastList.splice(index, 1);
-
-		// if select all is active
-		if (this.selectAll) {
-			this.selectAll = false;
-			this.selectedIndex = -1;
-		} // Swipe on selected
-		else if (index == this.selectedIndex) {
-			this.selectedIndex = -1;
-			this.$.podcastImage.setSrc(Podcast.DEFAULT_IMAGE);
-		} // Via swipe and above in list
-		else if (index < this.selectedIndex) this.selectedIndex--;
-		
-		this.store();
-		this.$.selectAllButton.setDisabled(this.podcastList.length === 0);
-		this.$.podcastListVR.render();	
 	},
 	
 	specialListSelected: function() {

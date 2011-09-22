@@ -90,6 +90,7 @@ enyo.kind({
 	
 	addSuggestion: function() {
 		var suggestion = this.currentSuggestions[this.$.suggestListVR.fetchRowIndex()];
+		
 		this.doAddSuggestion(suggestion.url);
 	},
 	
@@ -100,9 +101,9 @@ enyo.kind({
 	},
 	
 	getSuggestion: function(sender, index) {
-		if (index < this.currentSuggestions.length) {
-			var item = this.currentSuggestions[index];
-			
+		var item = this.currentSuggestions[index];
+		
+		if (item) {
 			this.$.podcastTitle.setContent(item.title);
 			this.$.podcastDetails.setContent(this.createMetadataString(item));
 			this.$.podcastDescription.setContent(item.description);

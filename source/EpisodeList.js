@@ -22,7 +22,7 @@ enyo.kind({
 	name: "Net.Alliknow.PodCatcher.EpisodeList",
 	kind: "SlidingView",
 	layoutKind: "VFlexLayout",
-	LIMIT: 100,
+	LIMIT: 250,
 	events: {
 		onResumeComplete: "",
 		onSelectEpisode: "",
@@ -164,12 +164,13 @@ enyo.kind({
 		
 		if (episode) {
 			var old = this.markedEpisodes.indexOf(episode.url) >= 0;
-			var playlist = Utilities.isInList(this.playlist, episode);
-			var downloaded = Utilities.isInList(this.downloadedEpisodes, episode);
 			
 			if (!this.showAll && old) {
 				this.$.episodeTitle.parent.hide();
 			} else {
+				var playlist = Utilities.isInList(this.playlist, episode);
+				var downloaded = Utilities.isInList(this.downloadedEpisodes, episode);
+				
 				// Put title
 				this.$.episodeTitle.setContent(episode.title);
 				if (this.selectedIndex == index) this.$.episodeTitle.addClass("highlight");
@@ -178,8 +179,7 @@ enyo.kind({
 				if (downloaded) this.$.episodeTitle.parent.addClass("downloaded");
 				
 				// Put date
-				var pubDate = new Date(episode.pubDate);
-				if (this.formatter) this.$.episodePublished.setContent(this.formatter.format(pubDate));
+				if (this.formatter) this.$.episodePublished.setContent(this.formatter.format(new Date(episode.pubDate)));
 				else this.$.episodePublished.setContent(episode.pubDate);
 				
 				// Put podcast title if wanted
@@ -187,7 +187,6 @@ enyo.kind({
 				
 				if (this.selectedIndex == index) this.$.episodePublished.addClass("highlight");
 				if (old) this.$.episodePublished.addClass("marked");
-				if (playlist) this.$.episodePublished.addClass("playlist");
 				if (playlist) {
 					this.$.episodePublished.addClass("playlist");
 					
@@ -257,15 +256,7 @@ enyo.kind({
 		// Add to playlist
 		if (! Utilities.isInList(this.playlist, episode)) this.playlist.push(episode);
 		// Remove from playlist
-		else {
-			var remove = -1;
-			
-			for (var index = 0; index < this.playlist.length; index++)
-				if (this.playlist[index].url == episode.url)
-					remove = index;
-					
-			if (remove >= 0) this.playlist.splice(remove, 1);
-		}
+		else Utilities.removeItemFromList(this.playlist, episode);
 		
 		// Update UI
 		this.$.showPlaylistButton.setDisabled(this.showPlaylist);
@@ -278,8 +269,7 @@ enyo.kind({
 	
 	nextInPlaylist: function(lastEpisode) {
 		// Remove last played episode from the playlist
-		if (Utilities.isInList(this.playlist, lastEpisode))
-			this.playlist.splice(Utilities.getIndexInList(this.playlist, lastEpisode), 1);
+		Utilities.removeItemFromList(this.playlist, lastEpisode);
 		
 		// Play next item
 		if (this.playlist.length > 0) {
@@ -312,8 +302,7 @@ enyo.kind({
 	
 	removeFromDownloaded: function(episode) {
 		if (Utilities.isInList(this.downloadedEpisodes, episode)) {
-			var remove = Utilities.getIndexInList(this.downloadedEpisodes, episode);
-			this.downloadedEpisodes.splice(remove, 1);
+			Utilities.removeItemFromList(this.downloadedEpisodes, episode);
 			
 			this.$.showDownloadedButton.setDisabled(this.showDownloads || this.downloadedEpisodes.length === 0);
 			if (this.showDownloads) this.setShowDownloads();
