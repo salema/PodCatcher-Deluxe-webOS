@@ -33,6 +33,14 @@ Utilities.prepareFeedService = function(service, url, user, pass) {
 },
 
 /**
+ * Create a nice time string for the play button
+ */
+Utilities.createTimeString = function(current, duration) {
+	return Utilities.formatTime(current) + " " +  $L("of") + " " +
+		Utilities.formatTime(duration);
+},
+
+/**
  * Convert a time given in seconds with many digits to HH:MM:SS
  */
 Utilities.formatTime = function(time) {
@@ -122,4 +130,11 @@ Utilities.getItemAttributeValueInList = function(list, item, name) {
 	
 	if (listItem) return listItem[name];
 	else return undefined;
+};
+
+/**
+ * Savely remove given item from given list
+ */
+Utilities.removeItemFromList = function(list, item) {
+	if (this.isInList(list, item)) list.splice(this.getIndexInList(list, item), 1);
 };

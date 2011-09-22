@@ -105,6 +105,7 @@ enyo.kind({
 	},
 	
 	grabPodcastFailed: function(sender, response, request) {
+		// 401 is access denied
 		if (request && request.xhr.status === 401) this.$.loginPopup.openAtCenter();
 		else this.showFailed();
 	},

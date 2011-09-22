@@ -129,8 +129,7 @@ enyo.kind({
 	},
 	
 	removeFromActive: function(episode) {
-		if (Utilities.isInList(this.activeEpisodes, episode))
-			this.activeEpisodes.splice(Utilities.getIndexInList(this.activeEpisodes, episode), 1);
+		Utilities.removeItemFromList(this.activeEpisodes, episode);
 	},
 	
 	updateProgress: function() {

@@ -41,11 +41,9 @@ enyo.kind({
 	
 	getUser: function() {
 		if (this.$.userInput) return this.$.userInput.getValue();
-		else return "";
 	},
 	
 	getPass: function() {
 		if (this.$.passInput) return this.$.passInput.getValue();
-		else return "";
 	}
 });

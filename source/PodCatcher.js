@@ -46,7 +46,7 @@ enyo.kind({
 					onResumeComplete: "propagateMarkedEpisodesToPodcastList"},
 			{kind: "Net.Alliknow.PodCatcher.EpisodeView", name: "episodeViewPane", flex: 1, peekWidth: 0, onTogglePlay: "updateDashboard", onNext: "playNext",
 					onPlaybackEnded: "playNext", onResume: "updateDashboard", onMarkEpisode: "episodeMarked", onOpenInBrowser: "openInBrowser",
-					onDownloaded: "episodeDownloaded", onDelete: "deleteDownloadedEpisode", onResize: "videoResize"}
+					onDownloaded: "episodeDownloaded", onDeleteDownload: "deleteDownloadedEpisode", onResize: "videoResize"}
 		]}
 	],
 	
@@ -222,7 +222,7 @@ enyo.kind({
 			else if (this.$.episodeViewPane.isInMiddleOfPlayback()) playText = $L("Resume");
 		
 		var episode = this.$.episodeViewPane.episode;
-		this.$.dashboard.setLayers([{icon: "icons/icon48.png", title: episode.title, text: episode.podcastTitle + " - " + playText}]);
+		//this.$.dashboard.setLayers([{icon: "icons/icon48.png", title: episode.title, text: episode.podcastTitle + " - " + playText}]);
 	},
 	
 	propagateMarkedEpisodesToPodcastList: function() {

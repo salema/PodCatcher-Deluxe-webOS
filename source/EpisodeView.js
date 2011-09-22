@@ -28,7 +28,7 @@ enyo.kind({
 		onResume: "",
 		onMarkEpisode: "",
 		onDownloaded: "",
-		onDelete: "",
+		onDeleteDownload: "",
 		onOpenInBrowser: ""
 	},
 	components: [
@@ -97,10 +97,12 @@ enyo.kind({
 	setEpisode: function(episode, autoplay) {
 		this.player = this.$.video.node;
 		
+		// Active, and other episode selected
 		if (this.plays && episode.url != this.episode.url) 
 			this.showError($L("Playback active, please pause before switching."));
-		else if (this.plays) 
-			this.$.error.hide();
+		// Active, and the current episode reselected
+		else if (this.plays) this.$.error.hide();
+		// Actually set new episode
 		else {
 			this.episode = episode;
 			this.resumeOnce = -1;
@@ -117,33 +119,32 @@ enyo.kind({
 		}
 	},
 	
+	startStopDelete: function(sender, response) {
+		// Cancel download
+		if (this.$.downloadManager.isDownloading(this.episode)) this.$.downloadManager.cancel(this.episode);
+		else {
+			// Cannot delete file since it is playing
+			if (this.episode.isDownloaded && this.plays) {
+				this.showError($L("Please stop playback before deleting."));
+			} // Delete downloaded file
+			else if (this.episode.isDownloaded) {
+				this.$.error.hide();
+				this.$.downloadButton.setCaption($L("Download"));
+				
+				this.player.src = this.episode.url;
+				
+				this.$.downloadManager.deleteDownload(this.episode);
+				this.episode.setDownloaded(false);
+				this.doDeleteDownload(this.episode);
+			} // Download episode 
+			else this.downloadEpisode(this.episode);
+		} 
+	},
+	
 	downloadEpisode: function(episode) {
 		if (this.episode.equals(episode)) this.$.downloadButton.setCaption($L("Cancel"));
 		
 		this.$.downloadManager.download(episode);
-	},
-	
-	startStopDelete: function(sender, response) {
-		// Download episode 
-		if (!this.$.downloadManager.isDownloading(this.episode)) {
-			if (!this.episode.isDownloaded) {
-				this.$.downloadButton.setCaption($L("Cancel"));
-				this.$.downloadManager.download(this.episode);
-			} // Cannot delete file since it is playing
-			else if (this.episode.isDownloaded && this.plays) {
-				this.showError($L("Please stop playback before deleting."));
-			} // Delete downloaded file
-			else if (this.episode.isDownloaded) {
-				this.player.src = this.episode.url;
-				this.$.error.hide();
-				this.$.downloadButton.setCaption($L("Download"));
-						
-				this.$.downloadManager.deleteDownload(this.episode);
-				this.episode.setDownloaded(false);
-				this.doDelete(this.episode);
-			}
-		} // Cancel download
-		else this.$.downloadManager.cancel(this.episode);
 	},
 	
 	downloadStatusUpdate: function(sender, episode, progress) {
@@ -155,7 +156,7 @@ enyo.kind({
 			this.$.error.hide();
 			this.$.downloadButton.setCaption($L("Delete from device"));
 			
-			if (!this.plays) this.player.src = episode.file;
+			if (! this.plays) this.player.src = episode.file;
 		}
 			
 		this.doDownloaded(episode);
@@ -207,13 +208,12 @@ enyo.kind({
 	},
 	
 	seeking: function(sender, currentlyAt) {
-		if (this.plays) clearInterval(this.playtimeInterval);
+		var timeString = Utilities.createTimeString(currentlyAt, this.player.duration);
 		
-		if (this.plays) 
-			this.$.playButton.setCaption($L("Pause at") + " " + Utilities.formatTime(currentlyAt) + " " +
-				$L("of") + " " + Utilities.formatTime(this.player.duration));
-		else this.$.playButton.setCaption($L("Resume at") + " " + Utilities.formatTime(currentlyAt) + " " +
-				$L("of") + " " + Utilities.formatTime(this.player.duration));
+		if (this.plays) {
+			clearInterval(this.playtimeInterval);
+			this.$.playButton.setCaption($L("Pause at") + " " + timeString);
+		} else this.$.playButton.setCaption($L("Resume at") + " " + timeString); 
 	},
 	
 	seek: function(sender, seekTo) {
@@ -234,14 +234,16 @@ enyo.kind({
 		if (this.plays && (this.player.readyState != 4 || this.player.seeking)) this.$.stalledSpinner.show();
 		else this.$.stalledSpinner.hide();
 		
+		var timeString = Utilities.createTimeString(this.player.currentTime, this.player.duration);
+		
 		// Update play button
 		if (this.plays) {
 			if (this.isAtStartOfPlayback()) this.$.playButton.setCaption($L("Pause"));
 			else if (this.isAtEndOfPlayback()) this.playbackEnded();
-			else this.$.playButton.setCaption($L("Pause at") + " " + this.createTimeString());
+			else this.$.playButton.setCaption($L("Pause at") + " " + timeString);
 		} else {
 			if (this.isAtStartOfPlayback()) this.$.playButton.setCaption($L("Play"));
-			else this.$.playButton.setCaption($L("Resume at") + " " + this.createTimeString());
+			else this.$.playButton.setCaption($L("Resume at") + " " + timeString);
 		}
 		
 		if (this.player.error > 0) this.playbackFailed();
@@ -277,13 +279,13 @@ enyo.kind({
 	},
 	
 	playbackEnded: function() {
-		if (! this.episode.marked) this.toggleMarked();	
+		if (! this.episode.marked) this.toggleMarked();
+		
 		this.stopPlayback($L("Playback complete"));
 	},
 	
 	playbackFailed: function() {
-		this.stopPlayback($L("Playback failed"));	
-		this.showError($L("Playback failed"));
+		this.stopPlayback($L("Playback failed"));
 	},
 	
 	stopPlayback: function(buttonText) {
@@ -333,13 +335,12 @@ enyo.kind({
 		this.$.error.hide();
 		this.$.playButton.setCaption($L("Play"));
 		this.$.playButton.setDisabled(false);
+		this.$.stalledSpinner.hide();
 		
 		if (episode.isDownloaded) this.$.downloadButton.setCaption($L("Delete from device"));
 		else if (this.$.downloadManager.isDownloading(episode)) this.$.downloadButton.setCaption($L("Cancel"));
 		else this.$.downloadButton.setCaption($L("Download"));
-		
-		this.$.stalledSpinner.hide();
-		
+				
 		if (this.isVideoContentAvailable()) this.$.episodeName.setContent($L("Watching") + " \"" + episode.title + "\"");
 		else this.$.episodeName.setContent($L("Listen to") + " \"" + episode.title + "\"");
 		
@@ -352,11 +353,6 @@ enyo.kind({
 		else this.$.markButton.setSrc(Episode.UNMARKED_ICON);
 	},
 		
-	createTimeString: function() {
-		return Utilities.formatTime(this.player.currentTime) + " " +  $L("of") + " " +
-			Utilities.formatTime(this.player.duration);
-	},
-	
 	showError: function(text) {
 		this.$.error.setContent(text);
 		this.$.error.show();
