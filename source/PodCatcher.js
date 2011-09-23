@@ -83,6 +83,8 @@ enyo.kind({
 	
 	toggleAutoDownload: function() {
 		this.enableAutoDownload = !this.enableAutoDownload;
+		// If auto-download was enabled, start it right away
+		if (this.enableAutoDownload) this.autoUpdate();
 		
 		this.store();
 	},
