@@ -29,6 +29,7 @@ enyo.kind({
 	},
 	components: [
 		{kind: "SystemService", name: "preferencesService", subscribe : false},
+		{kind: "WebService", name: "autoUpdatePodcast", onSuccess: "autoUpdatePodcastSuccess", onFailure: "autoUpdatePodcastFailed"},
 		{kind: "WebService", name: "grabPodcast", onSuccess: "grabPodcastSuccess", onFailure: "grabPodcastFailed"},
 		{kind: "WebService", name: "grabPodcastImage", onSuccess: "grabPodcastImageSuccess"},
 		{kind: "Net.Alliknow.PodCatcher.AddPodcastPopup", name: "addPodcastPopup", onAddPodcast: "addPodcast"},
@@ -38,9 +39,9 @@ enyo.kind({
 		]},
 		{kind: "Scroller", name: "podcastListScroller", flex: 1, components: [
 			{kind: "VirtualRepeater", name: "podcastListVR", onSetupRow: "getPodcast", onclick: "selectPodcastClick", components: [
-				{kind: "SwipeableItem", layout: "HFlexBox", onConfirm: "deletePodcast", style: "padding: 5px 0px 2px 10px;", components: [
+				{kind: "SwipeableItem", layout: "HFlexBox", onConfirm: "deletePodcast", components: [
 					{name: "podcastTitle", className: "nowrap"},
-					{name: "podcastEpisodeNumber", className: "nowrap", style: "font-size: smaller"}
+					{name: "podcastEpisodeNumber", className: "nowrap", style: "font-size: smaller;"}
 				]}
 			]}
 		]},
@@ -56,9 +57,9 @@ enyo.kind({
 		
 		this.selectedIndex = -1;
 		this.loadCounter = 0;
+		this.autoUpdateLoadCounter = 0;
 		this.podcastList = [];
 		this.selectAll = false;
-		this.autoUpdateInProgress = false;
 		
 		this.$.preferencesService.call({keys: ["storedPodcastList"]}, {method: "getPreferences", onSuccess: "restorePodcastList"});
 	},
@@ -78,6 +79,7 @@ enyo.kind({
 			}
 			
 			this.$.selectAllButton.setDisabled(this.selectAll || this.podcastList.length === 0);
+			this.$.podcastListVR.render();
 			this.autoUpdate();
 		}
 	},
@@ -157,9 +159,11 @@ enyo.kind({
 	},
 	
 	addPodcast: function(inSender, podcast) {
+		var index = Utilities.getIndexInList(this.podcastList, podcast);
+		
 		// podcast is already in list
-		if (this.isPodcastInList(podcast)) {
-			this.selectedIndex = this.getPodcastIndexInList(podcast);
+		if (index >= 0) {
+			this.selectedIndex = index;
 			this.selectPodcast();
 		} // podcast is new
 		else {
@@ -188,35 +192,96 @@ enyo.kind({
 		this.$.podcastListVR.render();	
 	},
 	
-	isPodcastInList: function(podcast) {
-		for (var index = 0; index < this.podcastList.length; index++)
-			if (this.podcastList[index].url == podcast.url) return true;
+	// Method called for item creation from virtual repeater
+	getPodcast: function(inSender, inIndex) {
+		var podcast = this.podcastList[inIndex];
+		
+		if (podcast) {
+			this.$.podcastTitle.setContent(podcast.title);
 			
-		return false;	
+			if (!podcast.episodeList) this.$.podcastEpisodeNumber.setContent("");
+			else if (podcast.episodeList.length === 0)
+				this.$.podcastEpisodeNumber.setContent($L("No episodes"));
+			else if (podcast.episodeList.length == 1)
+				this.$.podcastEpisodeNumber.setContent(podcast.episodeList.length + " " + $L("episode"));
+			else this.$.podcastEpisodeNumber.setContent(podcast.episodeList.length + " " + $L("episodes"));
+			
+			if (this.selectedIndex == inIndex || this.selectAll) {
+				this.$.podcastTitle.addClass("highlight");
+				this.$.podcastEpisodeNumber.addClass("highlight");
+			}
+		}
+		
+		return podcast !== undefined;
 	},
 	
-	getPodcastIndexInList: function(podcast) {
-		for (var index = 0; index < this.podcastList.length; index++)
-			if (this.podcastList[index].url == podcast.url) return index;	
+	selectPodcastClick: function(inSender, inEvent) {
+		this.selectedIndex = this.$.podcastListVR.fetchRowIndex();
+		this.selectPodcast();
+	},
+	
+	selectPodcast: function() {
+		this.prepareLoad(false);		
+		
+		var podcast = this.podcastList[this.selectedIndex];
+		
+		if (podcast) {
+			Utilities.prepareFeedService(this.$.grabPodcast, podcast.url, podcast.user, podcast.pass);
+			this.$.grabPodcast.call();
+			
+			this.$.grabPodcastImage.setUrl(encodeURI(podcast.image));
+			this.$.grabPodcastImage.call();
+		}
+	},
+	
+	selectAllPodcasts: function(sender, event) {
+		this.prepareLoad(true);
+		this.loadAll(this.$.grabPodcast);
+	},
+	
+	autoUpdate: function() {
+		this.$.podcastSpinner.show();
+		this.autoUpdateLoadCounter = 0;
+		
+		this.loadAll(this.$.autoUpdatePodcast);
+	},
+	
+	loadAll: function(service) {
+		for (var index = 0; index < this.podcastList.length; index++) {
+			Utilities.prepareFeedService(service, this.podcastList[index].url,
+					this.podcastList[index].user, this.podcastList[index].pass);
+			
+			service.call();
+		}
+	},
+		
+	autoUpdatePodcastSuccess: function(sender, response, request) {
+		this.autoUpdateLoadCounter++;
+		
+		var podcast = Utilities.getItemInList(this.podcastList, new Podcast(request.url));
+		podcast.readEpisodes(response);
+		
+		this.checkAutoUpdateComplete();
+	},
+	
+	autoUpdatePodcastFailed: function(sender, response, request) {
+		this.autoUpdateLoadCounter++;
+		this.checkAutoUpdateComplete();
+	},
+	
+	checkAutoUpdateComplete: function() {
+		// All feeds finished loading?
+		if (this.autoUpdateLoadCounter == this.podcastList.length) {
+			this.$.podcastSpinner.hide();
+			this.$.podcastListVR.render();
+		}
 	},
 	
 	grabPodcastSuccess: function(sender, response, request) {
 		this.loadCounter++;
 		
 		var podcast = Utilities.getItemInList(this.podcastList, new Podcast(request.url));
-		var xmlTree = XmlHelper.parse(response);
-		var items = XmlHelper.get(xmlTree, XmlHelper.ITEM);
-		
-		podcast.episodeList = [];
-		
-		for (var index = 0; index < items.length; index++) {
-			var episode = new Episode();
-			if (! episode.isValid(items[index])) continue;
-			
-			episode.read(items[index]);
-			episode.podcastTitle = podcast.title;
-			podcast.episodeList.push(episode);
-		}
+		podcast.readEpisodes(response);
 		
 		this.checkLoadFinished(podcast);
 	},
@@ -230,14 +295,10 @@ enyo.kind({
 	},
 	
 	checkLoadFinished: function(currentPodcast) {
-		// All feed finished loading?
-		if (!(this.selectAll || this.autoUpdateInProgress) || this.loadCounter == this.podcastList.length) {
-			if (this.selectAll && !this.autoUpdateInProgress) this.doSelectAll(this.podcastList);
-			else if (!this.autoUpdateInProgress) this.doSelectPodcast(currentPodcast);
-			else {
-				this.$.podcastSpinner.hide();
-				this.autoUpdateInProgress = false;
-			}
+		// All feeds finished loading?
+		if (!this.selectAll || this.loadCounter == this.podcastList.length) {
+			if (this.selectAll) this.doSelectAll(this.podcastList);
+			else this.doSelectPodcast(currentPodcast);
 			
 			this.$.podcastListVR.render();
 		}
