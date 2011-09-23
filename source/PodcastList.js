@@ -93,7 +93,8 @@ enyo.kind({
 		if (podcast) {
 			this.$.podcastTitle.setContent(podcast.title);
 			
-			if (!podcast.episodeList || podcast.episodeList.length === 0)
+			if (!podcast.episodeList) this.$.podcastEpisodeNumber.setContent("-----");
+			else if (podcast.episodeList.length === 0)
 				this.$.podcastEpisodeNumber.setContent($L("No episodes"));
 			else if (podcast.episodeList.length == 1)
 				this.$.podcastEpisodeNumber.setContent(podcast.episodeList.length + " " + $L("episode"));
