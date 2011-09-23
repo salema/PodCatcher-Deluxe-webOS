@@ -33,10 +33,13 @@ enyo.kind({
 	components: [
 		{kind: "WebService", name: "grabSuggestionsService", onSuccess: "grabSuggestionsSuccess", onFailure: "grabSuggestionsFailed"},
 		{kind: "PalmService", name: "openEmailCall", service: "palm://com.palm.applicationManager/", method: "open"},
-		{kind: "PickerGroup", label: $L("Filter for"), onChange: "updateSuggestions", style: "margin-left: 11px", components: [
-			{name: "languagePicker", items: [$L("All"), $L("English"), $L("German")], className: "filterPicker"},
-			{name: "categoryPicker", items: [$L("All"), $L("News"), $L("Sports"), $L("Technology")], className: "filterPicker"},
-			{name: "typePicker", items: [$L("All"), $L("Audio"), $L("Video")], className: "filterPicker"}
+		{kind: "HFlexBox", align: "center", components: [
+			{kind: "PickerGroup", label: $L("Filter for"), onChange: "updateSuggestions", flex: 1, style: "margin-left: 11px", components: [
+				{name: "languagePicker", items: [$L("All"), $L("English"), $L("German")], className: "filterPicker"},
+				{name: "categoryPicker", items: [$L("All"), $L("News"), $L("Sports"), $L("Technology")], className: "filterPicker"},
+				{name: "typePicker", items: [$L("All"), $L("Audio"), $L("Video")], className: "filterPicker"}
+			]},
+			{kind: "Spinner", name: "loadSpinner"}
 		]},
 		{kind: "Group", caption: $L("Featured Podcast"), components: [
 			{kind: "HFlexBox", align: "center", components: [
@@ -47,7 +50,7 @@ enyo.kind({
 			{name: "featuredDescription", style: "margin-left: 10px; margin-bottom: 10px; font-size: smaller"}
 		]},
 		{kind: "Group", caption: $L("Suggested Podcasts"), components: [
-			{kind: "Scroller", name: "suggestScroller", style: "height: 290px", components: [
+			{kind: "Scroller", name: "suggestScroller", style: "height: 270px", components: [
 				{kind: "VirtualRepeater", name: "suggestListVR", onSetupRow: "getSuggestion", onclick: "selectPodcastClick", components: [
 					{kind: "Item", components: [
 						{kind: "HFlexBox", align: "center", components: [
@@ -60,7 +63,7 @@ enyo.kind({
 				]}
 			]}
 		]},
-		{kind: "HtmlContent", content: $L("<a href=\"\">Send a proposal</a> for suggestions to be included in this list!"), onLinkClick: "sendProposal", style: "width: 100%; text-align: center;"}
+		{kind: "HtmlContent", name: "footer", onLinkClick: "sendProposal"}
 	],
 	
 	create: function() {
@@ -79,6 +82,10 @@ enyo.kind({
 		else this.$.languagePicker.setValue($L("English"));
 		this.$.categoryPicker.setValue($L("All"));
 		this.$.typePicker.setValue($L("Audio"));
+		
+		this.$.footer.setContent($L("<a href=\"\">Send a proposal</a> for suggestions to be included in this list!"));
+		this.$.footer.setStyle("width: 100%; text-align: center;");
+		this.$.loadSpinner.show();
 		
 		this.$.grabSuggestionsService.setUrl(this.SOURCE);
 		this.$.grabSuggestionsService.call();
@@ -113,10 +120,15 @@ enyo.kind({
 	},
 	
 	grabSuggestionsSuccess: function(sender, response, request) {		
-		this.allFeatured = eval(response).featured;
-		this.allSuggestions = eval(response).suggestions;
+		this.$.loadSpinner.hide();
 		
-		this.updateSuggestions();
+		if (! response) this.grabSuggestionsFailed(sender, response, request);
+		else {
+			this.allFeatured = eval(response).featured;
+			this.allSuggestions = eval(response).suggestions;
+		
+			this.updateSuggestions();
+		}
 	},
 	
 	updateSuggestions: function() {
@@ -153,7 +165,10 @@ enyo.kind({
 	},
 	
 	grabSuggestionsFailed: function(sender, response, request) {
-		this.close();
+		this.$.footer.setContent($L("Download failed"));
+		this.$.footer.setStyle("width: 100%; text-align: center; color: red;");
+		this.$.loadSpinner.hide();
+		
 		this.warn("Failed to load suggestions from server: " +  response);
 	}
 });
