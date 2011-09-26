@@ -344,7 +344,7 @@ enyo.kind({
 		this.$.episodeListVR.render();
 		this.$.episodeSpinner.hide();
 		
-		if (this.episodeList.length === 0) this.loadFailed();
+		if (this.episodeList.length === 0 && !(showDownloads || showPlaylist)) this.loadFailed();
 	},
 	
 	loadFailed: function() {
