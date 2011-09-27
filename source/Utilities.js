@@ -50,18 +50,6 @@ Utilities.formatTime = function(time) {
 };
 
 /**
- * Convert a download status response to a nice amount downloaded string
- */
-Utilities.formatDownloadStatus = function(data) {
-	var percent = Math.floor(data.amountReceived / data.amountTotal * 100);
-	var received = Math.round(data.amountReceived / (1024*1024));
-	var total = Math.round(data.amountTotal / (1024*1024));
-	
-	return this.formatNumber(percent) + "% (" + this.formatNumber(received) +
-			" " + $L("of") + " " + this.formatNumber(total) + "MB)";
-};
-
-/**
  * Make sure a number exists (and escape to "--" if not) and optional make it
  * two digits long. Use for positive integer only!
  */
@@ -77,15 +65,6 @@ Utilities.formatNumber = function(number, makeTwoDigits) {
 Utilities.startsWithValidProtocol = function(url) {
 	return url !== undefined && url.length >= 7 && 
 		(url.substring(0, 7) == "http://" || url.substring(0, 8) == "https://");
-};
-
-/**
- * Create an unique, no-hassle filename for a downloaded file
- */
-Utilities.createUniqueFilename = function(url) {
-	var urlToFile = url.split("?")[0];
-	var splits = urlToFile.split(".");
-	return new Date().getTime() + "." + splits[splits.length - 1];
 };
 
 /**
