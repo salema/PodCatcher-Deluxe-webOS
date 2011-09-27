@@ -95,9 +95,14 @@ Utilities.startsWithValidProtocol = function(url) {
  * Create an unique, no-hassle filename for a downloaded file
  */
 Utilities.createUniqueFilename = function(url) {
-	var urlToFile = url.split("?")[0];
-	var splits = urlToFile.split(".");
-	return new Date().getTime() + "." + splits[splits.length - 1];
+	// We do not need anything from behind the "?"
+	var start = url.split("?")[0];
+	
+	// Then we want to actual filename on the server only
+	var splits = start.split("/");
+	var filename = splits[splits.length - 1];
+		
+	return filename.replace(new RegExp('[^a-z0-9.]+', 'ig'), '_');
 };
 
 /**
