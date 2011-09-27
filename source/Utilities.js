@@ -101,7 +101,8 @@ Utilities.createUniqueFilename = function(url) {
 	// Then we want to actual filename on the server only
 	var splits = start.split("/");
 	var filename = splits[splits.length - 1];
-		
+
+	// Make sure this has only chars, numbers, dots and '_'
 	return filename.replace(new RegExp('[^a-z0-9.]+', 'ig'), '_');
 };
 
