@@ -151,8 +151,7 @@ enyo.kind({
 	episodeSelected: function(sender, episode, autoplay) {
 		this.$.episodeViewPane.setEpisode(episode, autoplay);
 		
-		if (!this.$.episodeViewPane.downloads && !this.$.episodeViewPane.plays)
-			this.updateDashboard(this, episode);
+		if (! this.$.episodeViewPane.plays)	this.updateDashboard();
 	},
 	
 	playlistChanged: function(sender, newLength) {
@@ -204,7 +203,7 @@ enyo.kind({
 		var playText = $L("Pause");
 		
 		// If not, figure out what else is the status
-		if (!this.$.episodeViewPane.plays)
+		if (! this.$.episodeViewPane.plays)
 			if (this.$.episodeViewPane.isAtStartOfPlayback()) playText = $L("Play");
 			else if (this.$.episodeViewPane.isAtEndOfPlayback()) playText = $L("Playback complete");
 			else if (this.$.episodeViewPane.isInMiddleOfPlayback()) playText = $L("Resume");
