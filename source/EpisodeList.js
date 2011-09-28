@@ -147,14 +147,12 @@ enyo.kind({
 			this.$.error.setContent($L("Your playlist is empty. Swipe any episode to the right in order to add it to the playlist."));
 			this.$.error.setStyle("color: gray;");
 			this.$.error.show();
-			this.$.episodeSpinner.hide();
 		} else {
 			for (var index = 0; index < this.playlist.length; index++)
 				this.episodeList.push(this.playlist[index]);
-			
-			this.afterLoad(false, true, false, true);
 		}
 		
+		this.afterLoad(false, true, false, true);
 		this.doSpecialListSelected();
 	},
 	
