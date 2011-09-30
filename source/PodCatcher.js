@@ -93,7 +93,7 @@ enyo.kind({
 	
 	episodeSelected: function(inSender, episode) {
 		this.$.episodeViewPane.setEpisode(episode);
-		this.updateDashboard(this, episode);
+		this.updateDashboard();
 	},
 	
 	togglePlay: function() {
@@ -116,12 +116,14 @@ enyo.kind({
 	},
 	
 	updateDashboard: function() {
+		// Default: we are playing
 		var playText = $L("Pause");
 		
-		if (!this.$.episodeViewPane.plays && this.$.episodeViewPane.isAtStartOfPlayback()) playText = $L("Play");
-		else if (!this.$.episodeViewPane.plays && this.$.episodeViewPane.isAtEndOfPlayback()) playText = $L("Playback complete");
-		else if (this.$.episodeViewPane.plays && this.$.episodeViewPane.isInMiddleOfPlayback()) playText = $L("Pause"); 
-		else if (! this.$.episodeViewPane.plays && this.$.episodeViewPane.isInMiddleOfPlayback()) playText = $L("Resume");
+		// If not, figure out what else is the status
+		if (! this.$.episodeViewPane.plays)
+			if (this.$.episodeViewPane.isAtStartOfPlayback()) playText = $L("Play");
+			else if (this.$.episodeViewPane.isAtEndOfPlayback()) playText = $L("Playback complete");
+			else if (this.$.episodeViewPane.isInMiddleOfPlayback()) playText = $L("Resume");
 		
 		var episode = this.$.episodeViewPane.episode;
 		this.$.dashboard.setLayers([{icon: "icons/icon48.png", title: episode.title, text: playText}]);
