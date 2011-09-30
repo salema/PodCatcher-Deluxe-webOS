@@ -98,19 +98,16 @@ enyo.kind({
 		var index = Utilities.getIndexInList(this.podcastList, podcast);
 		
 		// podcast is already in list
-		if (index >= 0) {
-			this.selectedIndex = index;
-			this.selectPodcast();
-		} // podcast is new
+		if (index >= 0) this.selectedIndex = index;
+		// podcast is new
 		else {
 			this.podcastList.push(podcast);
 			this.store();
 			
 			this.selectedIndex = this.podcastList.length - 1;
-			this.selectPodcast();
-			
-			this.$.podcastListScroller.scrollToBottom();
 		}
+		
+		this.selectPodcast();
 	},
 	
 	deletePodcast: function(sender, index) {
@@ -260,6 +257,7 @@ enyo.kind({
 			else this.doSelectPodcast(currentPodcast);
 			
 			this.$.podcastListVR.render();
+			if(! this.selectAll) this.scrollSelectedIntoView();
 		}
 	},
 	
@@ -271,6 +269,11 @@ enyo.kind({
 		this.$.selectAllButton.setDisabled(selectAll || this.podcastList.length === 0);
 		
 		this.doPrepareLoad();
+	},
+	
+	scrollSelectedIntoView: function() {
+		if (this.selectedIndex == this.podcastList.length - 1)
+			this.$.podcastListScroller.scrollToBottom();
 	},
 	
 	grabPodcastImageSuccess: function(sender, response, request) {
