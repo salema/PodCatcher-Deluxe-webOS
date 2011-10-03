@@ -21,6 +21,8 @@
 enyo.kind({
 	name: "Net.Alliknow.PodCatcher.EpisodeView",
 	kind: "SlidingView",
+	PLAY_BUTTON_INTERVAL: 1000,
+	SLIDER_INTERVAL: 500,
 	events: {
 		onTogglePlay: "",
 		onPlaybackEnded: "",
@@ -47,7 +49,7 @@ enyo.kind({
 		{kind: "Scroller", name: "episodeScroller", flex: 1, style: "margin: 5px 12px", components: [
 			{kind: "HtmlContent", name: "episodeDescription", onLinkClick: "doOpenInBrowser", flex: 1}
 		]},
-		{kind: "ProgressSlider", name: "playSlider", style: "margin: 10px;", onChanging: "seeking", onChange: "seek", tapPosition: false},
+		{kind: "ProgressSlider", name: "playSlider", style: "margin: 10px;", onmousedown: "seekTap", onChanging: "seeking", onChange: "seek"},
 		{kind: "Toolbar", className: "toolbar", components: [
 			{kind: "GrabButton", style: "position: static"},
 			{kind: "ToolButton", name: "playButton", caption: $L("Play"), onclick: "togglePlay", disabled: true, flex: 1},
@@ -60,7 +62,7 @@ enyo.kind({
 		
 		this.plays = false;
 		this.player = this.$.video.node;
-		this.sliderInterval = setInterval(enyo.bind(this, this.updatePlaySlider), 500);
+		this.sliderInterval = setInterval(enyo.bind(this, this.updatePlaySlider), this.SLIDER_INTERVAL);
 		this.videoInterval = setInterval(enyo.bind(this, this.updateVideoMode), 500);
 		
 		this.$.preferencesService.call({keys: ["resumeEpisode", "resumeTime"]},	{method: "getPreferences", onSuccess: "resume"});
@@ -197,7 +199,7 @@ enyo.kind({
 			this.resumeOnce = -1;
 			
 			this.player.play();
-			this.playtimeInterval = setInterval(enyo.bind(this, this.updatePlaytime), 1000);
+			this.playtimeInterval = setInterval(enyo.bind(this, this.updatePlaytime), this.PLAY_BUTTON_INTERVAL);
 		} else {
 			this.player.pause();
 			clearInterval(this.playtimeInterval);
@@ -206,26 +208,34 @@ enyo.kind({
 		this.updatePlaytime();
 	},
 	
+	seekTap: function() {
+		// We do not want to have the slider jump around
+		clearInterval(this.sliderInterval);
+		// Stop play button label text updates
+		if (this.plays) clearInterval(this.playtimeInterval);
+	},
+	
 	seeking: function(sender, currentlyAt) {
 		var timeString = Utilities.createTimeString(currentlyAt, this.player.duration);
 		
-		if (this.plays) {
-			clearInterval(this.playtimeInterval);
-			this.$.playButton.setCaption($L("Pause at") + " " + timeString);
-		} else this.$.playButton.setCaption($L("Resume at") + " " + timeString); 
+		if (this.plays) this.$.playButton.setCaption($L("Pause at") + " " + timeString);
+		else this.$.playButton.setCaption($L("Resume at") + " " + timeString); 
 	},
 	
 	seek: function(sender, seekTo) {
+		// Set player to new position
 		this.player.currentTime = seekTo;
-		// If seeking after playback ended
-		this.$.playButton.setDisabled(false);
 		
+		// Update play button text and restart updater
 		this.updatePlaytime();
-		if (this.plays) {
-			// just in case this has not been cleared by seeking before (we do not want multiple intervals!)
-			clearInterval(this.playtimeInterval);
-			this.playtimeInterval = setInterval(enyo.bind(this, this.updatePlaytime), 1000);
-		}
+		if (this.plays)
+			this.playtimeInterval = setInterval(enyo.bind(this, this.updatePlaytime), this.PLAY_BUTTON_INTERVAL);
+				
+		// Restart slider updater
+		this.sliderInterval = setInterval(enyo.bind(this, this.updatePlaySlider), this.SLIDER_INTERVAL);
+		
+		// If seeking after playback ended
+		this.$.playButton.setDisabled(this.isAtEndOfPlayback());
 	},
 	
 	updatePlaytime: function() {
