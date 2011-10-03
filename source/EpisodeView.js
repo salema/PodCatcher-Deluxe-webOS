@@ -96,7 +96,8 @@ enyo.kind({
 	},
 	
 	setEpisode: function(episode, autoplay) {
-		this.player = this.$.video.node;
+		this.player = this.$.video.hasNode();
+		this.player.setAttribute("x-palm-media-audio-class", "media");
 		
 		// Active, and other episode selected
 		if (this.plays && episode.url != this.episode.url) 
