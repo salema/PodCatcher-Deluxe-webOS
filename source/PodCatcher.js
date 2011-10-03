@@ -203,17 +203,20 @@ enyo.kind({
 	},
 	
 	updateDashboard: function() {
-		// Default: we are playing
-		var playText = $L("Pause");
-		
-		// If not, figure out what else is the status
-		if (! this.$.episodeViewPane.plays)
-			if (this.$.episodeViewPane.isAtStartOfPlayback()) playText = $L("Play");
-			else if (this.$.episodeViewPane.isAtEndOfPlayback()) playText = $L("Playback complete");
-			else if (this.$.episodeViewPane.isInMiddleOfPlayback()) playText = $L("Resume");
-		
-		var episode = this.$.episodeViewPane.episode;
-		this.$.dashboard.setLayers([{icon: "icons/icon48.png", title: episode.title, text: episode.podcastTitle + " - " + playText}]);
+		// Only use dashboard where it actually exists
+		if (window.PalmSystem) {
+			// Default: we are playing
+			var playText = $L("Pause");
+			
+			// If not, figure out what else is the status
+			if (! this.$.episodeViewPane.plays)
+				if (this.$.episodeViewPane.isAtStartOfPlayback()) playText = $L("Play");
+				else if (this.$.episodeViewPane.isAtEndOfPlayback()) playText = $L("Playback complete");
+				else if (this.$.episodeViewPane.isInMiddleOfPlayback()) playText = $L("Resume");
+			
+			var episode = this.$.episodeViewPane.episode;
+			this.$.dashboard.setLayers([{icon: "icons/icon48.png", title: episode.title, text: episode.podcastTitle + " - " + playText}]);
+		}
 	},
 	
 	propagateMarkedEpisodesToPodcastList: function() {

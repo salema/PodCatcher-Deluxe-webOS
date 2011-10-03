@@ -66,7 +66,8 @@ enyo.kind({
 		this.showDownloads = false;
 		this.showPlaylist = false;
 		
-		this.formatter = new enyo.g11n.DateFmt({date: "long", time: "short", weekday: true});
+		if (window.PalmSystem)
+			this.formatter = new enyo.g11n.DateFmt({date: "long", time: "short", weekday: true});
 		
 		this.$.preferencesService.call({keys: ["episodePlaylist", "markedEpisodes", "downloadedEpisodes"]},
 				{method: "getPreferences", onSuccess: "restore"});
