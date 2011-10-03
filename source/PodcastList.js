@@ -28,7 +28,7 @@ enyo.kind({
 		onSelectAll: ""
 	},
 	components: [
-		{kind: "SystemService", name: "preferencesService", subscribe : false},
+		{kind: "SystemService", name: "preferencesService", subscribe: false},
 		{kind: "WebService", name: "autoUpdatePodcast", onSuccess: "autoUpdatePodcastSuccess", onFailure: "autoUpdatePodcastFailed"},
 		{kind: "WebService", name: "grabPodcast", onSuccess: "grabPodcastSuccess", onFailure: "grabPodcastFailed"},
 		{kind: "WebService", name: "grabPodcastImage", onSuccess: "grabPodcastImageSuccess"},
