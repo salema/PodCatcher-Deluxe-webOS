@@ -33,7 +33,7 @@ enyo.kind({
 			{name: "episodeName", content: $L("Listen"), className: "nowrap", flex: 1},
 			{kind: "Spinner", name: "stalledSpinner", align: "right"}
 		]},
-		{kind: "Sound"},
+		{kind: "Sound", audioClass: "media"},
 		{name: "error", showing: false, className: "error"},
 		{kind: "Scroller", name: "episodeScroller", flex: 1, style: "margin: 5px 12px", components: [
 			{kind: "HtmlContent", name: "episodeDescription", onLinkClick: "doOpenInBrowser", flex: 1}
