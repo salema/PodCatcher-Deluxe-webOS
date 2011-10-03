@@ -34,7 +34,6 @@ enyo.kind({
 	components: [
 		{kind: "SystemService", name: "preferencesService", subscribe : false},
 		{kind: "ApplicationEvents", onUnload: "storeResumeInformation"},
-		{kind: "PalmService", name: "launchBrowserCall", service: "palm://com.palm.applicationManager/", method: "launch"},
 		{kind: "Header", layoutKind: "HFlexLayout", className: "header", components: [
 			{kind: "Image", name: "markButton", src: Episode.UNMARKED_ICON, onclick: "toggleMarked", style: "margin-right: 10px;"},
 			{name: "episodeName", content: $L("Listen"), className: "nowrap", flex: 1},
