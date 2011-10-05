@@ -23,7 +23,7 @@ enyo.kind({
 	name: "Net.Alliknow.PodCatcher",
 	kind: "VFlexBox",
 	HOME_PAGE: "http://www.podcatcher-deluxe.com",
-	HELP_PAGE: "http://salema.github.com/Yet-Another-Simple-Pod-Catcher/help.html",
+	HELP_PAGE: "http://help.podcatcher-deluxe.com",
 	AUTO_UPDATE_INTERVAL: 30 * 60 * 1000,
 	components: [
 		{kind: "SystemService", name: "preferencesService", subscribe : false},
