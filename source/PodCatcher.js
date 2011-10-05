@@ -25,7 +25,7 @@ enyo.kind({
 	VIDEOCATCHER: "http://developer.palm.com/appredirect/?packageid=net.alliknow.videocatcher",
 	PODCATCHER: "http://developer.palm.com/appredirect/?packageid=net.alliknow.podcatcher",
 	HELP_PAGE: "http://salema.github.com/Yet-Another-Simple-Pod-Catcher/help.html",
-	HOME_PAGE: "http://salema.github.com/Yet-Another-Simple-Pod-Catcher",
+	HOME_PAGE: "http://www.podcatcher-deluxe.com",
 	AUTO_UPDATE_INTERVAL: 30 * 60 * 1000,
 	components: [
 		{kind: "PalmService", name: "launchBrowserCall", service: "palm://com.palm.applicationManager/", method: "launch"},
