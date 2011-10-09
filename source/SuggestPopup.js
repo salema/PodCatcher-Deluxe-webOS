@@ -45,7 +45,7 @@ enyo.kind({
 			{kind: "HFlexBox", align: "center", components: [
 				{name: "featuredTitle", style: "margin: 10px;"},
 				{name: "featuredDetails", style: "color: grey; margin-left: 5px;", flex: 1},
-				{kind: "Button", name: "addFeaturedButton", content: $L("Add Podcast"), onclick: "addFeatured", style: "margin-right: 13px;"}
+				{kind: "Button", name: "addFeaturedButton", content: $L("Add Podcast"), onclick: "addFeatured", showing: false, style: "margin-right: 13px;"}
 			]},
 			{name: "featuredDescription", style: "margin-left: 10px; margin-bottom: 10px; font-size: smaller"}
 		]},
@@ -120,6 +120,7 @@ enyo.kind({
 	
 	grabSuggestionsSuccess: function(sender, response, request) {		
 		this.$.loadSpinner.hide();
+		this.$.addFeaturedButton.show();
 		
 		if (! response) this.grabSuggestionsFailed(sender, response, request);
 		else {
