@@ -205,11 +205,12 @@ enyo.kind({
 	},
 	
 	setOrientation: function() {
-		enyo.setAllowedOrientation(window.PalmSystem.videoOrientation);
+		if (window.PalmSystem)
+			enyo.setAllowedOrientation(window.PalmSystem.videoOrientation);
 	},
 	
 	unsetOrientation: function() {
-		enyo.setAllowedOrientation("free");
+		if (window.PalmSystem) enyo.setAllowedOrientation("free");
 	},
 	
 	updateDashboard: function() {

@@ -206,7 +206,7 @@ enyo.kind({
 			clearInterval(this.playtimeInterval);
 		}
 		
-		enyo.windows.setWindowProperties(window, {blockScreenTimeout: this.plays});
+		if (window.PalmSystem) enyo.windows.setWindowProperties(window, {blockScreenTimeout: this.plays});
 		this.updatePlaytime();
 	},
 	
@@ -308,7 +308,7 @@ enyo.kind({
 		this.$.playButton.setDisabled(true);
 		this.$.stalledSpinner.hide();
 		
-		enyo.windows.setWindowProperties(window, {blockScreenTimeout: false});
+		if (window.PalmSystem) enyo.windows.setWindowProperties(window, {blockScreenTimeout: false});
 		this.doPlaybackEnded();
 	},
 	
