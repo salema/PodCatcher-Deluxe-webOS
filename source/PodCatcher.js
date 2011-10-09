@@ -28,6 +28,8 @@ enyo.kind({
 	components: [
 		{kind: "SystemService", name: "preferencesService", subscribe : false},
 		{kind: "PalmService", name: "launchBrowserCall", service: "palm://com.palm.applicationManager/", method: "launch"},
+		{kind: "ApplicationEvents", onWindowActivated: "setOrientation"},
+		{kind: "ApplicationEvents", onWindowDeactivated: "unsetOrientation"},
 		{kind: "AppMenu", onBeforeOpen: "updateMenu", components: [
 			{kind: "MenuCheckItem", caption: $L("Autodownload"), name: "autoDownloadCheck", onclick: "toggleAutoDownload", checked: false},
 			{kind: "AppMenuItem", caption: $L("Episodes"), components: [
@@ -200,6 +202,14 @@ enyo.kind({
 	
 	openInBrowser: function(sender, url) {
 		this.$.launchBrowserCall.call({"id": "com.palm.app.browser", "params": {"target": url}});
+	},
+	
+	setOrientation: function() {
+		enyo.setAllowedOrientation(window.PalmSystem.videoOrientation);
+	},
+	
+	unsetOrientation: function() {
+		enyo.setAllowedOrientation("free");
 	},
 	
 	updateDashboard: function() {
