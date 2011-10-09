@@ -206,6 +206,7 @@ enyo.kind({
 			clearInterval(this.playtimeInterval);
 		}
 		
+		enyo.windows.setWindowProperties(window, {blockScreenTimeout: this.plays});
 		this.updatePlaytime();
 	},
 	
@@ -307,17 +308,21 @@ enyo.kind({
 		this.$.playButton.setDisabled(true);
 		this.$.stalledSpinner.hide();
 		
+		enyo.windows.setWindowProperties(window, {blockScreenTimeout: false});
 		this.doPlaybackEnded();
 	},
 	
 	videoResize: function(width) {
-		if (width > 1000 && this.isVideoContentAvailable()) {
+		var fullscreenMode = width > 1000 && this.isVideoContentAvailable();
+		
+		this.$.downloadManager.setAlwaysHide(fullscreenMode);
+		enyo.setFullScreen(fullscreenMode);
+		
+		if (fullscreenMode) {
 			this.$.downloadButton.hide();
-			this.$.downloadManager.setAlwaysHide(true);
 			this.$.episodeDescription.hide();
 		} else {
 			this.$.downloadButton.show();
-			this.$.downloadManager.setAlwaysHide(false);
 			this.$.episodeDescription.show();
 		}
 		
