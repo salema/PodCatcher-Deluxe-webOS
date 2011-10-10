@@ -89,4 +89,4 @@ Podcast.prototype.equals = function(podcast) {
 	return podcast instanceof Podcast && this.url == podcast.url;
 };
 
-Podcast.DEFAULT_IMAGE = "icons/icon128.png";
+Podcast.DEFAULT_IMAGE = "icons/podcast.png";
