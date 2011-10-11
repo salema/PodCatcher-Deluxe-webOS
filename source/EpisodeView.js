@@ -41,7 +41,7 @@ enyo.kind({
 			{name: "episodeName", content: $L("Watch"), className: "nowrap", flex: 1},
 			{kind: "Spinner", name: "stalledSpinner", align: "right"}
 		]},
-		{kind: "Video", showControls: false, className: "fullWidth", showing: false},
+		{kind: "Video", showControls: false, className: "fullWidth", style: "max-height: 620px", showing: false},
 		{kind: "Button", name: "downloadButton", caption: $L("Download"), onclick: "startStopDelete"},
 		{kind: "Net.Alliknow.PodCatcher.DownloadManager", name: "downloadManager", style: "display: block;", onStatusUpdate: "downloadStatusUpdate", 
 			onDownloadComplete: "downloadComplete", onCancelSuccess: "cancelSuccess", onDownloadFailed: "downloadFailed"},
