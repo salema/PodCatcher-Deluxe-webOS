@@ -112,7 +112,7 @@ enyo.kind({
 	},
 	
 	showFailed: function() {
-		this.$.error.setContent($L("Your podcast failed to load. Please check the URL and make sure you are online. Tap anywhere outside this window to cancel."));
+		this.$.error.setContent($L("Your podcast failed to load. Please check the URL and make sure that you are online. Tap anywhere outside this window to cancel."));
 		this.$.error.show();
 		
 		this.$.urlInput.setDisabled(false);
