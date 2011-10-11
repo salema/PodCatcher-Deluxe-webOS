@@ -129,7 +129,7 @@ enyo.kind({
 	},
 	
 	loadFailed: function() {
-		this.$.error.setContent($L("The podcast feed failed to load. Please make sure you are online."));
+		this.$.error.setContent($L("The podcast feed failed to load. Please make sure that you are online."));
 		this.$.error.setStyle("color: red;");
 		this.$.error.show();
 	}
