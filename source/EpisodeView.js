@@ -262,13 +262,15 @@ enyo.kind({
 	},
 		
 	updatePlaySlider: function () {
-		this.$.playSlider.setMaximum(this.player.duration);
-		this.$.playSlider.setBarMaximum(this.player.duration);
-		
-		this.$.playSlider.setPosition(this.player.currentTime);
-		
-		if (this.player.buffered.length > 0)
-			this.$.playSlider.setBarPosition(this.player.buffered.end(this.player.buffered.length - 1));
+		if (this.player) {
+			this.$.playSlider.setMaximum(this.player.duration);
+			this.$.playSlider.setBarMaximum(this.player.duration);
+			
+			this.$.playSlider.setPosition(this.player.currentTime);
+			
+			if (this.player.buffered.length > 0)
+				this.$.playSlider.setBarPosition(this.player.buffered.end(this.player.buffered.length - 1));
+		}
 	},
 	
 	updateVideoMode: function() {
