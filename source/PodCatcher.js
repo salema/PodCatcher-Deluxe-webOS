@@ -43,10 +43,10 @@ enyo.kind({
 		{kind: "SlidingPane", flex: 1, components: [
 			{kind: "Net.Alliknow.PodCatcher.PodcastList", name: "podcastListPane", width: "230px", onPrepareLoad: "prepareLoad",
 					onSelectPodcast: "podcastSelected", onSelectAll: "allPodcastsSelected", onAutoUpdateComplete: "autoDownload"},
-			{kind: "Net.Alliknow.PodCatcher.EpisodeList", name: "episodeListPane", width: "360px", peekWidth: 0,
+			{kind: "Net.Alliknow.PodCatcher.EpisodeList", name: "episodeListPane", width: "380px",
 					onSelectEpisode: "episodeSelected", onPlaylistChanged: "playlistChanged", onSpecialListSelected: "specialListSelected",
 					onResumeComplete: "propagateMarkedEpisodesToPodcastList"},
-			{kind: "Net.Alliknow.PodCatcher.EpisodeView", name: "episodeViewPane", flex: 1, peekWidth: 0, onTogglePlay: "updateDashboard", onNext: "playNext",
+			{kind: "Net.Alliknow.PodCatcher.EpisodeView", name: "episodeViewPane", flex: 1, onTogglePlay: "updateDashboard", onNext: "playNext",
 					onPlaybackEnded: "playNext", onResume: "updateDashboard", onMarkEpisode: "episodeMarked", onOpenInBrowser: "openInBrowser",
 					onDownloaded: "episodeDownloaded", onDeleteDownload: "deleteDownloadedEpisode", onResize: "videoResize"}
 		]}
