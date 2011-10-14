@@ -29,6 +29,8 @@ enyo.kind({
 		onOpenInBrowser: ""
 	},
 	components: [
+		{kind: "PalmService", name: "headsetService", service: "palm://com.palm.keys/headset/", method: "status",
+			subscribe: true, onSuccess: "headsetStatusChanged"},
 		{kind: "Header", layoutKind: "HFlexLayout", className: "header", components: [
 			{name: "episodeName", content: $L("Listen"), className: "nowrap", flex: 1},
 			{kind: "Spinner", name: "stalledSpinner", align: "right"}
@@ -50,6 +52,8 @@ enyo.kind({
 		
 		this.plays = false;
 		this.sliderInterval = setInterval(enyo.bind(this, this.updatePlaySlider), this.SLIDER_INTERVAL);
+		
+		if (window.PalmSystem) this.$.headsetService.call({});
 	},
 	
 	destroy: function() {
@@ -169,6 +173,12 @@ enyo.kind({
 		this.$.playButton.setCaption(buttonText);
 		this.$.playButton.setDisabled(true);
 		this.$.stalledSpinner.hide();
+	},
+	
+	headsetStatusChanged: function(sender, response) {
+		// Only if headset is unplugged ("up") and we are playing 
+		if (response && response.key == "headset" && response.state == "up" &&
+			this.plays) this.togglePlay();
 	},
 	
 	isAtStartOfPlayback: function() {
