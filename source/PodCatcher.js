@@ -180,10 +180,12 @@ enyo.kind({
 	},
 	
 	playNext: function() {
-		if (this.$.episodeViewPane.plays) this.$.episodeViewPane.togglePlay();
-		
-		this.$.episodeListPane.nextInPlaylist(this.$.episodeViewPane.episode);
-		this.updateDashboard();
+		if (this.$.episodeListPane.playlist.length > 0) {
+			if (this.$.episodeViewPane.plays) this.$.episodeViewPane.togglePlay();
+			
+			this.$.episodeListPane.nextInPlaylist(this.$.episodeViewPane.episode);
+			this.updateDashboard();
+		}
 	},
 	
 	openAppMenuHandler: function() {
