@@ -36,6 +36,8 @@ enyo.kind({
 	components: [
 		{kind: "SystemService", name: "preferencesService", subscribe : false},
 		{kind: "ApplicationEvents", onUnload: "storeResumeInformation"},
+		{kind: "PalmService", name: "headsetService", service: "palm://com.palm.keys/headset/", method: "status",
+			subscribe: true, onSuccess: "headsetStatusChanged"},
 		{kind: "Header", layoutKind: "HFlexLayout", className: "header", components: [
 			{kind: "Image", name: "markButton", src: Episode.UNMARKED_ICON, onclick: "toggleMarked", style: "margin-right: 10px;"},
 			{name: "episodeName", content: $L("Listen"), className: "nowrap", flex: 1},
@@ -66,6 +68,8 @@ enyo.kind({
 
 		this.sliderInterval = setInterval(enyo.bind(this, this.updatePlaySlider), this.SLIDER_INTERVAL);
 		this.videoInterval = setInterval(enyo.bind(this, this.updateVideoMode), 1000);
+		
+		if (window.PalmSystem) this.$.headsetService.call({});
 		
 		this.$.preferencesService.call({keys: ["resumeEpisode", "resumeTime"]},	{method: "getPreferences", onSuccess: "resume"});
 	},
@@ -304,7 +308,13 @@ enyo.kind({
 		
 		this.doPlaybackEnded();
 	},
-
+	
+	headsetStatusChanged: function(sender, response) {
+		// Only if headset is unplugged ("up") and we are playing 
+		if (response && response.key == "headset" && response.state == "up" &&
+			this.plays) this.togglePlay();
+	},
+	
 	isAtStartOfPlayback: function() {
 		return this.player.currentTime === 0;
 	},
