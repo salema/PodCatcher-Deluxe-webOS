@@ -36,8 +36,8 @@ enyo.kind({
 	components: [
 		{kind: "SystemService", name: "preferencesService", subscribe : false},
 		{kind: "ApplicationEvents", onUnload: "storeResumeInformation"},
-		{kind: "PalmService", name: "headsetService", service: "palm://com.palm.keys/headset/", method: "status",
-			subscribe: true, onSuccess: "headsetStatusChanged"},
+		{kind: "PalmService", name: "headsetService", service: "palm://com.palm.keys/headset/", method: "status", onSuccess: "headsetStatusChanged"},
+		{kind: "PalmService", name: "headsetButtonService", service: "palm://com.palm.keys/media/", method: "status", onSuccess: "headsetButtonPressed"},
 		{kind: "Header", layoutKind: "HFlexLayout", className: "header", components: [
 			{kind: "Image", name: "markButton", src: Episode.UNMARKED_ICON, onclick: "toggleMarked", style: "margin-right: 10px;"},
 			{name: "episodeName", content: $L("Watch"), className: "nowrap", flex: 1},
@@ -67,7 +67,10 @@ enyo.kind({
 		this.sliderInterval = setInterval(enyo.bind(this, this.updatePlaySlider), this.SLIDER_INTERVAL);
 		this.videoInterval = setInterval(enyo.bind(this, this.updateVideoMode), 500);
 		
-		if (window.PalmSystem) this.$.headsetService.call({});
+		if (window.PalmSystem) {
+			this.$.headsetService.call({subscribe: true});
+			this.$.headsetButtonService.call({subscribe: true});
+		}
 		
 		this.$.preferencesService.call({keys: ["resumeEpisode", "resumeTime"]},	{method: "getPreferences", onSuccess: "resume"});
 	},
@@ -341,6 +344,25 @@ enyo.kind({
 			this.plays) this.togglePlay();
 	},
 	
+	headsetButtonPressed: function(sender, event) {
+		if (event.state == "down") {
+			switch (event.key) {
+				case "play":
+					if (this.episode && !this.plays) this.togglePlay();
+					break;
+				case "pause":
+				case "stop":
+					if (this.plays) this.togglePlay();
+					break;
+				case "next":
+					this.doNext();
+					break;
+				case "prev":
+					break;
+			}
+		}
+	},
+		
 	isAtStartOfPlayback: function() {
 		return this.player.currentTime === 0;
 	},
