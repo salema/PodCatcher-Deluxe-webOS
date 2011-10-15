@@ -188,7 +188,7 @@ enyo.kind({
 		if (event.state == "down") {
 			switch (event.key) {
 				case "play":
-					if (this.episode && !this.plays) this.togglePlay();
+					if (this.episode && !this.plays && !this.isAtEndOfPlayback()) this.togglePlay();
 					break;
 				case "pause":
 				case "stop":
@@ -206,13 +206,8 @@ enyo.kind({
 		return this.$.sound.audio.currentTime === 0;
 	},
 	
-	isInMiddleOfPlayback: function() {
-		return this.$.sound.audio.currentTime > 0 &&
-			this.$.sound.audio.currentTime != this.$.sound.audio.duration;
-	},
-	
 	isAtEndOfPlayback: function() {
-		return this.$.sound.audio.currentTime == this.$.sound.audio.duration;
+		return this.$.sound.audio.ended;
 	},
 	
 	createTimeString: function() {
