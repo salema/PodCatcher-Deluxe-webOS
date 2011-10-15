@@ -322,7 +322,7 @@ enyo.kind({
 		if (event.state == "down") {
 			switch (event.key) {
 				case "play":
-					if (this.episode && !this.plays) this.togglePlay();
+					if (this.episode && !this.plays && !this.isAtEndOfPlayback()) this.togglePlay();
 					break;
 				case "pause":
 				case "stop":
@@ -341,13 +341,8 @@ enyo.kind({
 		return this.player.currentTime === 0;
 	},
 	
-	isInMiddleOfPlayback: function() {
-		return this.player.currentTime > 0 &&
-			this.player.currentTime !== this.player.duration;
-	},
-	
 	isAtEndOfPlayback: function() {
-		return this.player.currentTime === this.player.duration;
+		return this.player.ended;
 	},
 	
 	isVideoContentAvailable: function() {
