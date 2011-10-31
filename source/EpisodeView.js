@@ -44,7 +44,7 @@ enyo.kind({
 			{kind: "Spinner", name: "stalledSpinner", align: "right"}
 		]},
 		{kind: "HtmlContent", name: "videoInfo", className: "info", onLinkClick: "doOpenInBrowser", showing: false, content: $L("This episode has video content. You might want to give <a href=\"http://developer.palm.com/appredirect/?packageid=net.alliknow.videocatcher\">Video PodCatcher Deluxe</a> a try.")},
-		{kind: "Video", showControls: false, showing: false},
+		{kind: "Sound", audioClass: "media"},
 		{kind: "Button", name: "downloadButton", caption: $L("Download"), onclick: "startStopDelete"},
 		{kind: "Net.Alliknow.PodCatcher.DownloadManager", name: "downloadManager", style: "display: block;", onStatusUpdate: "downloadStatusUpdate", 
 			onDownloadComplete: "downloadComplete", onCancelSuccess: "cancelSuccess", onDownloadFailed: "downloadFailed"},
@@ -64,10 +64,10 @@ enyo.kind({
 		this.inherited(arguments);
 		
 		this.plays = false;
-		this.player = this.$.video.node;
+		this.player = this.$.sound.audio;
 
 		this.sliderInterval = setInterval(enyo.bind(this, this.updatePlaySlider), this.SLIDER_INTERVAL);
-		this.videoInterval = setInterval(enyo.bind(this, this.updateVideoMode), 1000);
+		//this.videoInterval = setInterval(enyo.bind(this, this.updateVideoMode), 1000);
 		
 		if (window.PalmSystem) {
 			this.$.headsetService.call({subscribe: true});
@@ -79,7 +79,7 @@ enyo.kind({
 	
 	destroy: function() {
 		clearInterval(this.sliderInterval);
-		clearInterval(this.videoInterval);
+		//clearInterval(this.videoInterval);
 		
 		this.inherited(arguments);
 	},
@@ -104,10 +104,7 @@ enyo.kind({
 		this.$.preferencesService.call({"resumeEpisode": this.episode, "resumeTime": this.player.currentTime}, {method: "setPreferences"});
 	},
 	
-	setEpisode: function(episode, autoplay) {
-		this.player = this.$.video.hasNode();
-		this.player.setAttribute("x-palm-media-audio-class", "media");
-		
+	setEpisode: function(episode, autoplay) {		
 		// Active, and other episode selected
 		if (this.plays && episode.url != this.episode.url) 
 			this.showError($L("Playback active, please pause before switching."));
