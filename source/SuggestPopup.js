@@ -45,7 +45,7 @@ enyo.kind({
 			{kind: "HFlexBox", align: "center", components: [
 				{name: "featuredTitle", style: "margin: 10px;"},
 				{name: "featuredDetails", style: "color: grey; margin-left: 5px;", flex: 1},
-				{kind: "Button", name: "addFeaturedButton", content: $L("Add Podcast"), onclick: "addFeatured", showing: false, style: "margin-right: 13px;"}
+				{kind: "Button", name: "addFeaturedButton", content: $L("Add Podcast"), onclick: "addFeatured", showing: false, style: "margin-right: 13px; color: #fff; background-color: #f60"}
 			]},
 			{name: "featuredDescription", style: "margin-left: 10px; margin-bottom: 10px; font-size: smaller"}
 		]},
@@ -56,7 +56,7 @@ enyo.kind({
 						{kind: "HFlexBox", align: "center", components: [
 							{name: "podcastTitle"},
 							{name: "podcastDetails", style: "color: grey; margin-left: 15px;", flex: 1},
-							{kind: "Button", name: "addSuggestionButton", content: $L("Add Podcast"), onclick: "addSuggestion"}
+							{kind: "Button", name: "addSuggestionButton", content: $L("Add Podcast"), onclick: "addSuggestion", className: "enyo-button-affirmative"}
 						]},
 						{name: "podcastDescription", style: "font-size: smaller"}
 					]}
@@ -91,11 +91,13 @@ enyo.kind({
 		this.$.grabSuggestionsService.call();
 	},
 	
-	addFeatured: function() {
+	addFeatured: function(sender) {
+		sender.setDisabled(true);
 		this.doAddSuggestion(this.featured.url);
 	},
 	
-	addSuggestion: function() {
+	addSuggestion: function(sender) {
+		sender.setDisabled(true);
 		var suggestion = this.currentSuggestions[this.$.suggestListVR.fetchRowIndex()];
 		
 		this.doAddSuggestion(suggestion.url);
