@@ -36,11 +36,10 @@ enyo.kind({
 			{kind: "HFlexBox", align: "center", components: [
 				{kind: "Input", name: "urlInput", hint: $L("Insert Podcast URL here"), inputType: "url", flex: 1,
 						alwaysLooksFocused: true, selectAllOnFocus: true, spellcheck: false, autoCapitalize: "lowercase"},
-				{kind: "Spinner", name: "loadSpinner"},
-				{kind: "Button", name: "addButton", content: $L("Add Podcast"), onclick: "addPodcast"}
+				{kind: "ActivityButton", name: "addButton", content: $L("Add Podcast"), onclick: "addPodcast", className: "enyo-button-affirmative"}
 			]},
 			{name: "error", showing: false, className: "error"},
-			{kind: "Button", content: $L("Show suggestions..."), style: "margin-top: 10px;", onclick: "showSuggestions"}
+			{kind: "Button", content: $L("Show suggestions..."), style: "margin-top: 10px; color: #fff; background-color: #f60", onclick: "showSuggestions"}
 		]},
 	],
 	
@@ -50,9 +49,9 @@ enyo.kind({
 		// update UI
 		this.$.urlInput.setValue("");
 		this.$.error.hide();
-		this.$.loadSpinner.hide();
 		this.$.urlInput.setDisabled(false);
 		this.$.addButton.setDisabled(false);
+		this.$.addButton.setActive(false);
 		
 
 		// call for clipboard contents (maybe a podcast feed url?!)
@@ -72,10 +71,10 @@ enyo.kind({
 		// update UI
 		this.$.loginPopup.close();
 		this.$.error.hide();
-		this.$.loadSpinner.show();
 		this.$.urlInput.setDisabled(true);
 		this.$.addButton.setDisabled(true);
-
+		this.$.addButton.setActive(true);
+		
 		// Check for protocol and add http if none is given
 		if (! Utilities.startsWithValidProtocol(this.$.urlInput.getValue()))
 			this.$.urlInput.setValue("http://" + this.$.urlInput.getValue());
@@ -117,6 +116,6 @@ enyo.kind({
 		
 		this.$.urlInput.setDisabled(false);
 		this.$.addButton.setDisabled(false);
-		this.$.loadSpinner.hide();
+		this.$.addButton.setActive(false);
 	}
 });
