@@ -30,7 +30,7 @@ enyo.kind({
 	components: [
 		{kind: "Input", name: "userInput", hint: $L("Username"), alwaysLooksFocused: true, selectAllOnFocus: true, spellcheck: false}, 
 		{kind: "PasswordInput", name: "passInput", hint: $L("Password"), alwaysLooksFocused: true, selectAllOnFocus: true, spellcheck: false, style: "margin-top: 5px;"}, 
-		{kind: "Button", name: "loginButton", caption: $L("Submit"), onclick: "doLogin", style: "margin-top: 8px;"}
+		{kind: "Button", name: "loginButton", caption: $L("Submit"), onclick: "doLogin", style: "margin-top: 8px;", className: "enyo-button-affirmative"}
 	],
 	
 	open: function() {
