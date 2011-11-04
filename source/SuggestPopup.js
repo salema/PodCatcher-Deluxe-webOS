@@ -75,6 +75,13 @@ enyo.kind({
 		this.currentSuggestions = [];
 	},
 	
+	rendered: function() {
+		this.$.loadSpinner.show();
+		
+		this.$.grabSuggestionsService.setUrl(this.SOURCE);
+		this.$.grabSuggestionsService.call();
+	},
+	
 	open: function() {
 		this.inherited(arguments);
 		
@@ -85,10 +92,6 @@ enyo.kind({
 		
 		this.$.footer.setContent($L("<a href=\"\">Send a proposal</a> for suggestions to be included in this list!"));
 		this.$.footer.setStyle("width: 100%; text-align: center;");
-		this.$.loadSpinner.show();
-		
-		this.$.grabSuggestionsService.setUrl(this.SOURCE);
-		this.$.grabSuggestionsService.call();
 	},
 	
 	addFeatured: function(sender) {
