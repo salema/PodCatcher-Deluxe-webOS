@@ -43,6 +43,7 @@ enyo.kind({
 			{name: "episodeName", content: $L("Watch"), className: "nowrap", flex: 1},
 			{kind: "Spinner", name: "stalledSpinner", align: "right"}
 		]},
+		{kind: "Sound", audioClass: "media"},
 		{kind: "Video", showControls: false, className: "fullWidth", style: "max-height: 620px", showing: false},
 		{kind: "Button", name: "downloadButton", caption: $L("Download"), onclick: "startStopDelete"},
 		{kind: "Net.Alliknow.PodCatcher.DownloadManager", name: "downloadManager", style: "display: block;", onStatusUpdate: "downloadStatusUpdate", 
@@ -103,9 +104,6 @@ enyo.kind({
 	},
 	
 	setEpisode: function(episode, autoplay) {
-		this.player = this.$.video.hasNode();
-		this.player.setAttribute("x-palm-media-audio-class", "media");
-		
 		// Active, and other episode selected
 		if (this.plays && episode.url != this.episode.url) 
 			this.showError($L("Playback active, please pause before switching."));
@@ -116,13 +114,20 @@ enyo.kind({
 			this.episode = episode;
 			this.resumeOnce = -1;
 			
+			// Select the correct player
+			if (this.isAudioOnly(episode)) this.player = this.$.sound.audio;
+			else {
+				this.player = this.$.video.hasNode();
+				this.player.setAttribute("x-palm-media-audio-class", "media");
+			}
+			
 			this.updateUIOnSetEpisode(episode);
 			
 			// Set sound source
 			if (episode.isDownloaded) this.player.src = episode.file;
 			else this.player.src = episode.url;
 			
-			//this.log(this.player.src);
+			this.log(this.player.src);
 			
 			if (autoplay) this.togglePlay();
 		}
@@ -213,7 +218,8 @@ enyo.kind({
 			clearInterval(this.playtimeInterval);
 		}
 		
-		if (window.PalmSystem) enyo.windows.setWindowProperties(window, {blockScreenTimeout: this.plays});
+		if (window.PalmSystem && !this.isAudioOnly(this.episode))
+			enyo.windows.setWindowProperties(window, {blockScreenTimeout: this.plays});
 		this.updatePlaytime();
 	},
 	
@@ -317,7 +323,8 @@ enyo.kind({
 		this.$.playButton.setDisabled(true);
 		this.$.stalledSpinner.hide();
 		
-		if (window.PalmSystem) enyo.windows.setWindowProperties(window, {blockScreenTimeout: false});
+		if (window.PalmSystem && !this.isAudioOnly(this.episode))
+			enyo.windows.setWindowProperties(window, {blockScreenTimeout: false});
 		this.doPlaybackEnded();
 	},
 	
@@ -373,6 +380,15 @@ enyo.kind({
 	
 	isVideoContentAvailable: function() {
 		return this.player && this.player.videoWidth > 0;
+	},
+	
+	isAudioOnly: function(episode) {
+		var filename = Utilities.createUniqueFilename(episode.url);
+		
+		var splits = filename.split(".");
+		var ending = splits[splits.length - 1];
+		
+		return ending == "mp3" || ending == "ogg";
 	},
 	
 	updateUIOnSetEpisode: function(episode) {
