@@ -31,26 +31,24 @@ enyo.kind({
 	},
 	width: "75%",
 	components: [
-		{kind: "WebService", name: "grabSuggestionsService", onSuccess: "grabSuggestionsSuccess", onFailure: "grabSuggestionsFailed"},
 		{kind: "PalmService", name: "openEmailCall", service: "palm://com.palm.applicationManager/", method: "open"},
 		{kind: "HFlexBox", align: "center", components: [
-			{kind: "PickerGroup", label: $L("Filter for"), onChange: "updateSuggestions", flex: 1, style: "margin-left: 11px", components: [
+			{kind: "PickerGroup", label: $L("Filter for"), onChange: "updateSuggestions", flex: 1, style: "margin-left: 20px; margin-right: 10px;", components: [
 				{name: "languagePicker", items: [$L("All"), $L("English"), $L("German")], className: "filterPicker"},
 				{name: "categoryPicker", items: [$L("All"), $L("News"), $L("Sports"), $L("Technology")], className: "filterPicker"},
 				{name: "typePicker", items: [$L("All"), $L("Audio"), $L("Video")], className: "filterPicker"}
-			]},
-			{kind: "Spinner", name: "loadSpinner"}
+			]}
 		]},
 		{kind: "Group", caption: $L("Featured Podcast"), components: [
 			{kind: "HFlexBox", align: "center", components: [
 				{name: "featuredTitle", style: "margin: 10px;"},
 				{name: "featuredDetails", style: "color: grey; margin-left: 5px;", flex: 1},
-				{kind: "Button", name: "addFeaturedButton", content: $L("Add Podcast"), onclick: "addFeatured", showing: false, style: "margin-right: 13px; color: #fff; background-color: #f60"}
+				{kind: "Button", name: "addFeaturedButton", content: $L("Add Podcast"), onclick: "addFeatured", style: "margin-right: 13px; color: #fff; background-color: #f60;"}
 			]},
 			{name: "featuredDescription", style: "margin-left: 10px; margin-bottom: 10px; font-size: smaller"}
 		]},
 		{kind: "Group", caption: $L("Suggested Podcasts"), components: [
-			{kind: "Scroller", name: "suggestScroller", style: "height: 270px", components: [
+			{kind: "Scroller", name: "suggestScroller", style: "height: 300px", components: [
 				{kind: "VirtualRepeater", name: "suggestListVR", onSetupRow: "getSuggestion", onclick: "selectPodcastClick", components: [
 					{kind: "Item", components: [
 						{kind: "HFlexBox", align: "center", components: [
@@ -63,7 +61,7 @@ enyo.kind({
 				]}
 			]}
 		]},
-		{kind: "HtmlContent", name: "footer", onLinkClick: "sendProposal"}
+		{kind: "HtmlContent", name: "footer", content: $L("<a href=\"\">Send a proposal</a> for suggestions to be included in this list!"), style: "width: 100%; text-align: center;", onLinkClick: "sendProposal"}
 	],
 	
 	create: function() {
@@ -75,20 +73,12 @@ enyo.kind({
 		this.currentSuggestions = [];
 	},
 	
-	open: function() {
-		this.inherited(arguments);
-		
+	initPicker: function() {
 		if (enyo.g11n.currentLocale().getLanguage() == "de") this.$.languagePicker.setValue($L("German"));
 		else this.$.languagePicker.setValue($L("English"));
+		
 		this.$.categoryPicker.setValue($L("All"));
 		this.$.typePicker.setValue($L("Audio"));
-		
-		this.$.footer.setContent($L("<a href=\"\">Send a proposal</a> for suggestions to be included in this list!"));
-		this.$.footer.setStyle("width: 100%; text-align: center;");
-		this.$.loadSpinner.show();
-		
-		this.$.grabSuggestionsService.setUrl(this.SOURCE);
-		this.$.grabSuggestionsService.call();
 	},
 	
 	addFeatured: function(sender) {
@@ -120,17 +110,9 @@ enyo.kind({
 		return index < this.currentSuggestions.length;
 	},
 	
-	grabSuggestionsSuccess: function(sender, response, request) {		
-		this.$.loadSpinner.hide();
-		this.$.addFeaturedButton.show();
-		
-		if (! response) this.grabSuggestionsFailed(sender, response, request);
-		else {
-			this.allFeatured = eval(response).featured;
-			this.allSuggestions = eval(response).suggestions;
-		
-			this.updateSuggestions();
-		}
+	setData: function(response) {
+		this.allFeatured = eval(response).featured;
+		this.allSuggestions = eval(response).suggestions;
 	},
 	
 	updateSuggestions: function() {
@@ -178,13 +160,5 @@ enyo.kind({
 	
 	createMetadataString: function(suggestion) {
 		return $L(suggestion.language) + " - " + $L(suggestion.category) + " - " + $L(suggestion.type);
-	},
-	
-	grabSuggestionsFailed: function(sender, response, request) {
-		this.$.footer.setContent($L("Download failed"));
-		this.$.footer.setStyle("width: 100%; text-align: center; color: red;");
-		this.$.loadSpinner.hide();
-		
-		this.warn("Failed to load suggestions from server: " +  response);
 	}
 });
