@@ -29,9 +29,10 @@ enyo.kind({
 	},
 	width: "70%",
 	components: [
+		{kind: "WebService", name: "grabSuggestionsService", onSuccess: "grabSuggestionsSuccess", onFailure: "grabSuggestionsFailed"},
 		{kind: "WebService", name: "grabPodcastService", onSuccess: "grabPodcastSuccess", onFailure: "grabPodcastFailed"},
 		{kind: "Net.Alliknow.PodCatcher.LoginPopup", name: "loginPopup", onLogin: "addPodcast"},
-		{kind: "Net.Alliknow.PodCatcher.SuggestPopup", name: "suggestPopup", onAddSuggestion: "addSuggestion"},
+		{kind: "Net.Alliknow.PodCatcher.SuggestPopup", name: "suggestPopup", onAddSuggestion: "addSuggestion", onBeforeOpen: "updateSuggestions"},
 		{kind: "VFlexBox", components: [
 			{kind: "HFlexBox", align: "center", components: [
 				{kind: "Input", name: "urlInput", hint: $L("Insert Podcast URL here"), inputType: "url", flex: 1,
@@ -39,9 +40,15 @@ enyo.kind({
 				{kind: "ActivityButton", name: "addButton", content: $L("Add Podcast"), onclick: "addPodcast", className: "enyo-button-affirmative"}
 			]},
 			{name: "error", showing: false, className: "error"},
-			{kind: "Button", content: $L("Show suggestions..."), style: "margin-top: 10px; color: #fff; background-color: #f60", onclick: "showSuggestions"}
+			{kind: "ActivityButton", name:"showSuggestionsButton", content: $L("Show suggestions..."), style: "margin-top: 10px; color: #fff; background-color: #f60;", onclick: "showSuggestions"}
 		]},
 	],
+	
+	create: function() {
+		this.inherited(arguments);
+		
+		this.loadSuggestionsOnOpen = true;
+	},
 	
 	open: function() {
 		this.inherited(arguments);
@@ -62,9 +69,21 @@ enyo.kind({
 		if (Utilities.startsWithValidProtocol(text)) this.$.urlInput.setValue(text);
 	},
 	
+	updateSuggestions: function() {
+		this.$.suggestPopup.initPicker();
+		this.$.suggestPopup.updateSuggestions();
+	},
+	
 	showSuggestions: function() {
-		this.close();
-		this.$.suggestPopup.openAtCenter();
+		if (this.loadSuggestionsOnOpen) {
+			this.$.showSuggestionsButton.setActive(true);
+			
+			this.$.grabSuggestionsService.setUrl(this.$.suggestPopup.SOURCE);
+			this.$.grabSuggestionsService.call();
+		} else {
+			this.close();
+			this.$.suggestPopup.openAtCenter();
+		}
 	},
 
 	addPodcast: function() {
@@ -104,10 +123,33 @@ enyo.kind({
 		} else this.grabPodcastFailed();
 	},
 	
+	grabSuggestionsSuccess: function(sender, response, request) {		
+		this.$.showSuggestionsButton.setActive(false);
+		
+		if (! response) this.grabSuggestionsFailed(sender, response, request);
+		else {
+			// do this only once in a lifetime
+			this.loadSuggestionsOnOpen = false;
+			
+			this.$.suggestPopup.setData(response);
+			
+			this.close();
+			this.$.suggestPopup.openAtCenter();
+		}
+	},
+	
 	grabPodcastFailed: function(sender, response, request) {
 		// 401 is access denied
 		if (request && request.xhr.status === 401) this.$.loginPopup.openAtCenter();
 		else this.showFailed();
+	},
+	
+	grabSuggestionsFailed: function(sender, response, request) {
+		this.$.showSuggestionsButton.setActive(false);
+		this.$.showSuggestionsButton.setDisabled(true);
+		this.$.showSuggestionsButton.setCaption($L("Download failed"));
+				
+		this.warn("Failed to load suggestions from server: " +  response);
 	},
 	
 	showFailed: function() {

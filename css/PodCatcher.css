@@ -56,5 +56,7 @@
 	border-top: 1px solid gray;
 }
 .filterPicker {
-	min-width: 100px;
+	margin-left: 5px;
+	margin-right: 5px;
+	min-width: 130px;
 }
