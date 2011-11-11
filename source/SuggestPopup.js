@@ -118,6 +118,10 @@ enyo.kind({
 	updateSuggestions: function() {
 		this.featured = this.pickFeatured();
 		
+		// Undisable button if featured changed
+		this.$.addFeaturedButton.setDisabled(this.$.addFeaturedButton.getDisabled() &&
+				this.$.featuredTitle.getContent() == this.featured.title);
+		
 		this.$.featuredTitle.setContent(this.featured.title);
 		this.$.featuredDetails.setContent(this.createMetadataString(this.featured));
 		this.$.featuredDescription.setContent(this.featured.description);
