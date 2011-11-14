@@ -321,9 +321,10 @@ enyo.kind({
 	},
 	
 	prepareLoad: function() {
+		this.$.selectedPodcastName.setContent($L("Select"));
 		this.$.episodeSpinner.show();
 		this.$.error.hide();
-				
+		
 		this.selectedIndex = -1;
 		this.episodeList = [];
 		
