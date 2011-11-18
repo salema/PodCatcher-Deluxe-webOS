@@ -94,7 +94,7 @@ enyo.kind({
 	
 	sendProposal: function() {
 		var params =  {"summary":"A proposal for a podcast suggestion in the PodCatcher apps",
-			"recipients":[{"type": "email",	"contactDisplay": "Kevin Hausmann", "role":1, "value": "kevin@alliknow.net"}]};
+			"recipients":[{"type": "email",	"contactDisplay": "PodCatcher Deluxe", "role":1, "value": "suggestion@podcatcher-deluxe.com"}]};
 		this.$.openEmailCall.call({"id": "com.palm.app.email", "params": params});
 	},
 	

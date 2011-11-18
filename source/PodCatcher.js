@@ -24,8 +24,8 @@ enyo.kind({
 	kind: "VFlexBox",
 	VIDEOCATCHER: "http://developer.palm.com/appredirect/?packageid=net.alliknow.videocatcher",
 	PODCATCHER: "http://developer.palm.com/appredirect/?packageid=net.alliknow.podcatcher",
-	HELP_PAGE: "http://help.podcatcher-deluxe.com",
 	HOME_PAGE: "http://www.podcatcher-deluxe.com",
+	HELP_PAGE: "http://www.podcatcher-deluxe.com/manual",
 	AUTO_UPDATE_INTERVAL: 30 * 60 * 1000,
 	components: [
 		{kind: "PalmService", name: "launchBrowserCall", service: "palm://com.palm.applicationManager/", method: "launch"},
