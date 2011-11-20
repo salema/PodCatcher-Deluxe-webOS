@@ -28,6 +28,7 @@
 }
 .highlight {
 	font-weight: bold;
+	white-space: normal;
 }
 .marked {
 	color: #5A5A5A;
