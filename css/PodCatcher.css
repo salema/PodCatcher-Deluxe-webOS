@@ -27,7 +27,8 @@
 	white-space: nowrap;
 }
 .highlight {
-	font-weight: bold
+	font-weight: bold;
+	white-space: normal;
 }
 .error {
 	color: red;
