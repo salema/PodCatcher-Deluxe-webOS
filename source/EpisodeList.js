@@ -252,15 +252,24 @@ enyo.kind({
 	togglePlaylist: function(sender, index) {
 		var episode = this.episodeList[index];
 		
-		// Add to playlist
-		if (! Utilities.isInList(this.playlist, episode)) this.playlist.push(episode);
-		// Remove from playlist
-		else Utilities.removeItemFromList(this.playlist, episode);
-		
-		// Update UI
-		this.$.showPlaylistButton.setDisabled(this.showPlaylist);
-		if (this.showPlaylist) this.setShowPlaylist();
-		else this.$.episodeListVR.render();
+		// Playlist is showing
+		if (this.showPlaylist) {
+			var isLastInPlaylist = index === this.playlist.length - 1;
+			// Remove episode and only put it back if it was not the last one
+			Utilities.removeItemFromList(this.playlist, episode);
+			if (!isLastInPlaylist) this.playlist.splice(index + 1, 0, episode);
+			
+			this.setShowPlaylist();
+		} 
+		// Any other episode list is showing
+		else {
+			// Add to playlist
+			if (! Utilities.isInList(this.playlist, episode)) this.playlist.push(episode);
+			// Remove from playlist
+			else Utilities.removeItemFromList(this.playlist, episode);
+			
+			this.$.episodeListVR.render();
+		}
 		
 		this.doPlaylistChanged(this.playlist.length);
 		this.store();		
