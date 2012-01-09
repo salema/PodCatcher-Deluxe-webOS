@@ -234,7 +234,7 @@ enyo.kind({
 		// Set player to new position
 		this.player.currentTime = seekTo;
 		// No resume after manual seek
-		//this.resumeOnce = false;
+		this.resumeOnce = false;
 		
 		// Update play button text and restart updater
 		this.updatePlaytime();
