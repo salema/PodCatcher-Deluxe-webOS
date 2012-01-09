@@ -1,6 +1,6 @@
 {
 	"id": "net.alliknow.videocatcher",
-	"version": "5.1.2",
+	"version": "5.2.2",
 	"vendor": "Kevin Hausmann",
 	"type": "web",
 	"main": "index.html",
