@@ -33,9 +33,10 @@ enyo.kind({
 		{kind: "PalmService", name: "episodeDelete", service: "palm://com.palm.downloadmanager/", method: "deleteDownloadedFile", onFailure: "genericFail"},
 		{kind: "PalmService", name: "cancel", service: "palm://com.palm.downloadmanager/", method: "cancelDownload", onSuccess: "cancelSuccess", onFailure: "genericFail"},
 		{kind: "ApplicationEvents", onUnload: "cancelAll"},
-		{kind: "HFlexBox", name: "progressUI", components: [
+		{kind: "Net.Alliknow.PodCatcher.DownloadManagerPopup", name: "downloadManagerPopup", onCancel: "cancelFromPopup"},
+		{kind: "HFlexBox", name: "progressUI", align: "center", components: [
 			{kind: "ProgressBar", name: "bar", style: "margin: 10px;", maximum: 100, position: 0, flex: 1},
-			{name: "downloadCount", content: "0", style: "margin-right: 10px;"}
+			{kind: "Button", name: "downloadCount", content: "0", style: "margin-right: 10px;", onclick: "showPopup"}
 		]}
 	],
 	
@@ -45,6 +46,11 @@ enyo.kind({
 		this.activeEpisodes = [];
 		this.alwaysHidden = false;
 		this.$.progressUI.hide();
+	},
+	
+	showPopup: function() {
+		this.$.downloadManagerPopup.openAtCenter();
+		this.$.downloadManagerPopup.update(this.activeEpisodes);
 	},
 	
 	download: function(episode) {
@@ -79,6 +85,10 @@ enyo.kind({
 		var activeEpisode = Utilities.getItemInList(this.activeEpisodes, episode);
 		
 		this.$.cancel.call({ticket: activeEpisode.ticket});
+	},
+	
+	cancelFromPopup: function(sender, episode) {
+		this.cancel(episode);
 	},
 	
 	cancelSuccess: function(sender, response) {
@@ -152,6 +162,9 @@ enyo.kind({
 			this.$.bar.setMaximum(total);
 			this.$.bar.setPosition(received);
 		}
+		
+		// Notify Download Manager Popup if active and open
+		if (this.$.downloadManagerPopup.showing) this.$.downloadManagerPopup.update(this.activeEpisodes);
 	},
 	
 	setAlwaysHide: function(hide) {
