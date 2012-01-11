@@ -81,6 +81,10 @@ enyo.kind({
 		}
 	},
 	
+	cancelFromPopup: function(sender, episode) {
+		this.cancel(episode);
+	},
+	
 	cancel: function(episode) {
 		var activeEpisode = Utilities.getItemInList(this.activeEpisodes, episode);
 		
