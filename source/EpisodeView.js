@@ -65,7 +65,7 @@ enyo.kind({
 		
 		this.plays = false;
 		this.player = this.$.sound.audio;
-
+		this.resumeTimes = [];
 		this.sliderInterval = setInterval(enyo.bind(this, this.updatePlaySlider), this.SLIDER_INTERVAL);
 		//this.videoInterval = setInterval(enyo.bind(this, this.updateVideoMode), 1000);
 		
@@ -74,7 +74,7 @@ enyo.kind({
 			this.$.headsetButtonService.call({subscribe: true});
 		}
 		
-		this.$.preferencesService.call({keys: ["resumeEpisode", "resumeTime"]},	{method: "getPreferences", onSuccess: "resume"});
+		this.$.preferencesService.call({keys: ["resumeEpisode", "resumeTimes"]}, {method: "getPreferences", onSuccess: "resumeOnStartup"});
 	},
 	
 	destroy: function() {
@@ -84,7 +84,10 @@ enyo.kind({
 		this.inherited(arguments);
 	},
 	
-	resume: function(sender, response) {
+	resumeOnStartup: function(sender, response) {
+		if (response.resumeTimes != undefined)
+			this.resumeTimes = response.resumeTimes;
+		
 		if (response.resumeEpisode != undefined) {
 			var episode = new Episode();
 			episode.readFromJSON(response.resumeEpisode);
@@ -92,16 +95,12 @@ enyo.kind({
 			this.setEpisode(episode, false);
 			this.doResume(episode);
 			this.doMarkEpisode(episode);
-			
-			if (response.resumeTime > 0) {
-				this.resumeOnce = response.resumeTime;
-				this.$.playButton.setCaption($L("Resume at") + " " + Utilities.formatTime(response.resumeTime));
-			}
 		}
 	},
 	
 	storeResumeInformation: function() {
-		this.$.preferencesService.call({"resumeEpisode": this.episode, "resumeTime": this.player.currentTime}, {method: "setPreferences"});
+		this.storeResumeTime();
+		this.$.preferencesService.call({"resumeEpisode": this.episode, "resumeTimes": this.resumeTimes}, {method: "setPreferences"});
 	},
 	
 	setEpisode: function(episode, autoplay) {		
@@ -112,8 +111,11 @@ enyo.kind({
 		else if (this.plays) this.$.error.hide();
 		// Actually set new episode
 		else {
+			// Save resume information of former episode
+			this.storeResumeTime();
+				
 			this.episode = episode;
-			this.resumeOnce = -1;
+			this.resumeOnce = this.canResume(episode);
 			
 			this.updateUIOnSetEpisode(episode);
 			
@@ -201,9 +203,8 @@ enyo.kind({
 		this.doTogglePlay();
 		
 		if (this.plays) {
-			// This happens only once after startup to allow resume of last episode
-			if (this.resumeOnce > 0) this.player.currentTime = this.resumeOnce;
-			this.resumeOnce = -1;
+			if (this.resumeOnce) this.player.currentTime = this.getResumeTime(this.episode);
+			this.resumeOnce = false;
 			
 			this.player.play();
 			this.playtimeInterval = setInterval(enyo.bind(this, this.updatePlaytime), this.PLAY_BUTTON_INTERVAL);
@@ -232,6 +233,8 @@ enyo.kind({
 	seek: function(sender, seekTo) {
 		// Set player to new position
 		this.player.currentTime = seekTo;
+		// No resume after manual seek
+		//this.resumeOnce = false;
 		
 		// Update play button text and restart updater
 		this.updatePlaytime();
@@ -289,6 +292,9 @@ enyo.kind({
 	
 	playbackEnded: function() {
 		if (! this.episode.marked) this.toggleMarked();
+		// remove from resume to list
+		for (var index = 0; index < this.resumeTimes.length; index++)
+			if (this.resumeTimes[index].url == this.episode.url) this.resumeTimes.splice(index, 1);
 		
 		this.stopPlayback($L("Playback complete"));
 	},
@@ -338,6 +344,10 @@ enyo.kind({
 		return this.player.currentTime === 0;
 	},
 	
+	isInMiddleOfPlayback: function() {
+		return !this.isAtStartOfPlayback() && !this.isAtEndOfPlayback(); 
+	},
+	
 	isAtEndOfPlayback: function() {
 		return this.player.ended;
 	},
@@ -346,10 +356,39 @@ enyo.kind({
 		return this.player && this.player.videoWidth > 0;
 	},
 	
+	storeResumeTime: function() {
+		if (this.episode && this.isInMiddleOfPlayback()) {
+			// Remove old entry
+			for (var index = 0; index < this.resumeTimes.length; index++)
+				if (this.resumeTimes[index].url == this.episode.url) this.resumeTimes.splice(index, 1);
+			
+			// Push new entry
+			this.resumeTimes.push({url: this.episode.url, time: this.player.currentTime});
+		}
+	},
+	
+	canResume: function(episode) {
+		for (var index = 0; index < this.resumeTimes.length; index++)
+			if (this.resumeTimes[index].url == episode.url) return true;
+		
+		return false;
+	},
+	
+	getResumeTime: function(episode) {
+		for (var index = 0; index < this.resumeTimes.length; index++)
+			if (this.resumeTimes[index].url == episode.url) return this.resumeTimes[index].time;
+		
+		return 0;
+	},
+	
 	updateUIOnSetEpisode: function(episode) {
 		this.$.videoInfo.hide();
 		this.$.error.hide();
-		this.$.playButton.setCaption($L("Play"));
+		
+		if (this.canResume(episode))
+			this.$.playButton.setCaption($L("Resume at") + " " + Utilities.formatTime(this.getResumeTime(episode)));
+		else this.$.playButton.setCaption($L("Play"));
+		
 		this.$.playButton.setDisabled(false);
 		this.$.stalledSpinner.hide();
 

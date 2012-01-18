@@ -9,6 +9,6 @@
 		"isDownloaded": true,
 		"marked": true
 	},
-	"resumeTime": 1234,
+	"resumeTimes": [{"url": "http://traffic.libsyn.com/linuxoutlaws/linuxoutlaws221.mp3", "time": "123"}],
 	"returnValue": true
 }
