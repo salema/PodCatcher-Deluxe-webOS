@@ -81,14 +81,14 @@ enyo.kind({
 		}
 	},
 	
-	cancelFromPopup: function(sender, episode) {
-		this.cancel(episode);
-	},
-	
 	cancel: function(episode) {
 		var activeEpisode = Utilities.getItemInList(this.activeEpisodes, episode);
 		
 		this.$.cancel.call({ticket: activeEpisode.ticket});
+	},
+	
+	cancelFromPopup: function(sender, episode) {
+		this.cancel(episode);
 	},
 	
 	cancelSuccess: function(sender, response) {
@@ -163,7 +163,8 @@ enyo.kind({
 			this.$.bar.setPosition(received);
 		}
 		
-		this.$.downloadManagerPopup.update(this.activeEpisodes);
+		// Notify Download Manager Popup if active and open
+		if (this.$.downloadManagerPopup.showing) this.$.downloadManagerPopup.update(this.activeEpisodes);
 	},
 	
 	setAlwaysHide: function(hide) {

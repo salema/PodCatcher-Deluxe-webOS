@@ -16,7 +16,7 @@
  */
 
 /**
- * Displays a nice popup for the user monitor current downloads
+ * Displays a nice popup for the user to monitor current downloads
  */
 enyo.kind({
 	name: "Net.Alliknow.PodCatcher.DownloadManagerPopup",
@@ -30,9 +30,9 @@ enyo.kind({
 	},
 	width: "75%",
 	components: [
-		{kind: "Scroller", name: "downloadsScroller", style: "height: 400px; border: 1px solid gray;", components: [
+		{kind: "Scroller", name: "downloadsScroller", style: "height: 320px; border: 1px solid gray;", components: [
 			{kind: "VirtualRepeater", name: "downloadsListVR", onSetupRow: "getDownload", components: [
-				{kind: "SwipeableItem", components: [
+				{kind: "Item", components: [
 					{kind: "HFlexBox", align: "center", components: [
 						{name: "downloadName", flex: 1},
 						{kind: "Button", name: "cancelDownload", content: $L("Cancel"), onclick: "cancelDownload", className: "enyo-button-negative"}
@@ -50,15 +50,14 @@ enyo.kind({
 	update: function(items) {
 		this.downloads = items;
 		
-		if (this.$.downloadsListVR) this.$.downloadsListVR.render();
+		this.$.downloadsListVR.render();
 	},
 	
 	getDownload: function(sender, index) {
 		if (!this.downloads || this.downloads.length === 0) {
-			this.$.footer.setContent("No current downloads");
+			this.$.footer.setContent($L("No active downloads"));
 			this.$.footer.show();
-		}
-		else {
+		} else {
 			this.$.footer.hide();
 			var download = this.downloads[index];
 		
