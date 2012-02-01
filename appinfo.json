@@ -1,6 +1,6 @@
 {
 	"id": "net.alliknow.podcatcher",
-	"version": "4.5.3",
+	"version": "4.6.2",
 	"vendor": "Kevin Hausmann",
 	"type": "web",
 	"main": "index.html",
