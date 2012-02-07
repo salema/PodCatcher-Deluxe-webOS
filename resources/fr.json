@@ -52,6 +52,7 @@
 	"Cancel at": "Annuler à",
 	"Please stop playback before deleting.": "Veuillez stopper la lecture avant la suppression.",
 	"Download failed": "Le téléchargement a échoué",
+	"No active downloads": "Pas de téléchargements actifs",
 	"Playback active, please pause before switching.": "Lecture active, presser pause avant de changer d'activité.",
 	"This episode has video content. You might want to give <a href=\"http://developer.palm.com/appredirect/?packageid=net.alliknow.videocatcher\">Video PodCatcher Deluxe</a> a try.": "Cet épisode contient une vidéo. Faites un essai avec <a href=\"http://developer.palm.com/appredirect/?packageid=net.alliknow.videocatcher\">Podcatcher Video Deluxe</a>."
 }

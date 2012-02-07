@@ -1,4 +1,4 @@
-/** Copyright 2011 Kevin Hausmann
+/** Copyright 2011, 2012 Kevin Hausmann
  *
  * This file is part of Yet Another Simple Pod Catcher.
  *
