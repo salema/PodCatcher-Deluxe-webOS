@@ -39,11 +39,6 @@
 		"url": "http://rss.cnn.com/services/podcasting/ac360/rss"
 	},
 	{
-		"title": "Eine Stunde Zeit",
-		"url": "http://www.radioeins.de/archiv/podcast/eine_stunde_zeit.feed.podcast.xml",
-		"image": "http://www.radioeins.de/etc/medialib/rbb/rad/image_bilder/podcast/podcast___eine_stunde.file.jpg"
-	},
-	{
 		"title": "Greenpeace Podcast",
 		"url": "http://www.greenpeace-berlin.de/fileadmin/podcast/greencast.xml"
 	}],
