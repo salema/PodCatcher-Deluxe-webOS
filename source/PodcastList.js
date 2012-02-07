@@ -107,7 +107,7 @@ enyo.kind({
 			this.podcastList.sort(new Podcast().compare);
 			this.store();
 			
-			this.selectedIndex = this.podcastList.length - 1;
+			this.selectedIndex = Utilities.getIndexInList(this.podcastList, podcast);
 		}
 		
 		this.selectPodcast();
@@ -143,7 +143,7 @@ enyo.kind({
 			else if (podcast.episodeList.length === 0)
 				this.$.podcastEpisodeNumber.setContent($L("No episodes"));
 			else {
-				var newEpisodeCount = this.getNumberOfUnmarkedEpisode(podcast.episodeList);
+				var newEpisodeCount = this.getNumberOfUnmarkedEpisodes(podcast.episodeList);
 				var text = "";
 				
 				if (newEpisodeCount === 0) text = $L("No new episodes");
@@ -275,6 +275,7 @@ enyo.kind({
 	},
 	
 	scrollSelectedIntoView: function() {
+		// TODO Make this actually work!
 		if (this.selectedIndex == this.podcastList.length - 1)
 			this.$.podcastListScroller.scrollToBottom();
 	},
@@ -290,7 +291,7 @@ enyo.kind({
 		this.$.podcastListVR.render();
 	},
 	
-	getNumberOfUnmarkedEpisode: function(episodeList) {
+	getNumberOfUnmarkedEpisodes: function(episodeList) {
 		var count = 0;
 		
 		for (var index = 0; index < episodeList.length; index++) 
