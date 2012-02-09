@@ -89,4 +89,8 @@ Podcast.prototype.equals = function(podcast) {
 	return podcast instanceof Podcast && this.url == podcast.url;
 };
 
+Podcast.prototype.compare = function(podcastA, podcastB) {
+	return podcastA.title.toLowerCase() >= podcastB.title.toLowerCase();
+};
+
 Podcast.DEFAULT_IMAGE = "icons/podcast.png";
