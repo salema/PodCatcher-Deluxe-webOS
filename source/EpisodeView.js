@@ -293,9 +293,7 @@ enyo.kind({
 	playbackEnded: function() {
 		if (! this.episode.marked) this.toggleMarked();
 		// remove from resume to list
-		for (var index = 0; index < this.resumeTimes.length; index++)
-			if (this.resumeTimes[index].url == this.episode.url) this.resumeTimes.splice(index, 1);
-		
+		this.removeResumeTimeForEpisode(this.episode);
 		this.stopPlayback($L("Playback complete"));
 	},
 	
@@ -359,19 +357,14 @@ enyo.kind({
 	storeResumeTime: function() {
 		if (this.episode && this.isInMiddleOfPlayback()) {
 			// Remove old entry
-			for (var index = 0; index < this.resumeTimes.length; index++)
-				if (this.resumeTimes[index].url == this.episode.url) this.resumeTimes.splice(index, 1);
-			
+			this.removeResumeTimeForEpisode(this.episode);
 			// Push new entry
 			this.resumeTimes.push({url: this.episode.url, time: this.player.currentTime});
 		}
 	},
 	
 	canResume: function(episode) {
-		for (var index = 0; index < this.resumeTimes.length; index++)
-			if (this.resumeTimes[index].url == episode.url) return true;
-		
-		return false;
+		return this.getResumeTime(episode) > 0;
 	},
 	
 	getResumeTime: function(episode) {
@@ -379,6 +372,11 @@ enyo.kind({
 			if (this.resumeTimes[index].url == episode.url) return this.resumeTimes[index].time;
 		
 		return 0;
+	},
+	
+	removeResumeTimeForEpisode: function(episode) {
+		for (var index = 0; index < this.resumeTimes.length; index++)
+			if (this.resumeTimes[index].url == this.episode.url) this.resumeTimes.splice(index, 1);
 	},
 	
 	updateUIOnSetEpisode: function(episode) {
