@@ -56,8 +56,12 @@ enyo.kind({
 		this.inherited(arguments);
 		
 		this.enableAutoDownload = false;
-		this.autoUpdateInterval = setInterval(enyo.bind(this, this.autoUpdate), this.AUTO_UPDATE_INTERVAL);
+		
 		this.$.preferencesService.call({keys: ["enableAutoDownload"]}, {method: "getPreferences", onSuccess: "restore"});
+	},
+	
+	ready: function() {
+		this.autoUpdateInterval = setInterval(enyo.bind(this, this.autoUpdate), this.AUTO_UPDATE_INTERVAL);
 	},
 	
 	destroy: function() {
