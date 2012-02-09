@@ -108,6 +108,7 @@ enyo.kind({
 			this.selectedIndex = Utilities.getIndexInList(this.podcastList, podcast);
 		}
 		
+		this.$.podcastListVR.render();
 		this.selectPodcast();
 	},
 
@@ -132,6 +133,7 @@ enyo.kind({
 		
 		if (podcast) {
 			this.$.podcastTitle.setContent(podcast.title);
+			this.$.podcastTitle.parent.addClass("list-item");
 			
 			if (!podcast.episodeList) this.$.podcastEpisodeNumber.setContent("-----");
 			else if (podcast.episodeList.length === 0)
@@ -235,7 +237,6 @@ enyo.kind({
 			else this.doSelectPodcast(currentPodcast);
 			
 			this.$.podcastListVR.render();
-			if(! this.selectAll) this.scrollSelectedIntoView();
 		}
 	},
 	
@@ -247,12 +248,6 @@ enyo.kind({
 		this.$.selectAllButton.setDisabled(selectAll || this.podcastList.length === 0);
 		
 		this.doPrepareLoad();
-	},
-	
-	scrollSelectedIntoView: function() {
-		// TODO Make this actually work!
-		if (this.selectedIndex == this.podcastList.length - 1)
-			this.$.podcastListScroller.scrollToBottom();
 	},
 	
 	grabPodcastImageSuccess: function(inSender, inResponse, inRequest) {

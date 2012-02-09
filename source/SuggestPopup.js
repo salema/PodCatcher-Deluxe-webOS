@@ -40,12 +40,14 @@ enyo.kind({
 			]}
 		]},
 		{kind: "Group", caption: $L("Featured Podcast"), components: [
-			{kind: "HFlexBox", align: "center", components: [
-				{name: "featuredTitle", style: "margin: 10px;"},
-				{name: "featuredDetails", style: "color: grey; margin-left: 5px;", flex: 1},
-				{kind: "Button", name: "addFeaturedButton", content: $L("Add Podcast"), onclick: "addFeatured", style: "margin-right: 13px; color: #fff; background-color: #f60;"}
-			]},
-			{name: "featuredDescription", style: "margin-left: 10px; margin-bottom: 10px; font-size: smaller"}
+			{kind: "Scroller", style: "height: 120px", components: [                                                              	
+				{kind: "HFlexBox", align: "center", components: [
+					{name: "featuredTitle", style: "margin: 10px;"},
+					{name: "featuredDetails", style: "color: grey; margin-left: 5px;", flex: 1},
+					{kind: "Button", name: "addFeaturedButton", content: $L("Add Podcast"), onclick: "addFeatured", style: "margin-right: 13px; color: #fff; background-color: #f60;"}
+				]},
+				{name: "featuredDescription", style: "margin-left: 10px; margin-bottom: 10px; font-size: smaller"}
+			]}
 		]},
 		{kind: "Group", caption: $L("Suggested Podcasts"), components: [
 			{kind: "Scroller", name: "suggestScroller", style: "height: 300px", components: [

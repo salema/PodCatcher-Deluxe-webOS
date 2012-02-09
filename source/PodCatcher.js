@@ -49,7 +49,9 @@ enyo.kind({
 	
 	create: function() {
 		this.inherited(arguments);
-		
+	},
+	
+	ready: function() {
 		this.autoUpdateInterval = setInterval(enyo.bind(this, this.autoUpdate), this.AUTO_UPDATE_INTERVAL);
 	},
 	
