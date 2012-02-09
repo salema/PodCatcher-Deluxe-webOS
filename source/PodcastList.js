@@ -105,7 +105,7 @@ enyo.kind({
 			this.podcastList.sort(new Podcast().compare);
 			this.storePodcastList();
 			
-			this.selectedIndex = this.podcastList.length - 1;
+			this.selectedIndex = Utilities.getIndexInList(this.podcastList, podcast);
 		}
 		
 		this.selectPodcast();
@@ -139,7 +139,7 @@ enyo.kind({
 			else if (podcast.episodeList.length == 1)
 				this.$.podcastEpisodeNumber.setContent(podcast.episodeList.length + " " + $L("episode"));
 			else this.$.podcastEpisodeNumber.setContent(podcast.episodeList.length + " " + $L("episodes"));
-			
+
 			if (this.selectedIndex == inIndex || this.selectAll) {
 				this.$.podcastTitle.addClass("highlight");
 				this.$.podcastEpisodeNumber.addClass("highlight");
@@ -250,6 +250,7 @@ enyo.kind({
 	},
 	
 	scrollSelectedIntoView: function() {
+		// TODO Make this actually work!
 		if (this.selectedIndex == this.podcastList.length - 1)
 			this.$.podcastListScroller.scrollToBottom();
 	},
