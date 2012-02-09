@@ -26,6 +26,9 @@
 	overflow: hidden;
 	white-space: nowrap;
 }
+.list-item {
+	background-color: light-gray;
+}
 .highlight {
 	font-weight: bold;
 	white-space: normal;
