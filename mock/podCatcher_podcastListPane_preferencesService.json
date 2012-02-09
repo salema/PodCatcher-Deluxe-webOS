@@ -29,6 +29,10 @@
 	{
 		"title": "Anderson Cooper 360°",
 		"url": "http://rss.cnn.com/services/podcasting/ac360/rss"
+	},
+	{
+		"title": "Greenpeace Podcast",
+		"url": "http://www.greenpeace-berlin.de/fileadmin/podcast/greencast.xml"
 	}],
 	"returnValue": true
 }

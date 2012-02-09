@@ -79,7 +79,9 @@ enyo.kind({
 				
 				this.podcastList.push(podcast);
 			}
-			
+
+			this.podcastList.sort(new Podcast().compare);
+
 			this.$.selectAllButton.setDisabled(this.selectAll || this.podcastList.length === 0);
 			this.$.podcastListVR.render();
 			this.autoUpdate();
@@ -102,6 +104,7 @@ enyo.kind({
 		// podcast is new
 		else {
 			this.podcastList.push(podcast);
+			this.podcastList.sort(new Podcast().compare);
 			this.store();
 			
 			this.selectedIndex = this.podcastList.length - 1;
