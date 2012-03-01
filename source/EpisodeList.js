@@ -163,8 +163,7 @@ enyo.kind({
 		
 		if (episode) {
 			var old = this.markedEpisodes.indexOf(episode.url) >= 0;
-			
-			
+						
 			if (!this.showAll && old) {
 				this.$.episodeTitle.parent.hide();
 			} else {
@@ -232,11 +231,13 @@ enyo.kind({
 	
 	updateListOfMarkedEpisodes: function(episode) {
 		// Add to list
-		if (episode.marked && !Utilities.isInList(this.markedEpisodes, episode.url)) 
+		if (episode.marked && this.markedEpisodes.indexOf(episode.url) < 0) 
 			this.markedEpisodes.push(episode.url);
 		// Remove from list 
-		else if (!episode.marked)
-			Utilities.removeItemFromList(this.markedEpisodes, episode.url);
+		else if (!episode.marked) {
+			var index = this.markedEpisodes.indexOf(episode.url);
+			if (index >= 0) this.markedEpisodes.splice(index, 1);
+		}
 	},
 	
 	toggleShowAll: function(sender, event) {
