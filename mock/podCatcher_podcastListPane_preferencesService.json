@@ -1,17 +1,9 @@
 {
-	"storedPodcastList": [{
-		"title": "Palm Developer Podcast",
-		"url": "http://feeds.feedburner.com/PalmDeveloperCenterPodcasts"
-	},
+	"storedPodcastList": [
 	{
 		"title": "Linux Outlaws",
 		"url": "http://feeds.feedburner.com/linuxoutlaws",
 		"image": "http://sixgun.org/files/linuxoutlaws.jpg"
-	},
-	{
-		"title": "Escape - Der Experte",
-		"url": "http://www.radioeins.de/archiv/podcast/escape_der_experte.feed.podcast.xml",
-		"image": "http://www.radioeins.de/etc/medialib/rbb/rad/image_bilder/podcast/podcast___der_experte.file.jpg"
 	},
 	{
 		"title": "Linux Action Show",
@@ -37,10 +29,6 @@
 	{
 		"title": "Anderson Cooper 360°",
 		"url": "http://rss.cnn.com/services/podcasting/ac360/rss"
-	},
-	{
-		"title": "Greenpeace Podcast",
-		"url": "http://www.greenpeace-berlin.de/fileadmin/podcast/greencast.xml"
 	}],
 	"returnValue": true
 }
