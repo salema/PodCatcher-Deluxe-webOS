@@ -44,12 +44,6 @@ enyo.kind({
 		]},
 	],
 	
-	create: function() {
-		this.inherited(arguments);
-		
-		this.loadSuggestionsOnOpen = true;
-	},
-	
 	open: function() {
 		this.inherited(arguments);
 		
@@ -59,6 +53,8 @@ enyo.kind({
 		this.$.urlInput.setDisabled(false);
 		this.$.addButton.setDisabled(false);
 		this.$.addButton.setActive(false);
+		this.$.showSuggestionsButton.setCaption($L("Show suggestions..."));
+		this.$.showSuggestionsButton.setDisabled(false);
 		
 
 		// call for clipboard contents (maybe a podcast feed url?!)
@@ -75,15 +71,10 @@ enyo.kind({
 	},
 	
 	showSuggestions: function() {
-		if (this.loadSuggestionsOnOpen) {
-			this.$.showSuggestionsButton.setActive(true);
+		this.$.showSuggestionsButton.setActive(true);
 			
-			this.$.grabSuggestionsService.setUrl(this.$.suggestPopup.SOURCE);
-			this.$.grabSuggestionsService.call();
-		} else {
-			this.close();
-			this.$.suggestPopup.openAtCenter();
-		}
+		this.$.grabSuggestionsService.setUrl(this.$.suggestPopup.SOURCE);
+		this.$.grabSuggestionsService.call();
 	},
 
 	addPodcast: function() {
@@ -126,11 +117,9 @@ enyo.kind({
 	grabSuggestionsSuccess: function(sender, response, request) {		
 		this.$.showSuggestionsButton.setActive(false);
 		
-		if (! response) this.grabSuggestionsFailed(sender, response, request);
+		// Make sure there is a useful response
+		if (! response || ! response.featured) this.grabSuggestionsFailed(sender, response, request);
 		else {
-			// do this only once in a lifetime
-			this.loadSuggestionsOnOpen = false;
-			
 			this.$.suggestPopup.setData(response);
 			
 			this.close();
