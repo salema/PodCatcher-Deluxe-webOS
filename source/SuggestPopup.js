@@ -21,7 +21,7 @@
 enyo.kind({
 	name: "Net.Alliknow.PodCatcher.SuggestPopup",
 	kind: "ModalDialog",
-	SOURCE: "http://www.podcatcher-deluxe.com/suggestions.json",
+	SOURCE: "http://salema.github.com/Yet-Another-Simple-Pod-Catcher/suggestions.json",
 	caption: $L("Add a new Podcast"),
 	layoutKind: "VFlexLayout",
 	scrim: true,
@@ -113,8 +113,8 @@ enyo.kind({
 	},
 	
 	setData: function(response) {
-		this.allFeatured = eval(response).featured;
-		this.allSuggestions = eval(response).suggestions;
+		this.allFeatured = response.featured;
+		this.allSuggestions = response.suggestions;
 	},
 	
 	updateSuggestions: function() {
