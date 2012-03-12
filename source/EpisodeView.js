@@ -34,7 +34,7 @@ enyo.kind({
 		onOpenInBrowser: ""
 	},
 	components: [
-		{kind: "SystemService", name: "preferencesService", subscribe : false},
+		{kind: "SystemService", name: "preferencesService", subscribe: false},
 		{kind: "ApplicationEvents", onUnload: "storeResumeInformation"},
 		{kind: "PalmService", name: "headsetService", service: "palm://com.palm.keys/headset/", method: "status", onSuccess: "headsetStatusChanged"},
 		{kind: "PalmService", name: "headsetButtonService", service: "palm://com.palm.keys/media/", method: "status", onSuccess: "headsetButtonPressed"},
