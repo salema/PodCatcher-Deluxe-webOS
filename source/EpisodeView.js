@@ -36,8 +36,8 @@ enyo.kind({
 	components: [
 		{kind: "SystemService", name: "preferencesService", subscribe: false},
 		{kind: "ApplicationEvents", onUnload: "storeResumeInformation"},
-		{kind: "PalmService", name: "headsetService", service: "palm://com.palm.keys/headset/", method: "status", onSuccess: "headsetStatusChanged"},
-		{kind: "PalmService", name: "headsetButtonService", service: "palm://com.palm.keys/media/", method: "status", onSuccess: "headsetButtonPressed"},
+		{kind: "PalmService", name: "headsetService", service: "palm://com.palm.keys/headset/", method: "status", onSuccess: "headsetStatusChanged", subscribe: true},
+		{kind: "PalmService", name: "headsetButtonService", service: "palm://com.palm.keys/media/", method: "status", onSuccess: "headsetButtonPressed", subscribe: true},
 		{kind: "Header", layoutKind: "HFlexLayout", className: "header", components: [
 			{kind: "Image", name: "markButton", src: Episode.UNMARKED_ICON, onclick: "toggleMarked", style: "margin-right: 10px;"},
 			{name: "episodeName", content: $L("Watch"), className: "nowrap", flex: 1},
@@ -367,9 +367,13 @@ enyo.kind({
 					if (this.plays) this.togglePlay();
 					break;
 				case "next":
+				case "nextAndPlay":
 					this.doNext();
 					break;
 				case "prev":
+					break;
+				case "togglePausePlay":
+					if ((this.episode && !this.plays && !this.isAtEndOfPlayback()) || this.plays) this.togglePlay();
 					break;
 			}
 		}
