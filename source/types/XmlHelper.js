@@ -51,6 +51,7 @@ XmlHelper.ITEM = "item";
 XmlHelper.TITLE = "title";
 XmlHelper.ENCLOSURE = "enclosure";
 XmlHelper.PUBDATE = "pubDate";
+XmlHelper.DATE = "date";
 XmlHelper.DESCRIPTION = "description";
 XmlHelper.IMAGE = "image";
 XmlHelper.THUMBNAIL = "thumbnail";

@@ -25,7 +25,7 @@ function Episode() {}
 Episode.prototype.readFromXML = function(xmlTree) {
 	this.title = XmlHelper.getFirstValue(xmlTree, XmlHelper.TITLE);
 	this.url = XmlHelper.getFirst(xmlTree, XmlHelper.ENCLOSURE).getAttribute(XmlHelper.URL);
-	this.pubDate = XmlHelper.getFirstValue(xmlTree, XmlHelper.PUBDATE);
+	this.pubDate = this.getPubDate(xmlTree);
 	
 	if (XmlHelper.has(xmlTree, XmlHelper.DESCRIPTION) &&
 		XmlHelper.getFirst(xmlTree, XmlHelper.DESCRIPTION).firstChild != undefined)
@@ -51,8 +51,14 @@ Episode.prototype.readFromJSON = function(data) {
 
 Episode.prototype.isValidXML = function(xmlTree) {
 	return XmlHelper.has(xmlTree, XmlHelper.TITLE) &&
-		XmlHelper.has(xmlTree, XmlHelper.ENCLOSURE) &&
-		XmlHelper.has(xmlTree, XmlHelper.PUBDATE);
+		XmlHelper.has(xmlTree, XmlHelper.ENCLOSURE) && (
+			XmlHelper.has(xmlTree, XmlHelper.PUBDATE) ||
+			XmlHelper.has(xmlTree, XmlHelper.DATE));
+};
+
+Episode.prototype.getPubDate = function(xmlTree) {
+	if (XmlHelper.has(xmlTree, XmlHelper.PUBDATE)) return XmlHelper.getFirstValue(xmlTree, XmlHelper.PUBDATE);
+	else return XmlHelper.getFirstValue(xmlTree, XmlHelper.DATE);
 };
 
 Episode.prototype.setDownloaded = function(downloaded, file) {
