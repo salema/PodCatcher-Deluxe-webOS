@@ -24,7 +24,6 @@ enyo.kind({
 	PLAY_BUTTON_INTERVAL: 1000,
 	SLIDER_INTERVAL: 500,
 	events: {
-		onTogglePlay: "",
 		onPlaybackEnded: "",
 		onNext: "",
 		onResume: "",
@@ -35,6 +34,7 @@ enyo.kind({
 	},
 	components: [
 		{kind: "SystemService", name: "preferencesService", subscribe: false},
+		{kind: "ApplicationEvents", onWindowRotated: "adjustInterfaceSize"},
 		{kind: "ApplicationEvents", onUnload: "storeResumeInformation"},
 		{kind: "PalmService", name: "headsetService", service: "palm://com.palm.keys/headset/", method: "status", onSuccess: "headsetStatusChanged", subscribe: true},
 		{kind: "PalmService", name: "headsetButtonService", service: "palm://com.palm.keys/media/", method: "status", onSuccess: "headsetButtonPressed", subscribe: true},
@@ -72,6 +72,8 @@ enyo.kind({
 		if (window.PalmSystem) {
 			this.$.headsetService.call({subscribe: true});
 			this.$.headsetButtonService.call({subscribe: true});
+			
+			this.smallInterface = enyo.getWindowOrientation() == "right" || enyo.getWindowOrientation() == "left";
 		}
 		
 		this.$.preferencesService.call({keys: ["resumeEpisode", "resumeTimes"]}, {method: "getPreferences", onSuccess: "resumeOnStartup"});
@@ -207,7 +209,6 @@ enyo.kind({
 
 	togglePlay: function() {
 		this.plays = !this.plays;
-		this.doTogglePlay();
 		
 		if (this.plays) {
 			if (this.resumeOnce) this.player.currentTime = this.getResumeTime(this.episode);
@@ -235,8 +236,8 @@ enyo.kind({
 	seeking: function(sender, currentlyAt) {
 		var timeString = Utilities.createTimeString(currentlyAt, this.player.duration);
 		
-		if (this.plays) this.$.playButton.setCaption($L("Pause at") + " " + timeString);
-		else this.$.playButton.setCaption($L("Resume at") + " " + timeString); 
+		if (this.plays && !this.smallInterface) this.$.playButton.setCaption($L("Pause at") + " " + timeString);
+		else if (!this.smallInterface) this.$.playButton.setCaption($L("Resume at") + " " + timeString); 
 	},
 	
 	seek: function(sender, seekTo) {
@@ -266,11 +267,12 @@ enyo.kind({
 		
 		// Update play button
 		if (this.plays) {
-			if (this.isAtStartOfPlayback()) this.$.playButton.setCaption($L("Pause"));
-			else if (this.isAtEndOfPlayback()) this.playbackEnded();
+			if (this.isAtEndOfPlayback()) this.playbackEnded();
+			else if (this.smallInterface || this.isAtStartOfPlayback()) this.$.playButton.setCaption($L("Pause"));
 			else this.$.playButton.setCaption($L("Pause at") + " " + timeString);
 		} else {
 			if (this.isAtStartOfPlayback()) this.$.playButton.setCaption($L("Play"));
+			else if (this.smallInterface) this.$.playButton.setCaption($L("Resume"));
 			else this.$.playButton.setCaption($L("Resume at") + " " + timeString);
 		}
 		
@@ -304,7 +306,7 @@ enyo.kind({
 	},
 	
 	playlistChanged: function(newLength) {
-		if (newLength > 0) this.$.nextButton.show();
+		if (newLength > 0 && !this.smallInterface) this.$.nextButton.show();
 		else this.$.nextButton.hide();
 	},
 	
@@ -334,7 +336,11 @@ enyo.kind({
 	},
 	
 	videoResize: function(width) {
-		var fullscreenMode = width > 1000 && this.isVideoContentAvailable();
+		var fullscreenMode;
+		
+		if (this.smallInterface)
+			fullscreenMode = width > 700 && this.isVideoContentAvailable();
+		else fullscreenMode = width > 1000 && this.isVideoContentAvailable();
 		
 		this.$.downloadManager.setAlwaysHide(fullscreenMode);
 		enyo.setFullScreen(fullscreenMode);
@@ -348,6 +354,13 @@ enyo.kind({
 		}
 		
 		this.$.episodeScroller.scrollTo(0, 0);
+	},
+	
+	adjustInterfaceSize: function(sender) {
+		this.smallInterface = enyo.getWindowOrientation() == "right" || enyo.getWindowOrientation() == "left";
+		
+		this.updatePlaytime();
+		if (this.smallInterface) this.$.nextButton.hide();
 	},
 	
 	headsetStatusChanged: function(sender, response) {
@@ -432,8 +445,9 @@ enyo.kind({
 	updateUIOnSetEpisode: function(episode) {
 		this.$.error.hide();
 		
-		if (this.canResume(episode))
+		if (!this.smallInterface && this.canResume(episode))
 			this.$.playButton.setCaption($L("Resume at") + " " + Utilities.formatTime(this.getResumeTime(episode)));
+		else if (this.canResume(episode)) this.$.playButton.setCaption($L("Resume"));
 		else this.$.playButton.setCaption($L("Play"));
 		
 		this.$.playButton.setDisabled(false);

@@ -28,8 +28,8 @@ enyo.kind({
 	components: [
 		{kind: "SystemService", name: "preferencesService", subscribe : false},
 		{kind: "PalmService", name: "launchBrowserCall", service: "palm://com.palm.applicationManager/", method: "launch"},
-		{kind: "ApplicationEvents", onWindowActivated: "setOrientation"},
-		{kind: "ApplicationEvents", onWindowDeactivated: "unsetOrientation"},
+		{kind: "ApplicationEvents", onWindowActivated: "windowActivated"},
+		{kind: "ApplicationEvents", onWindowDeactivated: "windowDeactivated"},
 		{kind: "AppMenu", onBeforeOpen: "updateMenu", components: [
 			{kind: "MenuCheckItem", caption: $L("Autodownload"), name: "autoDownloadCheck", onclick: "toggleAutoDownload", checked: false},
 			{kind: "AppMenuItem", caption: $L("Episodes"), components: [
@@ -45,8 +45,8 @@ enyo.kind({
 					onSelectPodcast: "podcastSelected", onSelectAll: "allPodcastsSelected", onAutoUpdateComplete: "autoDownload"},
 			{kind: "Net.Alliknow.PodCatcher.EpisodeList", name: "episodeListPane", width: "380px",
 					onSelectEpisode: "episodeSelected", onPlaylistChanged: "playlistChanged", onSpecialListSelected: "specialListSelected",
-					onResumeComplete: "propagateMarkedEpisodesToPodcastList"},
-			{kind: "Net.Alliknow.PodCatcher.EpisodeView", name: "episodeViewPane", flex: 1, onTogglePlay: "updateDashboard", onNext: "playNext",
+					onResumeComplete: "episodeViewResumeComplete"},
+			{kind: "Net.Alliknow.PodCatcher.EpisodeView", name: "episodeViewPane", flex: 1, onNext: "playNext",
 					onPlaybackEnded: "playNext", onResume: "updateDashboard", onMarkEpisode: "episodeMarked", onOpenInBrowser: "openInBrowser",
 					onDownloaded: "episodeDownloaded", onDeleteDownload: "deleteDownloadedEpisode", onResize: "videoResize"}
 		]}
@@ -56,6 +56,7 @@ enyo.kind({
 		this.inherited(arguments);
 		
 		this.enableAutoDownload = false;
+		this.showDashboard = false;
 		
 		this.$.preferencesService.call({keys: ["enableAutoDownload"]}, {method: "getPreferences", onSuccess: "restore"});
 	},
@@ -210,18 +211,22 @@ enyo.kind({
 		this.$.launchBrowserCall.call({"id": "com.palm.app.browser", "params": {"target": url}});
 	},
 	
-	setOrientation: function() {
-		if (window.PalmSystem)
-			enyo.setAllowedOrientation(window.PalmSystem.videoOrientation);
+	windowActivated: function() {
+		this.showDashboard = false;
+		this.updateDashboard();
 	},
 	
-	unsetOrientation: function() {
-		if (window.PalmSystem) enyo.setAllowedOrientation("free");
+	windowDeactivated: function() {
+		if (this.$.episodeViewPane.plays && this.$.episodeViewPane.isVideoContentAvailable())
+			this.$.episodeViewPane.togglePlay();
+		
+		this.showDashboard = !this.$.episodeViewPane.isVideoContentAvailable();
+		this.updateDashboard();
 	},
 	
 	updateDashboard: function() {
-		// Only use dashboard where it actually exists
-		if (window.PalmSystem) {
+		// Only use dashboard where it actually exists and we are not focused and there is no video
+		if (window.PalmSystem && this.showDashboard) {
 			// Default: we are playing
 			var playText = $L("Pause");
 			
@@ -233,11 +238,15 @@ enyo.kind({
 			}
 			
 			var episode = this.$.episodeViewPane.episode;
-			this.$.dashboard.setLayers([{icon: "icons/icon48.png", title: episode.title, text: episode.podcastTitle + " - " + playText}]);
-		}
+			if (episode)
+				this.$.dashboard.setLayers([{icon: "icons/icon48.png", title: episode.title, text: episode.podcastTitle + " - " + playText}]);
+		} else this.$.dashboard.setLayers([]);
 	},
 	
-	propagateMarkedEpisodesToPodcastList: function() {
+	episodeViewResumeComplete: function() {
+		// propagate marked episodes to podcast list
 		this.$.podcastListPane.markedEpisodes = this.$.episodeListPane.markedEpisodes;
+		// alert episode view about playlist length 
+		this.playlistChanged(this, this.$.episodeListPane.playlist.length);
 	}
 });
