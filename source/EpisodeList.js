@@ -81,8 +81,6 @@ enyo.kind({
 				
 				this.playlist.push(episode);
 			}
-			
-			this.doPlaylistChanged(this.playlist.length);
 		}
 		
 		if (response.markedEpisodes != undefined)
