@@ -24,11 +24,11 @@ enyo.kind({
 	PLAY_BUTTON_INTERVAL: 1000,
 	SLIDER_INTERVAL: 500,
 	events: {
-		onTogglePlay: "",
 		onPlaybackEnded: "",
 		onOpenInBrowser: ""
 	},
 	components: [
+		{kind: "ApplicationEvents", onWindowRotated: "adjustInterfaceSize"},
 		{kind: "PalmService", name: "headsetService", service: "palm://com.palm.keys/headset/", method: "status", onSuccess: "headsetStatusChanged", subscribe: true},
 		{kind: "PalmService", name: "headsetButtonService", service: "palm://com.palm.keys/media/", method: "status", onSuccess: "headsetButtonPressed", subscribe: true},
 		{kind: "Header", layoutKind: "HFlexLayout", className: "header", components: [
@@ -56,6 +56,8 @@ enyo.kind({
 		if (window.PalmSystem) {
 			this.$.headsetService.call({subscribe: true});
 			this.$.headsetButtonService.call({subscribe: true});
+			
+			this.smallInterface = enyo.getWindowOrientation() == "right" || enyo.getWindowOrientation() == "left";
 		}
 	},
 	
@@ -89,12 +91,10 @@ enyo.kind({
 
 	togglePlay: function() {
 		this.plays = !this.plays;
-		this.doTogglePlay();
 		
 		if (this.plays) {
 			this.$.sound.play();
 			
-			this.updatePlaytime();
 			this.interval = setInterval(enyo.bind(this, this.updatePlaytime), this.PLAY_BUTTON_INTERVAL);
 		} else {
 			this.$.sound.audio.pause();
@@ -105,6 +105,8 @@ enyo.kind({
 			
 			this.$.stalledSpinner.hide();
 		}
+		
+		this.updatePlaytime();
 	},
 	
 	seekTap: function() {
@@ -115,10 +117,11 @@ enyo.kind({
 	},
 	
 	seeking: function(sender, currentlyAt) {
-		if (this.plays) 
+		if (this.plays && !this.smallInterface) 
 			this.$.playButton.setCaption($L("Pause at") + " " + Utilities.formatTime(currentlyAt) + " " +
 				$L("of") + " " + Utilities.formatTime(this.$.sound.audio.duration));
-		else this.$.playButton.setCaption($L("Resume at") + " " + Utilities.formatTime(currentlyAt) + " " +
+		else if (!this.smallInterface)
+			this.$.playButton.setCaption($L("Resume at") + " " + Utilities.formatTime(currentlyAt) + " " +
 				$L("of") + " " + Utilities.formatTime(this.$.sound.audio.duration));
 	},
 	
@@ -145,11 +148,12 @@ enyo.kind({
 		
 		// Update play button
 		if (this.plays) {
-			if (this.isAtStartOfPlayback()) this.$.playButton.setCaption($L("Pause"));
-			else if (this.isAtEndOfPlayback()) this.stopPlayback($L("Playback complete"));
+			if (this.isAtEndOfPlayback()) this.stopPlayback($L("Playback complete"));
+			else if (this.smallInterface || this.isAtStartOfPlayback()) this.$.playButton.setCaption($L("Pause")); 
 			else this.$.playButton.setCaption($L("Pause at") + " " + this.createTimeString());
 		} else {
 			if (this.isAtStartOfPlayback()) this.$.playButton.setCaption($L("Play"));
+			else if (this.smallInterface) this.$.playButton.setCaption($L("Resume"));
 			else this.$.playButton.setCaption($L("Resume at") + " " + this.createTimeString());
 		}
 		
@@ -176,6 +180,12 @@ enyo.kind({
 		this.$.playButton.setCaption(buttonText);
 		this.$.playButton.setDisabled(true);
 		this.$.stalledSpinner.hide();
+	},
+	
+	adjustInterfaceSize: function(sender) {
+		this.smallInterface = enyo.getWindowOrientation() == "right" || enyo.getWindowOrientation() == "left";
+		
+		this.updatePlaytime();
 	},
 	
 	headsetStatusChanged: function(sender, response) {

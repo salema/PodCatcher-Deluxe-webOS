@@ -29,6 +29,8 @@ enyo.kind({
 	AUTO_UPDATE_INTERVAL: 30 * 60 * 1000,
 	components: [
 		{kind: "PalmService", name: "launchBrowserCall", service: "palm://com.palm.applicationManager/", method: "launch"},
+		{kind: "ApplicationEvents", onWindowActivated: "windowActivated"},
+		{kind: "ApplicationEvents", onWindowDeactivated: "windowDeactivated"},
 		{kind: "AppMenu", components: [
 			{kind: "AppMenuItem", caption: "PodCatcher Deluxe", components: [
 				{kind: "AppMenuItem", caption: $L("Video"), onclick: "openVideoDeluxe"},
@@ -42,13 +44,14 @@ enyo.kind({
 			{kind: "Net.Alliknow.PodCatcher.PodcastList", name: "podcastListPane", width: "230px", onPrepareLoad: "prepareLoad",
 					onSelectPodcast: "podcastSelected", onSelectAll: "allPodcastsSelected"},
 			{kind: "Net.Alliknow.PodCatcher.EpisodeList", name: "episodeListPane", width: "360px", onSelectEpisode: "episodeSelected"},
-			{kind: "Net.Alliknow.PodCatcher.EpisodeView", name: "episodeViewPane", flex: 1, onTogglePlay: "updateDashboard", 
+			{kind: "Net.Alliknow.PodCatcher.EpisodeView", name: "episodeViewPane", flex: 1, 
 					onPlaybackEnded: "updateDashboard", onOpenInBrowser: "openInBrowser"}
 		]}
 	],
 	
 	create: function() {
 		this.inherited(arguments);
+		this.showDashboard = false;
 	},
 	
 	ready: function() {
@@ -117,9 +120,19 @@ enyo.kind({
 		this.$.launchBrowserCall.call({"id": "com.palm.app.browser", "params": {"target": url}});
 	},
 	
+	windowActivated: function() {
+		this.showDashboard = false;
+		this.updateDashboard();
+	},
+	
+	windowDeactivated: function() {		
+		this.showDashboard = true;
+		this.updateDashboard();
+	},
+	
 	updateDashboard: function() {
-		// Only use dashboard where it actually exists
-		if (window.PalmSystem) {
+		// Only use dashboard where it actually exists and we are not focused and there is no video
+		if (window.PalmSystem && this.showDashboard) {
 			// Default: we are playing
 			var playText = $L("Pause");
 			
@@ -131,7 +144,8 @@ enyo.kind({
 			}
 			
 			var episode = this.$.episodeViewPane.episode;
-			this.$.dashboard.setLayers([{icon: "icons/icon48.png", title: episode.title, text: playText}]);
-		}
-	}
+			if (episode)
+				this.$.dashboard.setLayers([{icon: "icons/icon48.png", title: episode.title, text: episode.podcastTitle + " - " + playText}]);
+		} else this.$.dashboard.setLayers([]);
+	},
 });
