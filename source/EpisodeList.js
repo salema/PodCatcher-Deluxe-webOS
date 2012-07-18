@@ -269,7 +269,7 @@ enyo.kind({
 			this.$.episodeListVR.render();
 		}
 		
-		this.doPlaylistChanged(this.playlist.length);
+		this.doPlaylistChanged();
 		this.store();		
 	},
 	
@@ -292,7 +292,7 @@ enyo.kind({
 		this.store();
 		
 		if (this.showPlaylist) this.setShowPlaylist();
-		this.doPlaylistChanged(this.playlist.length);
+		this.doPlaylistChanged();
 		this.$.episodeListVR.render();
 	},
 	
