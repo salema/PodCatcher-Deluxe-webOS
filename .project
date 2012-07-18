@@ -12,7 +12,6 @@
 		</buildCommand>
 	</buildSpec>
 	<natures>
-		<nature>com.palm.pdt.nature</nature>
 		<nature>org.eclipse.wst.jsdt.core.jsNature</nature>
 	</natures>
 </projectDescription>
