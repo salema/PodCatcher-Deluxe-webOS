@@ -174,14 +174,16 @@ enyo.kind({
 	
 	showNextButton: function() {
 		var playlistEmpty = this.$.episodeListPane.playlist.length === 0;
-		this.$.episodeViewPane.showNextButton(playlistEmpty);
+		var portrait = enyo.getWindowOrientation() == "right" || enyo.getWindowOrientation() == "left";
+		
+		this.$.episodeViewPane.showNextButton(!playlistEmpty && !portrait);
 	},
 	
 	episodeDownloaded: function(sender, episode) {
 		this.$.episodeListPane.addToDownloaded(episode);
 		
 		if (window.PalmSystem)
-			enyo.windows.addBannerMessage($L("Downloaded") + " " + episode.title, "{}", "icons/icon48.png");
+			enyo.windows.addBannerMessage($L("Downloaded") + " \"" + episode.title + "\"", "{}", "icons/icon48.png");
 	},
 	
 	deleteDownloadedEpisode: function(sender, episode) {

@@ -45,11 +45,11 @@ enyo.kind({
 		]},
 		{kind: "Sound", audioClass: "media"},
 		{kind: "Video", showControls: false, className: "fullWidth", style: "max-height: 620px", showing: false},
-		{kind: "Button", name: "downloadButton", caption: $L("Download"), onclick: "startStopDelete"},
+		{kind: "Button", name: "downloadButton", caption: $L("Download"), onclick: "startStopDelete", style: "margin: 5px 10px"},
 		{kind: "Net.Alliknow.PodCatcher.DownloadManager", name: "downloadManager", style: "display: block;", onStatusUpdate: "downloadStatusUpdate", 
 			onDownloadComplete: "downloadComplete", onCancelSuccess: "cancelSuccess", onDownloadFailed: "downloadFailed"},
 		{name: "error", showing: false, className: "error"},
-		{kind: "Scroller", name: "episodeScroller", flex: 1, style: "margin: 5px 12px", components: [
+		{kind: "Scroller", name: "episodeScroller", flex: 1, style: "margin: 0px 12px 5px", components: [
 			{kind: "HtmlContent", name: "episodeDescription", onLinkClick: "doOpenInBrowser", flex: 1}
 		]},
 		{kind: "ProgressSlider", name: "playSlider", style: "margin: 10px;", onmousedown: "seekTap", onChanging: "seeking", onChange: "seek"},
@@ -64,6 +64,7 @@ enyo.kind({
 		this.inherited(arguments);
 		
 		this.plays = false;
+		this.fullscreen = false;
 		this.player = this.$.video.node;
 		this.resumeTimes = [];
 		this.sliderInterval = setInterval(enyo.bind(this, this.updatePlaySlider), this.SLIDER_INTERVAL);
@@ -192,6 +193,7 @@ enyo.kind({
 		if (this.episode.equals(episode)) {
 			this.$.error.hide();
 			this.$.downloadButton.setCaption($L("Download failed"));
+			this.$.downloadButton.setDisabled(true);
 		}
 	},
 	
@@ -305,9 +307,9 @@ enyo.kind({
 		}
 	},
 	
-	showNextButton: function(playlistEmpty) {
-		if (playlistEmpty || this.smallInterface) this.$.nextButton.hide();
-		else this.$.nextButton.show();
+	showNextButton: function(show) {
+		if (show) this.$.nextButton.show();
+		else this.$.nextButton.hide();
 	},
 	
 	playbackEnded: function() {
@@ -336,22 +338,12 @@ enyo.kind({
 	},
 	
 	videoResize: function(width) {
-		var fullscreenMode;
-		
 		if (this.smallInterface)
-			fullscreenMode = width > 700 && this.isVideoContentAvailable();
-		else fullscreenMode = width > 1000 && this.isVideoContentAvailable();
+			this.fullscreen = width > 700 && this.isVideoContentAvailable();
+		else this.fullscreen = width > 1000 && this.isVideoContentAvailable();
 		
-		this.$.downloadManager.setAlwaysHide(fullscreenMode);
-		enyo.setFullScreen(fullscreenMode);
-		
-		if (fullscreenMode) {
-			this.$.downloadButton.hide();
-			this.$.episodeDescription.hide();
-		} else {
-			this.$.downloadButton.show();
-			this.$.episodeDescription.show();
-		}
+		enyo.setFullScreen(this.fullscreen);
+		this.updateInterface();
 		
 		this.$.episodeScroller.scrollTo(0, 0);
 	},
@@ -359,7 +351,21 @@ enyo.kind({
 	adjustInterfaceSize: function(sender) {
 		this.smallInterface = enyo.getWindowOrientation() == "right" || enyo.getWindowOrientation() == "left";
 		
-		this.updatePlaytime();
+		this.updateInterface();
+		
+		if (! this.isAtEndOfPlayback()) this.updatePlaytime();
+	},
+	
+	updateInterface: function() {
+		this.$.downloadManager.setAlwaysHide(this.fullscreen && ! this.smallInterface);
+		
+		if (this.fullscreen && !this.smallInterface) {
+			this.$.downloadButton.hide();
+			this.$.episodeDescription.hide();
+		} else {
+			this.$.downloadButton.show();
+			this.$.episodeDescription.show();
+		}
 	},
 	
 	headsetStatusChanged: function(sender, response) {
@@ -455,7 +461,9 @@ enyo.kind({
 		if (episode.isDownloaded) this.$.downloadButton.setCaption($L("Delete from device"));
 		else if (this.$.downloadManager.isDownloading(episode)) this.$.downloadButton.setCaption($L("Cancel"));
 		else this.$.downloadButton.setCaption($L("Download"));
-				
+		
+		this.$.downloadButton.setDisabled(false);
+		
 		if (this.isVideoContentAvailable()) this.$.episodeName.setContent($L("Watching") + " \"" + episode.title + "\"");
 		else this.$.episodeName.setContent($L("Listen to") + " \"" + episode.title + "\"");
 		
