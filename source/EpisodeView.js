@@ -45,11 +45,11 @@ enyo.kind({
 		]},
 		{kind: "HtmlContent", name: "videoInfo", className: "info", onLinkClick: "doOpenInBrowser", showing: false, content: $L("This episode has video content. You might want to give <a href=\"http://developer.palm.com/appredirect/?packageid=net.alliknow.videocatcher\">Video PodCatcher Deluxe</a> a try.")},
 		{kind: "Sound", audioClass: "media"},
-		{kind: "Button", name: "downloadButton", caption: $L("Download"), onclick: "startStopDelete"},
+		{kind: "Button", name: "downloadButton", caption: $L("Download"), onclick: "startStopDelete", style: "margin: 5px 10px"},
 		{kind: "Net.Alliknow.PodCatcher.DownloadManager", name: "downloadManager", style: "display: block;", onStatusUpdate: "downloadStatusUpdate", 
 			onDownloadComplete: "downloadComplete", onCancelSuccess: "cancelSuccess", onDownloadFailed: "downloadFailed"},
 		{name: "error", showing: false, className: "error"},
-		{kind: "Scroller", name: "episodeScroller", flex: 1, style: "margin: 5px 12px", components: [
+		{kind: "Scroller", name: "episodeScroller", flex: 1, style: "margin: 0px 12px 5px", components: [
 			{kind: "HtmlContent", name: "episodeDescription", onLinkClick: "doOpenInBrowser", flex: 1}
 		]},
 		{kind: "ProgressSlider", name: "playSlider", style: "margin: 10px;", onmousedown: "seekTap", onChanging: "seeking", onChange: "seek"},
@@ -65,6 +65,7 @@ enyo.kind({
 		
 		this.plays = false;
 		this.player = this.$.sound.audio;
+
 		this.resumeTimes = [];
 		this.sliderInterval = setInterval(enyo.bind(this, this.updatePlaySlider), this.SLIDER_INTERVAL);
 		//this.videoInterval = setInterval(enyo.bind(this, this.updateVideoMode), 1000);
@@ -185,6 +186,7 @@ enyo.kind({
 		if (this.episode.equals(episode)) {
 			this.$.error.hide();
 			this.$.downloadButton.setCaption($L("Download failed"));
+			this.$.downloadButton.setDisabled(true);
 		}
 	},
 	
@@ -287,9 +289,9 @@ enyo.kind({
 		else this.$.videoInfo.hide();
 	},
 	
-	showNextButton: function(playlistEmpty) {
-		if (playlistEmpty || this.smallInterface) this.$.nextButton.hide();
-		else this.$.nextButton.show();
+	showNextButton: function(show) {
+		if (show) this.$.nextButton.show();
+		else this.$.nextButton.hide();
 	},
 	
 	playbackEnded: function() {
@@ -318,7 +320,21 @@ enyo.kind({
 	adjustInterfaceSize: function(sender) {
 		this.smallInterface = enyo.getWindowOrientation() == "right" || enyo.getWindowOrientation() == "left";
 		
-		this.updatePlaytime();
+		this.updateInterface();
+		
+		if (! this.isAtEndOfPlayback()) this.updatePlaytime();
+	},
+	
+	updateInterface: function() {
+		this.$.downloadManager.setAlwaysHide(this.fullscreen && ! this.smallInterface);
+		
+		if (this.fullscreen && !this.smallInterface) {
+			this.$.downloadButton.hide();
+			this.$.episodeDescription.hide();
+		} else {
+			this.$.downloadButton.show();
+			this.$.episodeDescription.show();
+		}
 	},
 	
 	headsetStatusChanged: function(sender, response) {
@@ -407,8 +423,9 @@ enyo.kind({
 		else if (this.$.downloadManager.isDownloading(episode)) this.$.downloadButton.setCaption($L("Cancel"));
 		else this.$.downloadButton.setCaption($L("Download"));
 
+		this.$.downloadButton.setDisabled(false);
 		this.$.episodeName.setContent($L("Listen to") + " \"" + episode.title + "\"");
-
+		
 		this.$.episodeDescription.setContent(episode.description);
 		this.$.episodeScroller.scrollTo(0, 0);
 		this.$.playSlider.setPosition(0);

@@ -35,7 +35,7 @@ enyo.kind({
 		{kind: "ApplicationEvents", onUnload: "cancelAll"},
 		{kind: "Net.Alliknow.PodCatcher.DownloadManagerPopup", name: "downloadManagerPopup", onCancel: "cancelFromPopup"},
 		{kind: "HFlexBox", name: "progressUI", align: "center", components: [
-			{kind: "ProgressBar", name: "bar", style: "margin: 10px;", maximum: 100, position: 0, flex: 1},
+			{kind: "ProgressBar", name: "bar", style: "margin: 10px 12px;", maximum: 100, position: 0, flex: 1},
 			{kind: "Button", name: "downloadCount", content: "0", style: "margin-right: 10px;", onclick: "showPopup"}
 		]}
 	],
@@ -69,13 +69,15 @@ enyo.kind({
 			episode.amountReceived = response.amountReceived;
 			episode.amountTotal = response.amountTotal;
 			
-			if (response.completed) {
+			if (response.completed && episode.amountReceived > 0) {
 				this.log("Completed download for ticket: " + episode.ticket);
 				episode.setDownloaded(true, response.target);
 				
 				this.doDownloadComplete(episode, response);
 				this.removeFromActive(episode);
-			} else this.doStatusUpdate(episode, Utilities.formatDownloadStatus(response));
+			} 
+			else if (response.completed) this.downloadFail(sender, response);
+			else this.doStatusUpdate(episode, Utilities.formatDownloadStatus(response));
 			
 			this.updateProgress();	
 		}
@@ -124,6 +126,7 @@ enyo.kind({
 		this.removeFromActive(episode);
 		this.updateProgress();
 		
+		this.deleteDownload(episode);
 		this.genericFail(sender, response);
 	},
 	
