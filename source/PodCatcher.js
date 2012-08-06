@@ -22,7 +22,7 @@
 enyo.kind({
 	name: "Net.Alliknow.PodCatcher",
 	kind: "VFlexBox",
-	APP: "http://developer.palm.com/appredirect/?packageid=net.alliknow.videocatcher",
+	APP: "http://developer.palm.com/appredirect/?packageid=net.alliknow.podcatcher",
 	HOME_PAGE: "http://www.podcatcher-deluxe.com",
 	HELP_PAGE: "http://www.podcatcher-deluxe.com/manual",
 	AUTO_UPDATE_INTERVAL: 30 * 60 * 1000,
