@@ -24,6 +24,7 @@ enyo.kind({
 	kind: "VFlexBox",
 	VIDEOCATCHER: "http://developer.palm.com/appredirect/?packageid=net.alliknow.videocatcher",
 	PODCATCHER: "http://developer.palm.com/appredirect/?packageid=net.alliknow.podcatcher",
+	APP: "http://developer.palm.com/appredirect/?packageid=net.alliknow.yaspc",
 	HOME_PAGE: "http://www.podcatcher-deluxe.com",
 	HELP_PAGE: "http://www.podcatcher-deluxe.com/manual",
 	AUTO_UPDATE_INTERVAL: 30 * 60 * 1000,
@@ -37,7 +38,8 @@ enyo.kind({
 				{kind: "AppMenuItem", caption: $L("Audio"), onclick: "openDeluxe"}
 			]},
 			{kind: "AppMenuItem", caption: $L("Help"), onclick: "openHelp"},
-			{kind: "AppMenuItem", caption: $L("About"), onclick: "openAbout"}
+			{kind: "AppMenuItem", caption: $L("About"), onclick: "openAbout"},
+			{kind: "AppMenuItem", caption: $L("Review"), onclick: "openReview"}
 		]},
 		{kind: "Dashboard", name: "dashboard", smallIcon: "icons/icon48.png", onTap: "togglePlay"},
 		{kind: "SlidingPane", flex: 1, components: [
@@ -84,6 +86,10 @@ enyo.kind({
 		this.openInBrowser(this, this.HELP_PAGE);
 	},
 	
+	openReview: function() {
+		this.openInBrowser(this, this.APP);
+	},
+		
 	prepareLoad: function(sender) {
 		this.$.episodeListPane.prepareLoad();
 	},
