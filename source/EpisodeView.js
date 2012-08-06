@@ -287,9 +287,9 @@ enyo.kind({
 		else this.$.videoInfo.hide();
 	},
 	
-	playlistChanged: function(newLength) {
-		if (newLength > 0 && !this.smallInterface) this.$.nextButton.show();
-		else this.$.nextButton.hide();
+	showNextButton: function(playlistEmpty) {
+		if (playlistEmpty || this.smallInterface) this.$.nextButton.hide();
+		else this.$.nextButton.show();
 	},
 	
 	playbackEnded: function() {
@@ -319,7 +319,6 @@ enyo.kind({
 		this.smallInterface = enyo.getWindowOrientation() == "right" || enyo.getWindowOrientation() == "left";
 		
 		this.updatePlaytime();
-		if (this.smallInterface) this.$.nextButton.hide();
 	},
 	
 	headsetStatusChanged: function(sender, response) {
