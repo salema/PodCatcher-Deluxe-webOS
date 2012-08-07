@@ -320,21 +320,7 @@ enyo.kind({
 	adjustInterfaceSize: function(sender) {
 		this.smallInterface = enyo.getWindowOrientation() == "right" || enyo.getWindowOrientation() == "left";
 		
-		this.updateInterface();
-		
 		if (! this.isAtEndOfPlayback()) this.updatePlaytime();
-	},
-	
-	updateInterface: function() {
-		this.$.downloadManager.setAlwaysHide(this.fullscreen && ! this.smallInterface);
-		
-		if (this.fullscreen && !this.smallInterface) {
-			this.$.downloadButton.hide();
-			this.$.episodeDescription.hide();
-		} else {
-			this.$.downloadButton.show();
-			this.$.episodeDescription.show();
-		}
 	},
 	
 	headsetStatusChanged: function(sender, response) {
